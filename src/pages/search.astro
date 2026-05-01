@@ -1,0 +1,103 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import SearchBar from '../components/SearchBar.astro';
+import { getCollection } from 'astro:content';
+import { visiblePosts } from '../lib/posts';
+
+const posts = visiblePosts(await getCollection('posts'));
+---
+
+<BaseLayout title="搜索 | s1oop's Blog">
+  <section class="ui-page archive-page search-page">
+    <PageHeader
+      eyebrow="site search"
+      title="搜索"
+      description="从标题、主题和正文里回找文章。"
+    />
+
+    <div class="search-layout ui-page-body">
+      <section class="search-console" aria-label="站内搜索">
+        <SearchBar />
+        <div class="search-console-foot">
+          <p id="search-status" class="search-status">输入后显示匹配文章。</p>
+          <span>{posts.length} 篇文章 / 标题 / 主题 / 正文</span>
+        </div>
+      </section>
+
+      <div id="search-results" class="search-results ui-stagger grid gap-5"></div>
+    </div>
+  </section>
+
+  <script is:inline>
+    const form = document.querySelector('form[action="/search"]');
+    const input = document.querySelector('#q');
+    const results = document.querySelector('#search-results');
+    const status = document.querySelector('#search-status');
+    let index = [];
+
+    const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    }[character]));
+
+    const renderResult = (post) => `
+      <article class="post-card ui-panel ui-panel-link">
+        <a href="${escapeHtml(post.href)}" class="post-card-link">
+          <div class="post-card-media">
+            ${post.image ? `<img src="${escapeHtml(post.image.src)}" alt="${escapeHtml(post.image.alt)}" loading="lazy" decoding="async" />` : '<span aria-hidden="true"></span>'}
+            <time>${new Date(post.date).toLocaleDateString('zh-CN')}</time>
+          </div>
+          <div class="post-card-main">
+            <div class="post-card-meta">
+              ${post.tags.map((tag) => `<span class="ui-badge">#${escapeHtml(tag)}</span>`).join('')}
+            </div>
+            <h2 class="post-card-title">${escapeHtml(post.title)}</h2>
+            <p class="post-card-excerpt">${escapeHtml(post.excerpt)}</p>
+            <div class="post-card-action"><span>阅读文章</span><span aria-hidden="true">-&gt;</span></div>
+          </div>
+        </a>
+      </article>
+    `;
+
+    const renderSearch = () => {
+      const keyword = input?.value?.trim().toLowerCase() ?? '';
+
+      if (!keyword) {
+        if (status) status.textContent = '输入后显示匹配文章。';
+        if (results) results.innerHTML = '';
+        return;
+      }
+
+      const matched = index.filter((post) => {
+        const haystack = [post.title, post.excerpt, post.body, post.tags.join(' ')].join(' ').toLowerCase();
+        return haystack.includes(keyword);
+      });
+
+      if (status) status.textContent = `找到 ${matched.length} 篇相关文章。`;
+      if (results) results.innerHTML = matched.map(renderResult).join('') || '<div class="search-empty"><p class="ui-eyebrow">empty</p><p>没有匹配结果。可以换一个关键词，或从全部文章继续浏览。</p></div>';
+    };
+
+    fetch('/search-index.json')
+      .then((response) => response.json())
+      .then((data) => {
+        index = data;
+        const query = new URLSearchParams(window.location.search).get('q')?.trim() ?? '';
+        if (query && input) input.value = query;
+        renderSearch();
+      })
+      .catch(() => {
+        if (status) status.textContent = '搜索暂时不可用。';
+      });
+
+    form?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      renderSearch();
+    });
+
+    input?.addEventListener('input', renderSearch);
+  </script>
+</BaseLayout>

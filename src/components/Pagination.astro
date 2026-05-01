@@ -1,0 +1,44 @@
+---
+interface Props {
+  currentPage: number;
+  totalPages: number;
+  baseHref: string;
+}
+
+const { currentPage, totalPages, baseHref } = Astro.props;
+
+const hrefForPage = (page: number) => (page === 1 ? baseHref : `${baseHref}/${page}`);
+const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
+---
+
+{totalPages > 1 && (
+  <nav class="ui-pagination" aria-label="分页">
+    <a
+      class:list={['ui-page-step', currentPage <= 1 && 'is-disabled']}
+      href={currentPage > 1 ? hrefForPage(currentPage - 1) : undefined}
+      aria-disabled={currentPage <= 1 ? 'true' : undefined}
+    >
+      上一页
+    </a>
+
+    <div class="ui-page-numbers">
+      {pages.map((page) => (
+        <a
+          class:list={['ui-page-number', page === currentPage && 'is-active']}
+          href={hrefForPage(page)}
+          aria-current={page === currentPage ? 'page' : undefined}
+        >
+          {page}
+        </a>
+      ))}
+    </div>
+
+    <a
+      class:list={['ui-page-step', currentPage >= totalPages && 'is-disabled']}
+      href={currentPage < totalPages ? hrefForPage(currentPage + 1) : undefined}
+      aria-disabled={currentPage >= totalPages ? 'true' : undefined}
+    >
+      下一页
+    </a>
+  </nav>
+)}

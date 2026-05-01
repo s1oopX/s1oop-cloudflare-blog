@@ -1,0 +1,45 @@
+---
+interface Props {
+  title: string;
+  excerpt: string;
+  href: string;
+  date?: Date | string;
+  tags?: string[];
+  image?: {
+    src: string;
+    alt: string;
+  } | null;
+}
+
+const { title, excerpt, href, date, tags = [], image = null } = Astro.props;
+const displayDate = date instanceof Date
+  ? new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(date)
+  : date;
+---
+
+<article class="post-card ui-panel ui-panel-link">
+  <a href={href} class="post-card-link">
+    <div class="post-card-media">
+      {image && (
+        <img src={image.src} alt={image.alt} loading="lazy" decoding="async" />
+      )}
+      {!image && <span aria-hidden="true"></span>}
+      <time>{displayDate}</time>
+    </div>
+    <div class="post-card-main">
+      <div class="post-card-meta">
+        {tags.map((tag) => (
+          <span class="ui-badge">
+            #{tag}
+          </span>
+        ))}
+      </div>
+      <h2 class="post-card-title">{title}</h2>
+      <p class="post-card-excerpt">{excerpt}</p>
+      <div class="post-card-action">
+        <span>阅读文章</span>
+        <span aria-hidden="true">-&gt;</span>
+      </div>
+    </div>
+  </a>
+</article>

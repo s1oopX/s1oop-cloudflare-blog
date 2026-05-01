@@ -1,0 +1,39 @@
+---
+const navItems = [
+  { href: '/blog', label: '最近', match: (path: string) => path === '/blog' || (path.startsWith('/blog/') && !path.startsWith('/blog/archive')) },
+  { href: '/blog/archive', label: '全部', match: (path: string) => path === '/blog/archive' || path.startsWith('/blog/archive/') },
+  { href: '/collections', label: '专栏' },
+  { href: '/search', label: '搜索' },
+  { href: '/about', label: '关于' },
+];
+
+const pathname = Astro.url.pathname;
+const isNavActive = (item: typeof navItems[number]) => item.match
+  ? item.match(pathname)
+  : pathname === item.href || pathname.startsWith(`${item.href}/`);
+---
+
+<header class="site-header">
+  <nav class="page-shell flex h-16 items-center justify-between">
+    <a href="/" class="site-brand" aria-label="返回 s1oop's Blog 首页">
+      <span class="site-brand-avatar">
+        <img src="/images/avatar.jpg" alt="" width="40" height="40" loading="eager" decoding="async" />
+      </span>
+      <span class="site-brand-name">s1oop's Blog</span>
+    </a>
+    <div class="site-nav-group">
+      {navItems.map((item) => (
+        <a
+          href={item.href}
+          class:list={[
+            'site-nav-link',
+            isNavActive(item) ? 'site-nav-link-active' : '',
+          ]}
+          aria-current={isNavActive(item) ? 'page' : undefined}
+        >
+          {item.label}
+        </a>
+      ))}
+    </div>
+  </nav>
+</header>

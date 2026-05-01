@@ -1,0 +1,23 @@
+---
+interface Props {
+  eyebrow: string;
+  title: string;
+  description: string;
+}
+
+const { eyebrow, title, description } = Astro.props;
+const hasActions = Astro.slots.has('actions');
+---
+
+<div class:list={['ui-page-head', hasActions && 'ui-page-head-actions']}>
+  <div class="ui-page-head-copy">
+    <p class="ui-eyebrow">{eyebrow}</p>
+    <h1 class="ui-title">{title}</h1>
+    <p class="ui-description">{description}</p>
+  </div>
+  {hasActions && (
+    <div class="ui-page-actions">
+      <slot name="actions" />
+    </div>
+  )}
+</div>

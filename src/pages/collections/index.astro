@@ -1,0 +1,47 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import { collectionHref, collections, postsForCollection } from '../../lib/collections';
+import { postHref, postImage, visiblePosts } from '../../lib/posts';
+
+const posts = visiblePosts(await getCollection('posts'));
+---
+
+<BaseLayout title="专栏 | s1oop's Blog">
+  <section class="ui-page archive-page">
+    <PageHeader
+      eyebrow="curated paths"
+      title="专栏"
+      description="按阅读意图整理的内容路线。你可以从一个主题开始，连续读下去。"
+    />
+
+    <div class="collection-grid ui-page-body ui-stagger">
+      {collections.map((collection) => {
+        const collectionPosts = postsForCollection(collection, posts);
+        const leadPost = collectionPosts[0];
+        const image = leadPost ? postImage(leadPost) : null;
+
+        return (
+          <a href={collectionHref(collection)} class="collection-card ui-panel ui-panel-link no-underline">
+            {image && (
+              <div class="collection-card-image">
+                <img src={image.src} alt={image.alt} loading="lazy" decoding="async" />
+              </div>
+            )}
+            <div class="collection-card-body">
+              <p class="ui-eyebrow">{collection.eyebrow}</p>
+              <h2>{collection.title}</h2>
+              <p>{collection.description}</p>
+              <div class="collection-card-list">
+                {collectionPosts.slice(0, 3).map((post) => (
+                  <span>{post.data.title}</span>
+                ))}
+              </div>
+            </div>
+          </a>
+        );
+      })}
+    </div>
+  </section>
+</BaseLayout>

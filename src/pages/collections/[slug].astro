@@ -1,0 +1,86 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import Pagination from '../../components/Pagination.astro';
+import PostCard from '../../components/PostCard.astro';
+import { collectionBySlug, collections, postsForCollection } from '../../lib/collections';
+import { POSTS_PER_PAGE, formatPostDate, pageCount, pageItems, postExcerpt, postHref, postImage, visiblePosts } from '../../lib/posts';
+
+export function getStaticPaths() {
+  return collections.map((collection) => ({ params: { slug: collection.slug } }));
+}
+
+const { slug } = Astro.params;
+const collection = collectionBySlug(slug);
+if (!collection) throw new Error(`Collection not found: ${slug}`);
+
+const posts = visiblePosts(await getCollection('posts'));
+const collectionPosts = postsForCollection(collection, posts);
+const currentPage = 1;
+const totalPages = pageCount(collectionPosts, POSTS_PER_PAGE);
+const paginatedPosts = pageItems(collectionPosts, currentPage, POSTS_PER_PAGE);
+const otherCollections = collections.filter((item) => item.slug !== collection.slug);
+---
+
+<BaseLayout title={`${collection.title} | s1oop's Blog`}>
+  <section class="ui-page archive-page">
+    <PageHeader
+      eyebrow={collection.eyebrow}
+      title={collection.title}
+      description={collection.description}
+    >
+      <Fragment slot="actions">
+        <a class="ui-button" href="/collections">全部专栏</a>
+      </Fragment>
+    </PageHeader>
+
+    <div class="ui-grid ui-page-body">
+      <div class="ui-stack ui-stagger">
+        {paginatedPosts.map((post) => (
+          <PostCard
+            title={post.data.title}
+            excerpt={postExcerpt(post)}
+            href={postHref(post)}
+            date={formatPostDate(post.data.date)}
+            tags={post.data.tags}
+            image={postImage(post)}
+          />
+        ))}
+        <Pagination currentPage={currentPage} totalPages={totalPages} baseHref={`/collections/${collection.slug}`} />
+      </div>
+
+      <aside class="ui-sidebar ui-stagger">
+        <section class="ui-panel">
+          <div class="ui-panel-header">
+            <h2 class="text-sm font-medium text-white">阅读说明</h2>
+          </div>
+          <div class="ui-panel-body grid gap-4">
+            <p class="text-sm leading-6 text-zinc-400">{collection.description}</p>
+            <div class="ui-stat-row">
+              <span class="ui-stat-label">文章</span>
+              <span class="ui-stat-value">{collectionPosts.length}</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="ui-panel">
+          <div class="ui-panel-header">
+            <h2 class="text-sm font-medium text-white">继续选择</h2>
+          </div>
+          <div class="ui-panel-body grid gap-3">
+            {otherCollections.map((item) => (
+              <a href={`/collections/${item.slug}`} class="ui-hover-accent text-sm leading-6 text-zinc-300 no-underline">
+                {item.title}
+              </a>
+            ))}
+            {otherCollections.length === 0 && (
+              <p class="text-sm text-zinc-400">暂无其他专栏。</p>
+            )}
+          </div>
+        </section>
+
+      </aside>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,90 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageHeader from '../../../components/PageHeader.astro';
+import Pagination from '../../../components/Pagination.astro';
+import PostCard from '../../../components/PostCard.astro';
+import { getCollection } from 'astro:content';
+import { POSTS_PER_PAGE, collectTags, formatPostDate, pageCount, pageItems, postExcerpt, postHref, postImage, visiblePosts } from '../../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = visiblePosts(await getCollection('posts'));
+  const tags = collectTags(posts);
+
+  return tags.flatMap((tag) => {
+    const taggedPosts = posts.filter((post) => post.data.tags.some((item) => item.toLowerCase() === tag.toLowerCase()));
+    const totalPages = pageCount(taggedPosts, POSTS_PER_PAGE);
+
+    return Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) => ({
+      params: { tag: tag.toLowerCase(), page: String(index + 2) },
+    }));
+  });
+}
+
+const { tag } = Astro.params;
+const posts = visiblePosts(await getCollection('posts'));
+const taggedPosts = posts.filter((post) => post.data.tags.some((item) => item.toLowerCase() === tag));
+const currentPage = Number(Astro.params.page);
+const totalPages = pageCount(taggedPosts, POSTS_PER_PAGE);
+const paginatedPosts = pageItems(taggedPosts, currentPage, POSTS_PER_PAGE);
+---
+
+<BaseLayout title={`#${tag} · 第 ${currentPage} 页 | s1oop's Blog`}>
+  <section class="ui-page archive-page">
+    <PageHeader
+      eyebrow="tag archive"
+      title={`#${tag}`}
+      description={`该标签下共有 ${taggedPosts.length} 篇文章。`}
+    >
+      <Fragment slot="actions">
+        <a class="ui-button" href="/tags">全部主题</a>
+      </Fragment>
+    </PageHeader>
+
+    <div class="ui-grid ui-page-body">
+      <div class="ui-stagger grid gap-5">
+        {paginatedPosts.map((post) => (
+          <PostCard
+            title={post.data.title}
+            excerpt={postExcerpt(post)}
+            href={postHref(post)}
+            date={formatPostDate(post.data.date)}
+            tags={post.data.tags}
+            image={postImage(post)}
+          />
+        ))}
+        <Pagination currentPage={currentPage} totalPages={totalPages} baseHref={`/tags/${tag}`} />
+      </div>
+
+      <aside class="ui-sidebar ui-stagger">
+        <section class="ui-panel">
+          <div class="ui-panel-header">
+            <h2 class="text-sm font-medium text-white">当前主题</h2>
+          </div>
+          <div class="ui-panel-body grid gap-4">
+            <div class="ui-stat-row">
+              <span class="ui-stat-label">主题</span>
+              <span class="ui-stat-value">#{tag}</span>
+            </div>
+            <div class="ui-stat-row">
+              <span class="ui-stat-label">文章</span>
+              <span class="ui-stat-value">{taggedPosts.length}</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="ui-panel">
+          <div class="ui-panel-header">
+            <h2 class="text-sm font-medium text-white">全部主题</h2>
+          </div>
+          <div class="ui-panel-body flex flex-wrap gap-2">
+            {collectTags(posts).map((item) => (
+              <a class="ui-badge no-underline hover:text-white" href={`/tags/${item.toLowerCase()}`}>
+                #{item}
+              </a>
+            ))}
+          </div>
+        </section>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>

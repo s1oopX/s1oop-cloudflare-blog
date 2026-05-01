@@ -1,0 +1,72 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageHeader from '../../../components/PageHeader.astro';
+import Pagination from '../../../components/Pagination.astro';
+import PostCard from '../../../components/PostCard.astro';
+import { POSTS_PER_PAGE, collectTags, formatPostDate, pageCount, pageItems, postExcerpt, postHref, postImage, visiblePosts } from '../../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = visiblePosts(await getCollection('posts'));
+  const totalPages = pageCount(posts, POSTS_PER_PAGE);
+
+  return Array.from({ length: Math.max(0, totalPages - 1) }, (_, index) => ({
+    params: { page: String(index + 2) },
+  }));
+}
+
+const posts = visiblePosts(await getCollection('posts'));
+const tags = collectTags(posts);
+const latestPost = posts[0];
+const currentPage = Number(Astro.params.page);
+const totalPages = pageCount(posts, POSTS_PER_PAGE);
+const paginatedPosts = pageItems(posts, currentPage, POSTS_PER_PAGE);
+---
+
+<BaseLayout title={`全部文章 · 第 ${currentPage} 页 | s1oop's Blog`}>
+  <section class="ui-page archive-page">
+    <PageHeader
+      eyebrow="full archive"
+      title="全部文章"
+      description="所有已经整理好的文章都保留在这里，适合回找旧内容。"
+    />
+
+    <div class="ui-grid ui-page-body">
+      <div class="ui-stack ui-stagger">
+        {paginatedPosts.map((post) => (
+          <PostCard
+            title={post.data.title}
+            excerpt={postExcerpt(post)}
+            href={postHref(post)}
+            date={formatPostDate(post.data.date)}
+            tags={post.data.tags}
+            image={postImage(post)}
+          />
+        ))}
+        <Pagination currentPage={currentPage} totalPages={totalPages} baseHref="/blog/archive" />
+      </div>
+
+      <aside class="ui-sidebar ui-stagger">
+        <section class="ui-panel">
+          <div class="ui-panel-header">
+            <h2 class="text-sm font-medium text-white">阅读概览</h2>
+          </div>
+          <div class="ui-panel-body grid gap-4">
+            <div class="ui-stat-row">
+              <span class="ui-stat-label">文章</span>
+              <span class="ui-stat-value">{posts.length}</span>
+            </div>
+            <div class="ui-stat-row">
+              <span class="ui-stat-label">标签</span>
+              <span class="ui-stat-value">{tags.length}</span>
+            </div>
+            <div class="ui-stat-row">
+              <span class="ui-stat-label">最新</span>
+              <span class="ui-stat-value">{latestPost ? formatPostDate(latestPost.data.date) : '-'}</span>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>

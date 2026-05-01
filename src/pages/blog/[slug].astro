@@ -1,0 +1,178 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Comments from '../../components/Comments.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import { getCollection, render } from 'astro:content';
+import { formatPostDate, postHref, postReadingStats, postSlug, relatedPostsFor, visiblePosts } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = visiblePosts(await getCollection('posts'));
+  return posts.map((post) => ({
+    params: { slug: postSlug(post) },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const posts = visiblePosts(await getCollection('posts'));
+const relatedPosts = relatedPostsFor(post, posts);
+const readingStats = postReadingStats(post);
+---
+
+<BaseLayout title={`${post.data.title} | s1oop's Blog`}>
+  <article class="ui-page reading-page">
+    <PageHeader
+      eyebrow={formatPostDate(post.data.date)}
+      title={post.data.title}
+      description={post.data.excerpt}
+    >
+      <Fragment slot="actions">
+        <a href="/blog" class="ui-button">最近</a>
+      </Fragment>
+    </PageHeader>
+
+    <div class="ui-grid ui-page-body">
+      <div class="ui-stack">
+        <div class="post-content reading-surface ui-panel p-6 sm:p-8">
+          <Content />
+        </div>
+
+        <Comments />
+      </div>
+
+      <aside class="ui-sidebar reading-sidebar ui-stagger">
+        <section class="ui-panel article-toc-panel" data-article-toc-panel>
+          <div class="ui-panel-header">
+            <h2 class="text-sm font-medium text-white">目录</h2>
+          </div>
+          <nav class="article-toc ui-panel-body" data-article-toc aria-label="文章目录">
+            <p class="article-toc-empty">正在读取文章结构。</p>
+          </nav>
+        </section>
+
+        <section class="ui-panel">
+          <div class="ui-panel-header">
+            <h2 class="text-sm font-medium text-white">文章信息</h2>
+          </div>
+          <div class="ui-panel-body grid gap-4">
+            <div class="ui-stat-row">
+              <span class="ui-stat-label">日期</span>
+              <span class="ui-stat-value">{formatPostDate(post.data.date)}</span>
+            </div>
+            <div class="ui-stat-row">
+              <span class="ui-stat-label">类型</span>
+              <span class="ui-stat-value">文章</span>
+            </div>
+            <div class="ui-stat-row">
+              <span class="ui-stat-label">字数</span>
+              <span class="ui-stat-value">约 {readingStats.wordCount} 字</span>
+            </div>
+            <div class="ui-stat-row">
+              <span class="ui-stat-label">阅读</span>
+              <span class="ui-stat-value">{readingStats.readingMinutes} 分钟</span>
+            </div>
+            <div class="grid gap-2 border-t border-white/10 pt-4">
+              <span class="ui-stat-label">标签</span>
+              <div class="flex flex-wrap gap-2">
+                {post.data.tags.map((tag) => (
+                  <a href={`/tags/${tag.toLowerCase()}`} class="ui-badge no-underline hover:text-white">
+                    #{tag}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="ui-panel">
+          <div class="ui-panel-header">
+            <h2 class="text-sm font-medium text-white">继续阅读</h2>
+          </div>
+          <div class="ui-panel-body grid gap-3">
+            {relatedPosts.map((item) => (
+              <a href={postHref(item)} class="ui-hover-accent text-sm leading-6 text-zinc-300 no-underline">
+                {item.data.title}
+              </a>
+            ))}
+            {relatedPosts.length === 0 && (
+              <p class="text-sm text-zinc-400">暂无其他文章。</p>
+            )}
+          </div>
+        </section>
+      </aside>
+    </div>
+  </article>
+
+  <script is:inline>
+    const slugifyHeading = (value) => value
+      .trim()
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}\s-]/gu, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      || 'section';
+
+    const content = document.querySelector('.post-content');
+    const toc = document.querySelector('[data-article-toc]');
+    const tocPanel = document.querySelector('[data-article-toc-panel]');
+    const headings = Array.from(content?.querySelectorAll('h2, h3') ?? []);
+
+    if (toc && tocPanel) {
+      if (!headings.length) {
+        tocPanel.hidden = true;
+      } else {
+        const usedIds = new Map();
+        toc.innerHTML = headings.map((heading, index) => {
+          const baseId = heading.id || slugifyHeading(heading.textContent || '');
+          const count = usedIds.get(baseId) ?? 0;
+          const id = count ? `${baseId}-${count + 1}` : baseId;
+          usedIds.set(baseId, count + 1);
+          heading.id = id;
+
+          const depth = heading.tagName === 'H3' ? 'is-depth-3' : 'is-depth-2';
+          const marker = heading.tagName === 'H3' ? '·' : String(index + 1).padStart(2, '0');
+          return `<a class="article-toc-link ${depth}" href="#${encodeURIComponent(id)}"><span class="article-toc-index">${marker}</span><span class="article-toc-text">${heading.textContent}</span></a>`;
+        }).join('');
+
+        const tocLinks = Array.from(toc.querySelectorAll('.article-toc-link'));
+        const byId = new Map(tocLinks.map((link) => [decodeURIComponent(link.getAttribute('href')?.slice(1) || ''), link]));
+
+        const setActive = (id) => {
+          tocLinks.forEach((link) => link.classList.toggle('is-active', link === byId.get(id)));
+        };
+
+        const updateActiveHeading = () => {
+          const anchorOffset = 86;
+          const activeHeading = headings.reduce((current, heading) => {
+            const top = heading.getBoundingClientRect().top;
+            return top <= anchorOffset ? heading : current;
+          }, headings[0]);
+
+          if (activeHeading?.id) setActive(activeHeading.id);
+        };
+
+        let ticking = false;
+        const requestActiveHeadingUpdate = () => {
+          if (ticking) return;
+          ticking = true;
+          window.requestAnimationFrame(() => {
+            updateActiveHeading();
+            ticking = false;
+          });
+        };
+
+        updateActiveHeading();
+        window.addEventListener('scroll', requestActiveHeadingUpdate, { passive: true });
+        window.addEventListener('resize', requestActiveHeadingUpdate);
+
+        tocLinks.forEach((link) => {
+          link.addEventListener('click', () => {
+            const id = decodeURIComponent(link.getAttribute('href')?.slice(1) || '');
+            if (id) window.setTimeout(() => setActive(id), 40);
+          });
+        });
+      }
+    }
+  </script>
+</BaseLayout>

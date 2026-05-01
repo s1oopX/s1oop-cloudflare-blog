@@ -1,0 +1,85 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+
+const records = [
+  {
+    date: '2026/04/30',
+    label: 'reading order',
+    title: '入口被重新收束。',
+    summary: '最近、全部、专栏、搜索和关于被固定为主要入口。读者不需要理解站内结构，只需要选择时间、主题或关键词。',
+    notes: [
+      '最近只呈现短期内的新内容',
+      '全部文章保留完整脉络',
+      '专栏承担连续阅读路线',
+    ],
+  },
+  {
+    date: '2026/04/30',
+    label: 'reading surface',
+    title: '文章页开始服务长时间停留。',
+    summary: '目录、文章信息和继续阅读被放回阅读场景里。页面不追求热闹，而是让一篇文章能被安静读完，也能继续接到下一篇。',
+    notes: [
+      '长文目录辅助跳转',
+      '日期、字数和阅读时间保留判断依据',
+      '相近主题优先进入继续阅读',
+    ],
+  },
+  {
+    date: '2026/04/30',
+    label: 'visual system',
+    title: '视觉回到暗色档案气质。',
+    summary: '头像、图片、卡片和阅读页保持同一种克制感。图片负责给出内容线索，不抢走文章本身的位置。',
+    notes: [
+      '列表使用图文并置',
+      '图片统一降低饱和和亮度',
+      '暗色底版保持连续',
+    ],
+  },
+  {
+    date: '2026/04/29',
+    label: 'first layer',
+    title: '博客从可访问开始。',
+    summary: '第一批入口只解决一件事：让文章被找到、被读到、被重新打开。之后的整理都围绕这个基础继续收紧。',
+    notes: [
+      '最近文章可直接进入',
+      '主题索引连接相近内容',
+      '搜索用于回找具体片段',
+    ],
+  },
+];
+---
+
+<BaseLayout title="更新记录 | s1oop's Blog">
+  <section class="ui-page archive-page changelog-page">
+    <PageHeader
+      eyebrow="site updates"
+      title="更新记录"
+      description="只保留会改变阅读入口、内容秩序和视觉判断的节点。"
+    />
+
+    <div class="changelog-shell ui-page-body">
+      <div class="changelog-list ui-stagger">
+        {records.map((record, index) => (
+          <article class="changelog-entry ui-panel">
+            <span class="changelog-branch" aria-hidden="true"></span>
+            <div class="changelog-entry-index">
+              <span>{String(records.length - index).padStart(2, '0')}</span>
+              <time>{record.date}</time>
+            </div>
+            <div class="changelog-entry-main">
+              <p class="ui-eyebrow">{record.label}</p>
+              <h2>{record.title}</h2>
+              <p>{record.summary}</p>
+              <ul>
+                {record.notes.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

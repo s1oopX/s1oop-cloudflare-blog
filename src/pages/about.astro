@@ -1,0 +1,220 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+
+const readingRoutes = [
+  { href: '/blog', label: '最近文章' },
+  { href: '/collections', label: '专栏' },
+  { href: '/tags', label: '主题索引' },
+];
+
+const profileRows = [
+  { label: 'Runtime', value: 'Cloudflare' },
+  { label: 'Frontend', value: 'Astro' },
+  { label: 'Writing', value: 'Markdown' },
+];
+
+const architectureRows = [
+  {
+    index: '01',
+    label: 'Deployment',
+    title: '单 Cloudflare 部署',
+    copy:
+      '页面分发、接口响应和边缘计算收束在 Cloudflare 同一平台。外部看到的是轻和稳定，内部减少的是服务器维护、跨服务编排和无意义的运行层。',
+    pill: 'Cloudflare Pages / Cloudflare Workers / Edge',
+  },
+  {
+    index: '02',
+    label: 'Stack',
+    title: '文本优先的技术选型',
+    copy:
+      'Astro 负责生成前台，Markdown 保留内容源，Cloudflare Workers 承接轻接口。选型不追求“大而全”的后台，而是把内容、索引和交互拆到足够轻的层级里。',
+    pill: 'Astro / Cloudflare Workers / Markdown',
+  },
+  {
+    index: '03',
+    label: 'Style',
+    title: '暗色档案视觉',
+    copy:
+      '界面不模拟信息流，也不做作品集式陈列。深色基底、细线网格、低饱和光感和克制动效共同建立一种档案感，让文章保持主体位置。',
+    pill: 'Noir / Grid / Reading',
+  },
+];
+
+const stackPills = ['Cloudflare Pages', 'Cloudflare Workers', 'Astro', 'Markdown'];
+
+const principles = [
+  {
+    label: 'Archive',
+    title: '反信息流',
+    copy: '内容不追逐即时热度，保留能被重新打开、重新阅读的文本。',
+  },
+  {
+    label: 'Stack',
+    title: '反炫技',
+    copy: '技术栈不作为展品出现，只承担生成、索引、分发和维护的职责。',
+  },
+  {
+    label: 'Tone',
+    title: '反说明书',
+    copy: '私人博客不是产品文档，表达必须先成立，结构再为表达服务。',
+  },
+];
+
+const sideSignals = [
+  { label: 'Edge', value: 'Cloudflare' },
+  { label: 'Build', value: 'Astro Static' },
+  { label: 'Source', value: 'Markdown' },
+];
+---
+
+<BaseLayout
+  title="关于 | s1oop's Blog"
+  description="关于 s1oop's Blog：一个整理设计、写作、阅读和长期观察的私人博客。"
+>
+  <section class="ui-page archive-page about-page">
+    <PageHeader
+      eyebrow="about archive"
+      title="关于"
+      description="一个部署在 Cloudflare，由 Astro、Cloudflare Workers 与 Markdown 支撑的私人博客。"
+    />
+
+    <div class="ui-grid ui-page-body">
+      <div class="about-main">
+        <section class="about-manifest ui-panel">
+          <div class="about-manifest-kicker">
+            <p class="ui-eyebrow">cloudflare deployment / technical stack</p>
+            <span>edge-native archive</span>
+          </div>
+          <div class="about-priority-grid">
+            <div class="about-priority-block about-priority-deploy">
+              <p class="ui-eyebrow">deployment signature</p>
+              <h2>单 Cloudflare 部署</h2>
+              <p>
+                静态分发、轻接口和边缘执行被收束在 Cloudflare 同一平台。
+                这不是“服务器 + 博客程序”的传统组合，而是一条更短的发布与访问链路。
+              </p>
+            </div>
+            <div class="about-priority-block">
+              <p class="ui-eyebrow">technical stack</p>
+              <h2>技术栈</h2>
+              <div class="about-stack-strip" aria-label="技术栈">
+                {stackPills.map((item) => <span>{item}</span>)}
+              </div>
+            </div>
+          </div>
+          <div class="about-manifest-body">
+            <div class="about-manifest-note">
+              <p class="ui-eyebrow">deployment</p>
+              <h3>部署层先收束。</h3>
+              <ul>
+                <li>Pages 负责静态分发</li>
+                <li>Cloudflare Workers 承接轻量接口</li>
+                <li>访问链路落在边缘网络</li>
+              </ul>
+            </div>
+            <div class="about-manifest-note">
+              <p class="ui-eyebrow">technical selection</p>
+              <h3>技术层保持轻量。</h3>
+              <ul>
+                <li>Astro 生成前台</li>
+                <li>Markdown 保留内容源</li>
+                <li>索引与主题由元数据派生</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <section class="about-architecture ui-panel">
+          <div class="about-panel-head">
+            <p class="ui-eyebrow">architecture notes</p>
+            <h2>该博客的不同之处</h2>
+          </div>
+          <div class="about-dossier-grid">
+            {architectureRows.map((item) => (
+              <article class="about-dossier-card">
+                <div class="about-dossier-topline">
+                  <span class="about-row-index" aria-hidden="true">{item.index}</span>
+                  <span class="about-row-pill" aria-label={`${item.label}: ${item.pill}`}>{item.pill}</span>
+                </div>
+                <div class="about-row-copy">
+                  <p class="ui-eyebrow">{item.label}</p>
+                  <h3>{item.title}</h3>
+                  <p>{item.copy}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section class="about-principles ui-panel">
+          <div class="about-panel-head">
+            <p class="ui-eyebrow">editorial position</p>
+            <h2>写作立场</h2>
+          </div>
+          <div class="about-principle-list">
+            {principles.map((item) => (
+              <article>
+                <p class="ui-eyebrow">{item.label}</p>
+                <h3>{item.title}</h3>
+                <p>{item.copy}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <aside class="ui-sidebar ui-stagger" aria-label="博客说明">
+        <section class="about-profile ui-panel">
+          <div class="about-profile-head">
+            <img src="/images/avatar.jpg" alt="" width="128" height="128" loading="eager" decoding="async" />
+            <div>
+              <p class="ui-eyebrow">s1oop</p>
+              <h2>私人博客</h2>
+              <p>写作、阅读、设计判断和技术取舍的长期存放处。</p>
+            </div>
+          </div>
+          <dl class="about-profile-meta">
+            {profileRows.map((item) => (
+              <div>
+                <dt>{item.label}</dt>
+                <dd>{item.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+
+        <section class="about-signal-panel ui-panel">
+          <div class="ui-panel-header">
+            <p class="ui-eyebrow">system</p>
+            <h2 class="about-side-title">技术指纹</h2>
+          </div>
+          <div class="about-signal-list">
+            {sideSignals.map((item) => (
+              <div>
+                <span>{item.label}</span>
+                <strong>{item.value}</strong>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section class="about-routes-panel ui-panel">
+          <div class="ui-panel-header">
+            <p class="ui-eyebrow">routes</p>
+            <h2 class="about-side-title">阅读入口</h2>
+          </div>
+          <nav class="ui-panel-body about-route-list" aria-label="阅读入口">
+            {readingRoutes.map((item, index) => (
+              <a href={item.href}>
+                <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+                <strong>{item.label}</strong>
+                <span aria-hidden="true">-&gt;</span>
+              </a>
+            ))}
+          </nav>
+        </section>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>
