@@ -16,16 +16,51 @@ const posts = visiblePosts(await getCollection('posts'));
       description="从标题、主题和正文里回找文章。"
     />
 
-    <div class="search-layout ui-page-body">
-      <section class="search-console" aria-label="站内搜索">
-        <SearchBar />
-        <div class="search-console-foot">
-          <p id="search-status" class="search-status">输入后显示匹配文章。</p>
-          <span>{posts.length} 篇文章 / 标题 / 主题 / 正文</span>
-        </div>
-      </section>
+    <div class="ui-grid ui-page-body search-grid">
+      <div class="ui-stack ui-stagger">
+        <section class="ui-panel" aria-label="站内搜索">
+          <div class="ui-panel-body grid gap-4">
+            <SearchBar />
+            <div class="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4">
+              <p id="search-status" class="search-status">输入关键词后显示结果。</p>
+              <span class="font-mono text-[0.68rem] uppercase tracking-[0.12em] text-zinc-500">{posts.length} 篇文章 / 标题 / 主题 / 正文</span>
+            </div>
+          </div>
+        </section>
 
-      <div id="search-results" class="search-results ui-stagger grid gap-5"></div>
+        <div id="search-results" class="search-results ui-stagger grid gap-5"></div>
+      </div>
+
+      <aside class="ui-sidebar ui-stagger">
+        <section class="ui-panel">
+          <div class="ui-panel-header">
+            <h2 class="text-sm font-medium text-white">搜索概览</h2>
+          </div>
+          <div class="ui-panel-body grid gap-4">
+            <div class="ui-stat-row">
+              <span class="ui-stat-label">文章</span>
+              <span class="ui-stat-value">{posts.length}</span>
+            </div>
+            <div class="ui-stat-row">
+              <span class="ui-stat-label">范围</span>
+              <span class="ui-stat-value">标题 / 主题 / 正文</span>
+            </div>
+            <div class="ui-stat-row">
+              <span class="ui-stat-label">状态</span>
+              <span class="ui-stat-value" id="search-sidebar-state">请输入关键词</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="ui-panel">
+          <div class="ui-panel-header">
+            <h2 class="text-sm font-medium text-white">搜索说明</h2>
+          </div>
+          <div class="ui-panel-body">
+            <p class="text-sm leading-6 text-zinc-400">搜索结果和完整文章入口放在同一页面中，方便继续阅读。</p>
+          </div>
+        </section>
+      </aside>
     </div>
   </section>
 
@@ -34,6 +69,7 @@ const posts = visiblePosts(await getCollection('posts'));
     const input = document.querySelector('#q');
     const results = document.querySelector('#search-results');
     const status = document.querySelector('#search-status');
+    const sidebarState = document.querySelector('#search-sidebar-state');
     let index = [];
 
     const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
@@ -44,6 +80,25 @@ const posts = visiblePosts(await getCollection('posts'));
       "'": '&#39;',
     }[character]));
 
+    const renderTags = (tags = []) => {
+      const visibleTags = tags.slice(0, 2);
+      const extraTagCount = Math.max(0, tags.length - visibleTags.length);
+      const badges = visibleTags.map((tag) => `<span class="ui-badge">#${escapeHtml(tag)}</span>`).join('');
+      const extraBadge = extraTagCount > 0 ? `<span class="ui-badge">+${extraTagCount}</span>` : '';
+      return badges + extraBadge;
+    };
+
+    const renderEmpty = (eyebrow, message) => `
+      <article class="ui-panel">
+        <div class="ui-panel-header">
+          <p class="ui-eyebrow">${escapeHtml(eyebrow)}</p>
+        </div>
+        <div class="ui-panel-body">
+          <p class="text-sm leading-6 text-zinc-400">${escapeHtml(message)}</p>
+        </div>
+      </article>
+    `;
+
     const renderResult = (post) => `
       <article class="post-card ui-panel ui-panel-link">
         <a href="${escapeHtml(post.href)}" class="post-card-link">
@@ -53,7 +108,7 @@ const posts = visiblePosts(await getCollection('posts'));
           </div>
           <div class="post-card-main">
             <div class="post-card-meta">
-              ${post.tags.map((tag) => `<span class="ui-badge">#${escapeHtml(tag)}</span>`).join('')}
+              ${renderTags(post.tags)}
             </div>
             <h2 class="post-card-title">${escapeHtml(post.title)}</h2>
             <p class="post-card-excerpt">${escapeHtml(post.excerpt)}</p>
@@ -67,7 +122,8 @@ const posts = visiblePosts(await getCollection('posts'));
       const keyword = input?.value?.trim().toLowerCase() ?? '';
 
       if (!keyword) {
-        if (status) status.textContent = '输入后显示匹配文章。';
+        if (status) status.textContent = '输入关键词后显示结果。';
+        if (sidebarState) sidebarState.textContent = '请输入关键词';
         if (results) results.innerHTML = '';
         return;
       }
@@ -78,7 +134,8 @@ const posts = visiblePosts(await getCollection('posts'));
       });
 
       if (status) status.textContent = `找到 ${matched.length} 篇相关文章。`;
-      if (results) results.innerHTML = matched.map(renderResult).join('') || '<div class="search-empty"><p class="ui-eyebrow">empty</p><p>没有匹配结果。可以换一个关键词，或从全部文章继续浏览。</p></div>';
+      if (sidebarState) sidebarState.textContent = `${matched.length} 条结果`;
+      if (results) results.innerHTML = matched.map(renderResult).join('') || renderEmpty('没有结果', '没有找到匹配结果。可以换一个关键词，或从全部文章继续浏览。');
     };
 
     fetch('/search-index.json')
@@ -90,7 +147,9 @@ const posts = visiblePosts(await getCollection('posts'));
         renderSearch();
       })
       .catch(() => {
-        if (status) status.textContent = '搜索暂时不可用。';
+        if (status) status.textContent = '当前无法搜索。';
+        if (sidebarState) sidebarState.textContent = '暂不可用';
+        if (results) results.innerHTML = renderEmpty('搜索暂不可用', '搜索数据暂时无法读取。可以稍后再试，或从全部文章继续浏览。');
       });
 
     form?.addEventListener('submit', (event) => {

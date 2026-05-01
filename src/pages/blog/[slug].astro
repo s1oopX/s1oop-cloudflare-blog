@@ -89,10 +89,11 @@ const readingStats = postReadingStats(post);
           <div class="ui-panel-header">
             <h2 class="text-sm font-medium text-white">继续阅读</h2>
           </div>
-          <div class="ui-panel-body grid gap-3">
+          <div class="ui-panel-body article-related-list">
             {relatedPosts.map((item) => (
-              <a href={postHref(item)} class="ui-hover-accent text-sm leading-6 text-zinc-300 no-underline">
-                {item.data.title}
+              <a href={postHref(item)} class="article-related-item no-underline">
+                <span class="article-related-date">{formatPostDate(item.data.date)}</span>
+                <span class="article-related-title">{item.data.title}</span>
               </a>
             ))}
             {relatedPosts.length === 0 && (

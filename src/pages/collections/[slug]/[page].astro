@@ -30,6 +30,7 @@ const currentPage = Number(Astro.params.page);
 const totalPages = pageCount(collectionPosts, POSTS_PER_PAGE);
 const paginatedPosts = pageItems(collectionPosts, currentPage, POSTS_PER_PAGE);
 const otherCollections = collections.filter((item) => item.slug !== collection.slug);
+const latestCollectionPost = collectionPosts[0];
 ---
 
 <BaseLayout title={`${collection.title} · 第 ${currentPage} 页 | s1oop's Blog`}>
@@ -56,6 +57,9 @@ const otherCollections = collections.filter((item) => item.slug !== collection.s
             image={postImage(post)}
           />
         ))}
+        {collectionPosts.length === 0 && (
+          <div class="ui-panel p-5 text-sm text-zinc-400">该专栏暂无文章。</div>
+        )}
         <Pagination currentPage={currentPage} totalPages={totalPages} baseHref={`/collections/${collection.slug}`} />
       </div>
 
@@ -70,6 +74,10 @@ const otherCollections = collections.filter((item) => item.slug !== collection.s
               <span class="ui-stat-label">文章</span>
               <span class="ui-stat-value">{collectionPosts.length}</span>
             </div>
+            <div class="ui-stat-row">
+              <span class="ui-stat-label">最新</span>
+              <span class="ui-stat-value">{latestCollectionPost ? formatPostDate(latestCollectionPost.data.date) : '-'}</span>
+            </div>
           </div>
         </section>
 
@@ -77,10 +85,11 @@ const otherCollections = collections.filter((item) => item.slug !== collection.s
           <div class="ui-panel-header">
             <h2 class="text-sm font-medium text-white">继续选择</h2>
           </div>
-          <div class="ui-panel-body grid gap-3">
+          <div class="ui-panel-body sidebar-link-list">
             {otherCollections.map((item) => (
-              <a href={`/collections/${item.slug}`} class="ui-hover-accent text-sm leading-6 text-zinc-300 no-underline">
-                {item.title}
+              <a href={`/collections/${item.slug}`} class="sidebar-link-item no-underline">
+                <span class="sidebar-link-kicker">{postsForCollection(item, posts).length} 篇</span>
+                <span class="sidebar-link-title">{item.title}</span>
               </a>
             ))}
             {otherCollections.length === 0 && (

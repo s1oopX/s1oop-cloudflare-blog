@@ -2,7 +2,7 @@
 
 Minimal Cloudflare-native blog scaffold.
 
-This private blog uses `/s1oop` as the only hidden management entry. There is no login system, and public comments are closed.
+This private blog uses `/s1oop` as the hidden management entry and `/s1oop/admin` as the unlocked page. There is no login system, and public comments are closed.
 
 ## Stack
 
@@ -113,4 +113,4 @@ draft: false
 Post body.
 ```
 
-The site builds article pages, tag pages, `/blog`, `/s1oop`, and `/search-index.json` from this content.
+The site builds article pages, tag pages, `/blog`, `/s1oop`, `/s1oop/admin`, and `/search-index.json` from this content.

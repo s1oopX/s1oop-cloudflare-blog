@@ -5,7 +5,7 @@ export default {
         ok: true,
         enabled: false,
         comments: [],
-        message: 'Public comments are closed for this private blog.',
+        message: 'Public comments are closed for this private blog',
       });
     }
 
@@ -13,7 +13,7 @@ export default {
       return Response.json(
         {
           ok: false,
-          message: 'Public comments are closed for this private blog.',
+          message: 'Public comments are closed for this private blog',
         },
         { status: 403 },
       );

@@ -23,11 +23,11 @@ const totalPages = pageCount(posts, POSTS_PER_PAGE);
 const paginatedPosts = pageItems(posts, currentPage, POSTS_PER_PAGE);
 ---
 
-<BaseLayout title={`全部文章 · 第 ${currentPage} 页 | s1oop's Blog`}>
+<BaseLayout title={`全部 · 第 ${currentPage} 页 | s1oop's Blog`}>
   <section class="ui-page archive-page">
     <PageHeader
       eyebrow="full archive"
-      title="全部文章"
+      title="全部"
       description="所有已经整理好的文章都保留在这里，适合回找旧内容。"
     />
 

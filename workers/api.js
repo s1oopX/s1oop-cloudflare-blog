@@ -14,7 +14,7 @@ const text = (value) => String(value ?? '').trim();
 const requireAdminPassword = (env) => {
   const password = text(env.ADMIN_PASSWORD);
   if (!password) {
-    return { ok: false, status: 503, message: 'ADMIN_PASSWORD is not configured.' };
+    return { ok: false, status: 503, message: 'ADMIN_PASSWORD is not configured' };
   }
 
   return { ok: true, password };
@@ -39,7 +39,7 @@ async function verifyAdmin(request, env) {
 
   const password = await readRequestPassword(request);
   if (password !== configured.password) {
-    return { ok: false, status: 401, message: 'Invalid password.' };
+    return { ok: false, status: 401, message: 'Invalid password' };
   }
 
   return { ok: true };
@@ -153,7 +153,7 @@ export default {
         {
           ok: false,
           enabled: false,
-          message: 'Public comments are closed for this private blog.',
+        message: 'Public comments are closed for this private blog',
         },
         { status: 403 },
       );
@@ -164,7 +164,7 @@ export default {
         return json({
           ok: true,
           persisted: false,
-          message: 'BLOG_KV is not bound. Static site remains fully functional.',
+          message: 'BLOG_KV is not bound. Static site remains fully functional',
         });
       }
 
@@ -230,7 +230,7 @@ export default {
         return json(
           {
             ok: false,
-            message: 'GitHub publishing is not configured. Set GITHUB_TOKEN, GITHUB_OWNER, GITHUB_REPO and GITHUB_BRANCH.',
+            message: 'GitHub publishing is not configured. Set GITHUB_TOKEN, GITHUB_OWNER, GITHUB_REPO and GITHUB_BRANCH',
           },
           { status: 501 },
         );
@@ -241,16 +241,16 @@ export default {
       const requestedSlug = form?.get('slug');
 
       if (!file || typeof file === 'string') {
-        return json({ ok: false, message: 'Upload a Markdown file.' }, { status: 400 });
+        return json({ ok: false, message: 'Upload a Markdown file' }, { status: 400 });
       }
 
       const extension = file.name.toLowerCase().endsWith('.mdx') ? 'mdx' : 'md';
       if (!file.name.toLowerCase().endsWith('.md') && !file.name.toLowerCase().endsWith('.mdx')) {
-        return json({ ok: false, message: 'Only .md and .mdx files are supported.' }, { status: 400 });
+        return json({ ok: false, message: 'Only .md and .mdx files are supported' }, { status: 400 });
       }
 
       if (file.size > 512 * 1024) {
-        return json({ ok: false, message: 'Markdown file is too large.' }, { status: 400 });
+        return json({ ok: false, message: 'Markdown file is too large' }, { status: 400 });
       }
 
       const markdown = await file.text();
@@ -269,7 +269,7 @@ export default {
         const body = await existing.json();
         sha = body.sha;
       } else if (existing.status !== 404) {
-        return json({ ok: false, message: 'Could not check existing GitHub file.' }, { status: 502 });
+        return json({ ok: false, message: 'Could not check existing GitHub file' }, { status: 502 });
       }
 
       const response = await githubRequest(config, `/contents/${encodedPath}`, {
@@ -285,7 +285,7 @@ export default {
       const result = await response.json().catch(() => ({}));
       if (!response.ok) {
         return json(
-          { ok: false, message: result.message || 'GitHub publish failed.' },
+          { ok: false, message: result.message || 'GitHub publish failed' },
           { status: 502 },
         );
       }

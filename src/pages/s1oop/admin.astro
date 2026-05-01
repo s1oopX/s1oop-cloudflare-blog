@@ -1,0 +1,232 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="个人管理 | s1oop's Blog"
+  description="s1oop 的个人管理页面"
+  hideChrome={true}
+  mainClass="private-admin-root"
+>
+  <section class="private-dashboard" aria-label="s1oop 个人管理">
+    <header class="private-dashboard-head">
+      <div>
+        <p class="private-admin-kicker">markdown publish</p>
+        <h1 class="private-dashboard-title">个人管理</h1>
+        <p class="private-dashboard-copy">独立的 Markdown 发布工作页，用于整理内容并提交文章</p>
+      </div>
+      <div class="private-dashboard-actions">
+        <a class="private-admin-secondary" href="/blog">回到博客</a>
+        <button id="private-lock-button" class="private-admin-secondary" type="button">锁定</button>
+      </div>
+    </header>
+
+    <div class="private-dashboard-status" aria-label="管理状态">
+      <div class="private-status-card">
+        <span>访问状态</span>
+        <strong id="admin-auth-state">验证中</strong>
+      </div>
+      <div class="private-status-card">
+        <span>内容来源</span>
+        <strong>Markdown</strong>
+      </div>
+      <div class="private-status-card">
+        <span>发布目标</span>
+        <strong>GitHub</strong>
+      </div>
+    </div>
+
+    <div class="private-dashboard-grid">
+      <main class="private-dashboard-main">
+        <section class="private-dashboard-panel private-publish-panel" aria-labelledby="publish-title">
+          <div class="private-panel-head">
+            <div>
+              <p class="private-admin-kicker">compose</p>
+              <h2 id="publish-title">发布文章</h2>
+            </div>
+            <span class="private-panel-badge">.md / .mdx</span>
+          </div>
+
+          <form id="post-upload" class="private-admin-form private-admin-upload" novalidate>
+            <label class="private-admin-file">
+              <span id="post-file-label">选择 Markdown 文件</span>
+              <input id="post-file" name="file" type="file" accept=".md,.mdx,text/markdown" required />
+            </label>
+            <input
+              id="post-slug"
+              class="private-admin-input"
+              name="slug"
+              type="text"
+              placeholder="文件名，可留空"
+            />
+            <div class="private-publish-meta" aria-label="发布检查">
+              <span>需要 YAML frontmatter</span>
+              <span>建议包含 title / date / excerpt / tags</span>
+              <span>文件上限 512KB</span>
+            </div>
+            <div class="private-admin-actions">
+              <button class="private-admin-button" type="submit">提交发布</button>
+              <button id="post-clear-button" class="private-admin-secondary" type="button">清空</button>
+            </div>
+          </form>
+
+          <p id="post-upload-state" class="private-admin-state private-admin-state-inline">支持 .md / .mdx</p>
+        </section>
+
+        <section class="private-dashboard-panel" aria-labelledby="checklist-title">
+          <div class="private-panel-head">
+            <div>
+              <p class="private-admin-kicker">review</p>
+              <h2 id="checklist-title">发布前检查</h2>
+            </div>
+          </div>
+          <ul class="private-checklist">
+            <li>标题是否能直接说明文章主题</li>
+            <li>摘要是否适合展示在文章列表</li>
+            <li>标签是否和现有内容结构一致</li>
+            <li>配图路径是否已经放入 public/images</li>
+          </ul>
+        </section>
+      </main>
+
+      <aside class="private-dashboard-side" aria-label="辅助信息">
+        <section class="private-dashboard-panel">
+          <div class="private-panel-head">
+            <div>
+              <p class="private-admin-kicker">format</p>
+              <h2>文件格式</h2>
+            </div>
+          </div>
+          <ul class="private-checklist">
+            <li>文件扩展名使用 .md 或 .mdx</li>
+            <li>文件内容需要以 YAML frontmatter 开头</li>
+            <li>title 和 date 是发布校验必填项</li>
+            <li>slug 留空时会自动使用文件名</li>
+          </ul>
+        </section>
+
+        <section class="private-dashboard-panel">
+          <div class="private-panel-head">
+            <div>
+              <p class="private-admin-kicker">state</p>
+              <h2>操作状态</h2>
+            </div>
+          </div>
+          <div class="private-operation-list">
+            <div>
+              <span>当前会话</span>
+              <strong>浏览器本地保存</strong>
+            </div>
+            <div>
+              <span>锁定后</span>
+              <strong>清除访问凭据</strong>
+            </div>
+            <div>
+              <span>发布后</span>
+              <strong>等待构建刷新</strong>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </section>
+
+  <script is:inline>
+    const passwordKey = 's1oop-admin-password';
+    const uploadForm = document.querySelector('#post-upload');
+    const uploadState = document.querySelector('#post-upload-state');
+    const lockButton = document.querySelector('#private-lock-button');
+    const clearButton = document.querySelector('#post-clear-button');
+    const fileInput = document.querySelector('#post-file');
+    const fileLabel = document.querySelector('#post-file-label');
+    const authState = document.querySelector('#admin-auth-state');
+
+    const setState = (node, text, tone = 'muted') => {
+      if (!node) return;
+      node.textContent = text;
+      node.dataset.tone = tone;
+    };
+
+    const verifyPassword = async (password) => {
+      const response = await fetch('/api/admin/check', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.ok) throw new Error(data.message || '密码验证失败');
+      return data;
+    };
+
+    const getPassword = () => sessionStorage.getItem(passwordKey);
+
+    const lockAndExit = () => {
+      sessionStorage.removeItem(passwordKey);
+      window.location.replace('/s1oop');
+    };
+
+    const existingPassword = getPassword();
+    if (!existingPassword) {
+      window.location.replace('/s1oop');
+    } else {
+      verifyPassword(existingPassword)
+        .then(() => {
+          setState(authState, '已解锁', 'success');
+        })
+        .catch(() => {
+          lockAndExit();
+        });
+    }
+
+    fileInput?.addEventListener('change', () => {
+      const file = fileInput.files?.[0];
+      if (!file) {
+        if (fileLabel) fileLabel.textContent = '选择 Markdown 文件';
+        return;
+      }
+      if (fileLabel) fileLabel.textContent = file.name;
+    });
+
+    clearButton?.addEventListener('click', () => {
+      uploadForm?.reset();
+      if (fileLabel) fileLabel.textContent = '选择 Markdown 文件';
+      setState(uploadState, '支持 .md / .mdx', 'muted');
+    });
+
+    uploadForm?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const password = getPassword();
+      if (!password) {
+        lockAndExit();
+        return;
+      }
+
+      const form = new FormData(uploadForm);
+      const file = form.get('file');
+      if (!file || !file.name) {
+        setState(uploadState, '请选择 .md 或 .mdx 文件', 'error');
+        return;
+      }
+
+      setState(uploadState, '正在提交...', 'muted');
+      try {
+        const response = await fetch('/api/admin/posts', {
+          method: 'POST',
+          headers: { authorization: `Bearer ${password}` },
+          body: form,
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.ok) throw new Error(data.message || '发布失败');
+        setState(uploadState, `已提交：${data.path}`, 'success');
+        uploadForm.reset();
+        if (fileLabel) fileLabel.textContent = '选择 Markdown 文件';
+      } catch (error) {
+        setState(uploadState, error.message || '发布失败', 'error');
+      }
+    });
+
+    lockButton?.addEventListener('click', () => {
+      lockAndExit();
+    });
+  </script>
+</BaseLayout>

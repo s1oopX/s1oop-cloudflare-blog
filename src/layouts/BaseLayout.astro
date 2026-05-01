@@ -11,14 +11,14 @@ interface Props {
 }
 
 const {
-  title = 's1oop的私人博客',
-  description = 's1oop的私人博客收集设计、写作、阅读与日常思考，适合安静阅读和长期回看。',
+  title = 's1oop的个人博客',
+  description = 's1oop的个人博客收集设计、写作、阅读与日常思考，适合安静阅读和长期回看。',
   hideChrome = false,
   mainClass,
 } = Astro.props;
 
 const mainClasses = mainClass ?? 'site-main flex-1';
-const siteTitle = 's1oop的私人博客';
+const siteTitle = 's1oop的个人博客';
 const documentTitle = title === 's1oop'
   ? siteTitle
   : title

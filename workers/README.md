@@ -14,7 +14,7 @@
 
 ## Private Publishing
 
-The `/s1oop` page unlocks with a password and sends Markdown files to `POST /api/admin/posts`.
+The `/s1oop` page unlocks with a password and redirects to `/s1oop/admin`, which sends Markdown files to `POST /api/admin/posts`.
 Configure these Worker environment variables before using it:
 
 ```text

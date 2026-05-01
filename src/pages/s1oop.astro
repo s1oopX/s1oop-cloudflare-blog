@@ -3,17 +3,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout
-  title="私人页面 | s1oop's Blog"
-  description="s1oop 的私人管理入口。"
+  title="个人登录 | s1oop's Blog"
+  description="s1oop 的个人登录入口"
   hideChrome={true}
   mainClass="private-admin-root"
 >
   <section class="private-admin-stage" aria-label="s1oop private access">
     <div class="private-admin-panel">
-      <section id="private-lock" class="private-admin-view" aria-label="私人页面解锁">
+      <section class="private-admin-view" aria-label="个人页面解锁">
         <p class="private-admin-kicker">private access</p>
         <h1 class="private-admin-title">s1oop</h1>
-        <form id="private-login" class="private-admin-form">
+        <form id="private-login" class="private-admin-form" novalidate>
           <label class="sr-only" for="private-password">访问密码</label>
           <input
             id="private-password"
@@ -26,62 +26,20 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           />
           <button class="private-admin-button" type="submit">开启</button>
         </form>
-        <p id="private-login-state" class="private-admin-state">私人管理入口</p>
-      </section>
-
-      <section id="private-admin" class="private-admin-view private-admin-view-hidden" aria-label="Markdown 发布" hidden>
-        <p class="private-admin-kicker">markdown publish</p>
-        <h1 class="private-admin-title">发布文章</h1>
-        <form id="post-upload" class="private-admin-form private-admin-upload">
-          <label class="private-admin-file">
-            <span>选择 Markdown</span>
-            <input id="post-file" name="file" type="file" accept=".md,.mdx,text/markdown" required />
-          </label>
-          <input
-            id="post-slug"
-            class="private-admin-input"
-            name="slug"
-            type="text"
-            placeholder="文件名，可留空"
-          />
-          <div class="private-admin-actions">
-            <button class="private-admin-button" type="submit">提交发布</button>
-            <button id="private-lock-button" class="private-admin-secondary" type="button">锁定</button>
-          </div>
-        </form>
-        <p id="post-upload-state" class="private-admin-state">支持 .md / .mdx</p>
+        <p id="private-login-state" class="private-admin-state">个人管理入口</p>
       </section>
     </div>
   </section>
 
   <script is:inline>
     const passwordKey = 's1oop-admin-password';
-    const lockPanel = document.querySelector('#private-lock');
-    const adminPanel = document.querySelector('#private-admin');
     const loginForm = document.querySelector('#private-login');
-    const uploadForm = document.querySelector('#post-upload');
     const loginState = document.querySelector('#private-login-state');
-    const uploadState = document.querySelector('#post-upload-state');
-    const lockButton = document.querySelector('#private-lock-button');
 
     const setState = (node, text, tone = 'muted') => {
       if (!node) return;
       node.textContent = text;
       node.dataset.tone = tone;
-    };
-
-    const setUnlocked = (password) => {
-      sessionStorage.setItem(passwordKey, password);
-      lockPanel.hidden = true;
-      adminPanel.hidden = false;
-      adminPanel.classList.remove('private-admin-view-hidden');
-    };
-
-    const setLocked = () => {
-      sessionStorage.removeItem(passwordKey);
-      lockPanel.hidden = false;
-      adminPanel.hidden = true;
-      adminPanel.classList.add('private-admin-view-hidden');
     };
 
     const verifyPassword = async (password) => {
@@ -91,67 +49,43 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         body: JSON.stringify({ password }),
       });
       const data = await response.json().catch(() => ({}));
-      if (!response.ok || !data.ok) throw new Error(data.message || '密码验证失败。');
+      if (!response.ok || !data.ok) throw new Error(data.message || '密码验证失败');
       return data;
+    };
+
+    const enterAdmin = (password) => {
+      sessionStorage.setItem(passwordKey, password);
+      window.location.assign('/s1oop/admin');
     };
 
     const existingPassword = sessionStorage.getItem(passwordKey);
     if (existingPassword) {
-      verifyPassword(existingPassword).then(() => {
-        setUnlocked(existingPassword);
-      }).catch(setLocked);
+      verifyPassword(existingPassword)
+        .then(() => {
+          window.location.replace('/s1oop/admin');
+        })
+        .catch(() => {
+          sessionStorage.removeItem(passwordKey);
+        });
     }
 
     loginForm?.addEventListener('submit', async (event) => {
       event.preventDefault();
       const form = new FormData(loginForm);
       const password = String(form.get('password') || '').trim();
-      if (!password) return;
+      if (!password) {
+        setState(loginState, '请输入密码', 'error');
+        return;
+      }
 
       setState(loginState, '正在验证...', 'muted');
       try {
         await verifyPassword(password);
-        setUnlocked(password);
-        setState(uploadState, '已解锁，可以上传 Markdown。', 'success');
+        setState(loginState, '正在进入...', 'success');
+        enterAdmin(password);
       } catch (error) {
-        setState(loginState, error.message || '密码验证失败。', 'error');
+        setState(loginState, error.message || '密码验证失败', 'error');
       }
-    });
-
-    uploadForm?.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      const password = sessionStorage.getItem(passwordKey);
-      if (!password) {
-        setLocked();
-        return;
-      }
-
-      const form = new FormData(uploadForm);
-      const file = form.get('file');
-      if (!file || !file.name) {
-        setState(uploadState, '请选择 .md 或 .mdx 文件。', 'error');
-        return;
-      }
-
-      setState(uploadState, '正在提交...', 'muted');
-      try {
-        const response = await fetch('/api/admin/posts', {
-          method: 'POST',
-          headers: { authorization: `Bearer ${password}` },
-          body: form,
-        });
-        const data = await response.json().catch(() => ({}));
-        if (!response.ok || !data.ok) throw new Error(data.message || '发布失败。');
-        setState(uploadState, `已提交：${data.path}`, 'success');
-        uploadForm.reset();
-      } catch (error) {
-        setState(uploadState, error.message || '发布失败。', 'error');
-      }
-    });
-
-    lockButton?.addEventListener('click', () => {
-      setLocked();
-      setState(loginState, '已锁定。', 'muted');
     });
   </script>
 </BaseLayout>

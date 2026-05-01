@@ -41,7 +41,11 @@ const architectureRows = [
   },
 ];
 
-const stackPills = ['Cloudflare Pages', 'Cloudflare Workers', 'Astro', 'Markdown'];
+const stackRows = [
+  ['Cloudflare Pages'],
+  ['Cloudflare Workers'],
+  ['Astro', 'Markdown'],
+];
 
 const principles = [
   {
@@ -57,7 +61,7 @@ const principles = [
   {
     label: 'Tone',
     title: '反说明书',
-    copy: '私人博客不是产品文档，表达必须先成立，结构再为表达服务。',
+    copy: '个人博客不是产品文档，表达必须先成立，结构再为表达服务。',
   },
 ];
 
@@ -70,13 +74,13 @@ const sideSignals = [
 
 <BaseLayout
   title="关于 | s1oop's Blog"
-  description="关于 s1oop's Blog：一个整理设计、写作、阅读和长期观察的私人博客。"
+  description="关于 s1oop's Blog：一个整理设计、写作、阅读和长期观察的个人博客。"
 >
   <section class="ui-page archive-page about-page">
     <PageHeader
       eyebrow="about archive"
       title="关于"
-      description="一个部署在 Cloudflare，由 Astro、Cloudflare Workers 与 Markdown 支撑的私人博客。"
+      description="一个部署在 Cloudflare，由 Astro、Cloudflare Workers 与 Markdown 支撑的个人博客。"
     />
 
     <div class="ui-grid ui-page-body">
@@ -99,7 +103,11 @@ const sideSignals = [
               <p class="ui-eyebrow">technical stack</p>
               <h2>技术栈</h2>
               <div class="about-stack-strip" aria-label="技术栈">
-                {stackPills.map((item) => <span>{item}</span>)}
+                {stackRows.map((row) => (
+                  <div class="about-stack-row">
+                    {row.map((item) => <span>{item}</span>)}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -170,7 +178,7 @@ const sideSignals = [
             <img src="/images/avatar.jpg" alt="" width="128" height="128" loading="eager" decoding="async" />
             <div>
               <p class="ui-eyebrow">s1oop</p>
-              <h2>私人博客</h2>
+              <h2>个人博客</h2>
               <p>写作、阅读、设计判断和技术取舍的长期存放处。</p>
             </div>
           </div>

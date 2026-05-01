@@ -20,7 +20,7 @@ export function formatPostDate(date: Date) {
 }
 
 export function postExcerpt(post: BlogPost) {
-  return post.data.excerpt || '这是一篇私人博客文章。';
+  return post.data.excerpt || '这是一篇个人博客文章。';
 }
 
 export function postImage(post: BlogPost) {

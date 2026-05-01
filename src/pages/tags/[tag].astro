@@ -15,6 +15,12 @@ export async function getStaticPaths() {
 const { tag } = Astro.params;
 const posts = visiblePosts(await getCollection('posts'));
 const taggedPosts = posts.filter((post) => post.data.tags.some((item) => item.toLowerCase() === tag));
+const allTags = collectTags(posts);
+const tagStats = allTags.map((item) => ({
+  tag: item,
+  count: posts.filter((post) => post.data.tags.some((postTag) => postTag.toLowerCase() === item.toLowerCase())).length,
+}));
+const latestTaggedPost = taggedPosts[0];
 const currentPage = 1;
 const totalPages = pageCount(taggedPosts, POSTS_PER_PAGE);
 const paginatedPosts = pageItems(taggedPosts, currentPage, POSTS_PER_PAGE);
@@ -64,6 +70,10 @@ const paginatedPosts = pageItems(taggedPosts, currentPage, POSTS_PER_PAGE);
               <span class="ui-stat-label">文章</span>
               <span class="ui-stat-value">{taggedPosts.length}</span>
             </div>
+            <div class="ui-stat-row">
+              <span class="ui-stat-label">最新</span>
+              <span class="ui-stat-value">{latestTaggedPost ? formatPostDate(latestTaggedPost.data.date) : '-'}</span>
+            </div>
           </div>
         </section>
 
@@ -71,10 +81,11 @@ const paginatedPosts = pageItems(taggedPosts, currentPage, POSTS_PER_PAGE);
           <div class="ui-panel-header">
             <h2 class="text-sm font-medium text-white">全部主题</h2>
           </div>
-          <div class="ui-panel-body flex flex-wrap gap-2">
-            {collectTags(posts).map((item) => (
-              <a class="ui-badge no-underline hover:text-white" href={`/tags/${item.toLowerCase()}`}>
-                #{item}
+          <div class="ui-panel-body sidebar-link-list">
+            {tagStats.map((item) => (
+              <a class="sidebar-link-item no-underline" href={`/tags/${item.tag.toLowerCase()}`}>
+                <span class="sidebar-link-kicker">{item.count} 篇</span>
+                <span class="sidebar-link-title">#{item.tag}</span>
               </a>
             ))}
           </div>
