@@ -83,7 +83,7 @@
   }
 
   .ui-page {
-    @apply mx-auto w-full max-w-6xl px-5 py-5 sm:py-7;
+    @apply mx-auto w-full max-w-6xl px-5 pb-5 pt-0 sm:pb-7 sm:pt-0;
     position: relative;
     isolation: isolate;
     min-height: calc(100dvh - 8rem);
