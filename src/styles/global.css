@@ -32,7 +32,7 @@
 
   html {
     @apply scroll-smooth text-zinc-100 antialiased;
-    overflow-y: scroll;
+    overflow-y: auto;
     scrollbar-gutter: stable;
     background: var(--background);
   }
@@ -86,12 +86,12 @@
     @apply mx-auto w-full max-w-6xl px-5 pb-5 pt-0 sm:pb-7 sm:pt-0;
     position: relative;
     isolation: isolate;
-    min-height: calc(100dvh - 8rem);
+    min-height: 0;
   }
 
   .ui-page-head {
     @apply relative overflow-hidden border-b py-5 sm:py-6;
-    border-color: rgb(var(--accent-rgb) / 0.12);
+    border-color: rgb(var(--accent-rgb) / 0.2);
     background: transparent;
   }
 
@@ -278,7 +278,7 @@
 
   .footer-inner {
     @apply flex flex-col gap-3 border-t pt-5 sm:flex-row sm:items-center sm:justify-between;
-    border-color: rgb(var(--accent-rgb) / 0.08);
+    border-color: rgb(var(--accent-rgb) / 0.2);
   }
 
   .footer-signature {
@@ -304,7 +304,7 @@
 
   .footer-note + .footer-note::before {
     content: '|';
-    color: rgb(63 63 70 / 0.72);
+    color: rgb(82 82 91 / 0.86);
     margin-right: 0.75rem;
   }
 
@@ -315,7 +315,7 @@
 
   .footer-links a + a::before {
     content: '|';
-    color: rgb(63 63 70 / 0.72);
+    color: rgb(82 82 91 / 0.86);
     margin-inline: 0.65rem;
   }
 
@@ -400,18 +400,18 @@
 
   .ui-search-button {
     @apply inline-flex h-9 shrink-0 items-center justify-center rounded-md border px-4 text-sm font-medium text-zinc-100 no-underline transition active:translate-y-px;
-    border-color: rgb(var(--accent-rgb) / 0.28);
+    border-color: rgb(var(--accent-rgb) / 0.22);
     background:
-      linear-gradient(180deg, rgb(var(--accent-rgb) / 0.15), rgb(var(--accent-rgb) / 0.06)),
-      color-mix(in srgb, var(--card-2) 84%, transparent);
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.055);
+      linear-gradient(180deg, rgb(var(--accent-rgb) / 0.1), rgb(var(--accent-rgb) / 0.035)),
+      color-mix(in srgb, var(--card) 90%, transparent);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
   }
 
   .ui-search-button:hover {
-    border-color: rgb(var(--accent-rgb) / 0.42);
+    border-color: rgb(var(--accent-rgb) / 0.34);
     background:
-      linear-gradient(180deg, rgb(var(--accent-rgb) / 0.2), rgb(var(--accent-rgb) / 0.075)),
-      color-mix(in srgb, var(--card-2) 76%, white);
+      linear-gradient(180deg, rgb(var(--accent-rgb) / 0.14), rgb(var(--accent-rgb) / 0.05)),
+      color-mix(in srgb, var(--card-2) 90%, transparent);
   }
 
   .ui-separator {
