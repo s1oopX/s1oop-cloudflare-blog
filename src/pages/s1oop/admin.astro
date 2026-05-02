@@ -11,7 +11,7 @@ import PageHeader from '../../components/PageHeader.astro';
     <PageHeader
       eyebrow="PRIVATE CONSOLE"
       title="个人控制台"
-      description="Markdown 写入 D1，配图写入 R2，发布后不再回写 GitHub。"
+      description="Markdown 和小图都写入 D1，发布后不再回写 GitHub。"
     >
       <a slot="actions" class="private-admin-secondary" href="/blog">回到博客</a>
       <button slot="actions" id="private-lock-button" class="private-admin-secondary" type="button">锁定</button>
@@ -84,7 +84,7 @@ import PageHeader from '../../components/PageHeader.astro';
             </div>
           </form>
 
-          <p id="post-upload-state" class="private-admin-state private-admin-state-inline">支持 .md / .mdx，图片写入 R2</p>
+          <p id="post-upload-state" class="private-admin-state private-admin-state-inline">支持 .md / .mdx，单张图片不超过 1 MB</p>
         </section>
 
         <section class="private-dashboard-panel" aria-labelledby="modules-title">
@@ -108,7 +108,7 @@ import PageHeader from '../../components/PageHeader.astro';
             <div>
               <span>接口</span>
               <strong>/api/admin/*</strong>
-              <p>集中处理鉴权、D1 写入、R2 图片和未来统计接口。</p>
+              <p>集中处理鉴权、D1 文章写入、D1 小图和未来接口。</p>
             </div>
           </div>
         </section>
@@ -124,7 +124,7 @@ import PageHeader from '../../components/PageHeader.astro';
             <li><span>Frontmatter</span><strong>title / date</strong></li>
             <li><span>摘要</span><strong>列表可读</strong></li>
             <li><span>标签</span><strong>沿用既有主题</strong></li>
-            <li><span>配图</span><strong>R2 images</strong></li>
+            <li><span>配图</span><strong>D1 小图</strong></li>
           </ul>
         </section>
       </main>
@@ -144,7 +144,7 @@ import PageHeader from '../../components/PageHeader.astro';
             </div>
             <div>
               <span>发布</span>
-              <strong>D1 / R2</strong>
+              <strong>D1 content</strong>
             </div>
             <div>
               <span>评论</span>
@@ -206,7 +206,8 @@ import PageHeader from '../../components/PageHeader.astro';
       if (message === 'Invalid password') return '密码不正确';
       if (message === 'ADMIN_PASSWORD is not configured') return '访问密码未配置';
       if (message?.includes('D1 binding BLOG_DB is not configured')) return 'D1 文章库未绑定';
-      if (message?.includes('R2 binding BLOG_IMAGES is not configured')) return 'R2 图片桶未绑定';
+      if (message?.includes('Each image must be 1 MB or smaller')) return '单张图片不能超过 1 MB';
+      if (message?.includes('Only JPEG, PNG, WebP and GIF images are supported')) return '仅支持 JPEG / PNG / WebP / GIF';
       return message || '操作失败';
     };
 
@@ -303,7 +304,7 @@ import PageHeader from '../../components/PageHeader.astro';
       setState(fileState, '未选择');
       setState(workflowState, '待提交');
       setFileMeta();
-      setState(uploadState, '支持 .md / .mdx，图片写入 R2', 'muted');
+      setState(uploadState, '支持 .md / .mdx，单张图片不超过 1 MB', 'muted');
     });
 
     uploadForm?.addEventListener('submit', async (event) => {

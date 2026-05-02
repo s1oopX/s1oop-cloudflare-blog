@@ -23,4 +23,4 @@ Never commit:
 
 ## Admin API
 
-The `/s1oop/admin` publishing API is optional. It should only be enabled in deployments where `ADMIN_PASSWORD`, the `BLOG_DB` D1 binding, and the `BLOG_IMAGES` R2 binding are configured intentionally.
+The `/s1oop/admin` publishing API is optional. It should only be enabled in deployments where `ADMIN_PASSWORD` and the `BLOG_DB` D1 binding are configured intentionally.

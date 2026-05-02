@@ -7,8 +7,10 @@ const json = (data, init = {}) =>
     },
   });
 
-const todayKey = () => new Date().toISOString().slice(0, 10);
 const text = (value) => String(value ?? '').trim();
+const MAX_MARKDOWN_BYTES = 512 * 1024;
+const MAX_ASSET_BYTES = 1024 * 1024;
+const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 
 const requireAdminPassword = (env) => {
   const password = text(env.ADMIN_PASSWORD);
@@ -392,34 +394,48 @@ async function putRuntimePost(env, post) {
 
 async function storeImages(env, slug, files) {
   if (!files.length) return { markdownRewrites: new Map(), assets: [] };
-  if (!env.BLOG_IMAGES) {
-    throw new Response(
-      JSON.stringify({ ok: false, message: 'R2 binding BLOG_IMAGES is not configured' }),
-      { status: 501, headers: { 'content-type': 'application/json; charset=utf-8' } },
-    );
-  }
 
   const markdownRewrites = new Map();
   const assets = [];
+  const names = new Map();
   for (const file of files) {
     if (!file || typeof file === 'string') continue;
-    if (!file.type?.startsWith('image/')) {
+    if (!IMAGE_TYPES.has(file.type)) {
       throw new Response(
-        JSON.stringify({ ok: false, message: 'Only image files can be uploaded as post assets' }),
+        JSON.stringify({ ok: false, message: 'Only JPEG, PNG, WebP and GIF images are supported' }),
         { status: 400, headers: { 'content-type': 'application/json; charset=utf-8' } },
       );
     }
 
-    const name = sanitizeAssetName(file.name);
+    if (file.size > MAX_ASSET_BYTES) {
+      throw new Response(
+        JSON.stringify({ ok: false, message: 'Each image must be 1 MB or smaller' }),
+        { status: 400, headers: { 'content-type': 'application/json; charset=utf-8' } },
+      );
+    }
+
+    const originalName = sanitizeAssetName(file.name);
+    const count = names.get(originalName) ?? 0;
+    names.set(originalName, count + 1);
+    const name = count ? originalName.replace(/(\.[^.]+)?$/, `-${count + 1}$1`) : originalName;
     const key = `posts/${slug}/${name}`;
-    await env.BLOG_IMAGES.put(key, file.stream(), {
-      httpMetadata: { contentType: file.type || 'application/octet-stream' },
-      customMetadata: { originalName: file.name },
-    });
+    const body = await file.arrayBuffer();
+
+    await env.BLOG_DB.prepare(
+      `INSERT INTO blog_assets (key, slug, filename, content_type, body, byte_length, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+       ON CONFLICT(key) DO UPDATE SET
+         slug = excluded.slug,
+         filename = excluded.filename,
+         content_type = excluded.content_type,
+         body = excluded.body,
+         byte_length = excluded.byte_length,
+         updated_at = CURRENT_TIMESTAMP`,
+    ).bind(key, slug, name, file.type, body, file.size).run();
 
     const href = `/api/assets/${key}`;
-    markdownRewrites.set(name.toLowerCase(), href);
-    markdownRewrites.set(`./${name}`.toLowerCase(), href);
+    markdownRewrites.set(originalName.toLowerCase(), href);
+    markdownRewrites.set(`./${originalName}`.toLowerCase(), href);
     assets.push({ name, key, href, contentType: file.type, size: file.size });
   }
 
@@ -435,22 +451,23 @@ function rewriteMarkdownImages(markdown, rewrites) {
   });
 }
 
-async function readJson(kv, key, fallback) {
-  if (!kv) return fallback;
-  const value = await kv.get(key, 'json');
-  return value ?? fallback;
-}
-
-async function writeJson(kv, key, value) {
-  if (!kv) return false;
-  await kv.put(key, JSON.stringify(value));
-  return true;
+function assetBody(value) {
+  if (value instanceof ArrayBuffer) return value;
+  if (ArrayBuffer.isView(value)) return value;
+  if (typeof value === 'string') {
+    const binary = atob(value);
+    const bytes = new Uint8Array(binary.length);
+    for (let index = 0; index < binary.length; index += 1) {
+      bytes[index] = binary.charCodeAt(index);
+    }
+    return bytes;
+  }
+  return value;
 }
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
-    const kv = env.BLOG_KV;
 
     if (request.method === 'OPTIONS') {
       return new Response(null, {
@@ -459,79 +476,6 @@ export default {
           'access-control-allow-methods': 'GET,POST,OPTIONS',
           'access-control-allow-headers': 'authorization,content-type,x-admin-password',
         },
-      });
-    }
-
-    if (url.pathname === '/api/comments' && request.method === 'GET') {
-      const slug = url.searchParams.get('slug') ?? 'global';
-      const comments = await readJson(kv, `comments:${slug}`, []);
-
-      return json({
-        ok: true,
-        enabled: env.COMMENTS_ENABLED === 'true',
-        comments,
-      });
-    }
-
-    if (url.pathname === '/api/comments' && request.method === 'POST') {
-      return json(
-        {
-          ok: false,
-          enabled: false,
-          message: 'Public comments are closed for this private blog',
-        },
-        { status: 403 },
-      );
-    }
-
-    if (url.pathname === '/api/stats/visit' && request.method === 'POST') {
-      if (!kv) {
-        return json({
-          ok: true,
-          persisted: false,
-          message: 'BLOG_KV is not bound. Static site remains fully functional',
-        });
-      }
-
-      const body = await request.json().catch(() => ({}));
-      const visitorId = String(body.visitorId ?? 'anonymous').slice(0, 64);
-      const path = String(body.path ?? '/').slice(0, 256);
-      const day = todayKey();
-      const stats = await readJson(kv, `stats:daily:${day}`, {
-        pageViews: 0,
-        visitors: [],
-        paths: {},
-      });
-
-      stats.pageViews += 1;
-      if (!stats.visitors.includes(visitorId)) stats.visitors.push(visitorId);
-      stats.paths[path] = (stats.paths[path] ?? 0) + 1;
-
-      await writeJson(kv, `stats:daily:${day}`, stats);
-
-      return json({
-        ok: true,
-        persisted: true,
-        pageViews: stats.pageViews,
-        visitors: stats.visitors.length,
-      });
-    }
-
-    if (url.pathname === '/api/stats' && request.method === 'GET') {
-      const day = url.searchParams.get('day') ?? todayKey();
-      const stats = await readJson(kv, `stats:daily:${day}`, {
-        pageViews: 0,
-        visitors: [],
-        paths: {},
-      });
-
-      return json({
-        ok: true,
-        persisted: Boolean(kv),
-        day,
-        pageViews: stats.pageViews,
-        visitors: stats.visitors.length,
-        paths: stats.paths,
       });
     }
 
@@ -545,7 +489,7 @@ export default {
         ok: true,
         storage: {
           d1: Boolean(env.BLOG_DB),
-          r2: Boolean(env.BLOG_IMAGES),
+          assets: 'd1',
         },
       });
     }
@@ -577,7 +521,7 @@ export default {
         return json({ ok: false, message: 'Only .md and .mdx files are supported' }, { status: 400 });
       }
 
-      if (file.size > 512 * 1024) {
+      if (file.size > MAX_MARKDOWN_BYTES) {
         return json({ ok: false, message: 'Markdown file is too large' }, { status: 400 });
       }
 
@@ -648,21 +592,32 @@ export default {
     }
 
     if (url.pathname.startsWith('/api/assets/') && request.method === 'GET') {
-      if (!env.BLOG_IMAGES) {
-        return json({ ok: false, message: 'R2 binding BLOG_IMAGES is not configured' }, { status: 501 });
+      if (!env.BLOG_DB) {
+        return json({ ok: false, message: 'D1 binding BLOG_DB is not configured' }, { status: 501 });
       }
 
       const key = decodeURIComponent(url.pathname.slice('/api/assets/'.length));
-      const object = await env.BLOG_IMAGES.get(key);
+      const cache = globalThis.caches?.default;
+      const cacheRequest = new Request(url.toString(), request);
+      const cached = await cache?.match(cacheRequest).catch(() => null);
+      if (cached) return cached;
+
+      const object = await env.BLOG_DB.prepare(
+        `SELECT content_type, body, byte_length, updated_at
+         FROM blog_assets
+         WHERE key = ?`,
+      ).bind(key).first();
       if (!object) return json({ ok: false, message: 'Asset not found' }, { status: 404 });
 
       const headers = new Headers();
-      object.writeHttpMetadata(headers);
-      headers.set('etag', object.httpEtag);
+      headers.set('content-type', object.content_type || 'application/octet-stream');
+      headers.set('content-length', String(object.byte_length || 0));
       headers.set('cache-control', 'public, max-age=31536000, immutable');
       headers.set('access-control-allow-origin', '*');
 
-      return new Response(object.body, { headers });
+      const response = new Response(assetBody(object.body), { headers });
+      await cache?.put(cacheRequest, response.clone()).catch(() => {});
+      return response;
     }
 
     return json({ ok: false, message: 'Not Found' }, { status: 404 });
