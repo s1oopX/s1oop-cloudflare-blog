@@ -19,6 +19,8 @@ Cloudflare deployment configuration lives in `wrangler.jsonc`.
 - `POST /api/admin/posts`: accepts a Markdown upload and stores the post plus optional small images in D1.
 - `GET /api/admin/posts/:slug`: checks whether a runtime post exists before upload.
 - `DELETE /api/admin/posts/:slug`: deletes a runtime post and its D1 image assets.
+- `GET /api/admin/assets/orphans`: counts D1 image assets that no longer belong to a post.
+- `DELETE /api/admin/assets/orphans`: deletes orphaned D1 image assets.
 - `GET /api/admin/settings`: reads private runtime settings.
 - `PATCH /api/admin/settings`: updates runtime settings such as the comment switch.
 - `GET /api/comments` and `GET /api/comments/status`: expose the current public comment switch.
@@ -39,6 +41,7 @@ BLOG_DB      D1 database binding
 Runtime publishing does not write Markdown back to GitHub. GitHub remains the source repository for code and static content.
 
 Uploaded images are stored in `blog_assets` as small base64 payloads. Keep each image at or below 1 MB.
+The private admin page compresses JPEG, PNG, and WebP uploads in the browser before sending them to D1. GIF uploads are kept as-is.
 
 Runtime post images are stored in D1. R2 is intentionally not required for this lightweight deployment.
 
@@ -48,4 +51,5 @@ Apply all migrations before enabling the admin page in production:
 npx wrangler d1 execute s1oop-blog-content --file migrations/0001_runtime_posts.sql
 npx wrangler d1 execute s1oop-blog-content --file migrations/0002_blog_assets.sql
 npx wrangler d1 execute s1oop-blog-content --file migrations/0003_site_settings.sql
+npx wrangler d1 execute s1oop-blog-content --file migrations/0004_runtime_post_search_text.sql
 ```

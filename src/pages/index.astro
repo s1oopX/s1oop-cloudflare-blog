@@ -196,15 +196,24 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       portrait.classList.remove('is-running');
     });
 
+    let portraitPointerFrame = 0;
+    let portraitPointerEvent = null;
+
     document.addEventListener('pointermove', (event) => {
-      if (!portrait) return;
-      const rect = portrait.getBoundingClientRect();
-      const isInside =
-        event.clientX >= rect.left &&
-        event.clientX <= rect.right &&
-        event.clientY >= rect.top &&
-        event.clientY <= rect.bottom;
-      portrait.classList.toggle('is-running', isInside);
+      portraitPointerEvent = event;
+      if (portraitPointerFrame) return;
+
+      portraitPointerFrame = window.requestAnimationFrame(() => {
+        portraitPointerFrame = 0;
+        if (!portrait || !portraitPointerEvent) return;
+        const rect = portrait.getBoundingClientRect();
+        const isInside =
+          portraitPointerEvent.clientX >= rect.left &&
+          portraitPointerEvent.clientX <= rect.right &&
+          portraitPointerEvent.clientY >= rect.top &&
+          portraitPointerEvent.clientY <= rect.bottom;
+        portrait.classList.toggle('is-running', isInside);
+      });
     });
 
     dots.forEach((dot) => {

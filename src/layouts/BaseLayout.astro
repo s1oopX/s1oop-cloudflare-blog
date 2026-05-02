@@ -46,13 +46,23 @@ const documentTitle = title === 's1oop'
     </main>
     {!hideChrome && <Footer />}
     <script is:inline>
-      document.addEventListener('pointermove', (event) => {
-        const panel = event.target.closest?.('.ui-panel');
-        if (!panel) return;
+      let panelPointerFrame = 0;
+      let panelPointerEvent = null;
 
-        const rect = panel.getBoundingClientRect();
-        panel.style.setProperty('--pointer-x', `${event.clientX - rect.left}px`);
-        panel.style.setProperty('--pointer-y', `${event.clientY - rect.top}px`);
+      document.addEventListener('pointermove', (event) => {
+        panelPointerEvent = event;
+        if (panelPointerFrame) return;
+
+        panelPointerFrame = window.requestAnimationFrame(() => {
+          panelPointerFrame = 0;
+          const currentEvent = panelPointerEvent;
+          const panel = currentEvent?.target.closest?.('.ui-panel');
+          if (!panel) return;
+
+          const rect = panel.getBoundingClientRect();
+          panel.style.setProperty('--pointer-x', `${currentEvent.clientX - rect.left}px`);
+          panel.style.setProperty('--pointer-y', `${currentEvent.clientY - rect.top}px`);
+        });
       });
     </script>
   </body>

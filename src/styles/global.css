@@ -1719,6 +1719,10 @@
     @apply text-right text-sm font-medium text-zinc-300;
   }
 
+  .private-inline-action {
+    @apply h-8 px-3 text-xs;
+  }
+
   .ui-stagger > * {
     opacity: 1;
   }

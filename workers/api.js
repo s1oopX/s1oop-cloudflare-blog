@@ -1,8 +1,15 @@
+const CACHE = {
+  noStore: 'no-store',
+  publicList: 'public, max-age=30, stale-while-revalidate=120',
+  publicDetail: 'public, max-age=10, stale-while-revalidate=60',
+  publicAsset: 'public, max-age=31536000, immutable',
+};
+
 const json = (data, init = {}) =>
   Response.json(data, {
     ...init,
     headers: {
-      'access-control-allow-origin': '*',
+      'cache-control': CACHE.noStore,
       ...init.headers,
     },
   });
@@ -42,11 +49,25 @@ async function verifyAdmin(request, env) {
   if (!configured.ok) return configured;
 
   const password = await readRequestPassword(request);
-  if (password !== configured.password) {
+  if (!timingSafeEqual(password, configured.password)) {
     return { ok: false, status: 401, message: 'Invalid password' };
   }
 
   return { ok: true };
+}
+
+function timingSafeEqual(left, right) {
+  const encoder = new TextEncoder();
+  const leftBytes = encoder.encode(String(left ?? ''));
+  const rightBytes = encoder.encode(String(right ?? ''));
+  const length = Math.max(leftBytes.length, rightBytes.length);
+  let diff = leftBytes.length ^ rightBytes.length;
+
+  for (let index = 0; index < length; index += 1) {
+    diff |= (leftBytes[index] ?? 0) ^ (rightBytes[index] ?? 0);
+  }
+
+  return diff === 0;
 }
 
 function toSlug(value) {
@@ -309,6 +330,17 @@ function readingStats(markdown) {
   };
 }
 
+function searchText(markdown) {
+  return markdown
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/!\[([^\]]*)]\([^)]+\)/g, '$1 ')
+    .replace(/\[([^\]]+)]\([^)]+\)/g, '$1 ')
+    .replace(/[#>*_`~|[\]()-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 8000);
+}
+
 function firstImage(markdown, fallbackTitle) {
   const match = markdown.match(/!\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)/);
   if (!match) return null;
@@ -320,7 +352,7 @@ function firstImage(markdown, fallbackTitle) {
 
 function postListItem(row) {
   const tags = JSON.parse(row.tags_json || '[]');
-  return {
+  const post = {
     slug: row.slug,
     href: `/blog/live?slug=${encodeURIComponent(row.slug)}`,
     title: row.title,
@@ -330,6 +362,9 @@ function postListItem(row) {
     image: row.image_src ? { src: row.image_src, alt: row.image_alt || row.title } : null,
     runtime: true,
   };
+
+  if ('search_text' in row) post.body = row.search_text || '';
+  return post;
 }
 
 function adminPostListItem(row) {
@@ -356,10 +391,14 @@ function fullPost(row) {
   };
 }
 
-async function listRuntimePosts(env, limit = 50) {
+async function listRuntimePosts(env, limit = 50, options = {}) {
   if (!env.BLOG_DB) return [];
+  const includeSearch = Boolean(options.includeSearch);
+  const fields = includeSearch
+    ? 'slug, title, excerpt, date, tags_json, image_src, image_alt, search_text'
+    : 'slug, title, excerpt, date, tags_json, image_src, image_alt';
   const result = await env.BLOG_DB.prepare(
-    `SELECT slug, title, excerpt, date, tags_json, image_src, image_alt
+    `SELECT ${fields}
      FROM blog_posts
      WHERE published = 1
      ORDER BY date DESC, updated_at DESC
@@ -423,13 +462,33 @@ async function deleteRuntimePost(env, slug) {
   return { deleted: true, assetCount: assets?.count ?? 0 };
 }
 
+async function countOrphanAssets(env) {
+  const row = await env.BLOG_DB.prepare(
+    `SELECT COUNT(*) AS count
+     FROM blog_assets
+     WHERE slug NOT IN (SELECT slug FROM blog_posts)`,
+  ).first();
+  return Number(row?.count ?? 0);
+}
+
+async function deleteOrphanAssets(env) {
+  const count = await countOrphanAssets(env);
+  if (count > 0) {
+    await env.BLOG_DB.prepare(
+      `DELETE FROM blog_assets
+       WHERE slug NOT IN (SELECT slug FROM blog_posts)`,
+    ).run();
+  }
+  return { deleted: count };
+}
+
 async function putRuntimePost(env, post) {
   await env.BLOG_DB.prepare(
     `INSERT INTO blog_posts (
        slug, title, excerpt, date, tags_json, markdown, html, image_src, image_alt,
-       word_count, reading_minutes, published, updated_at
+       word_count, reading_minutes, published, search_text, updated_at
      )
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
      ON CONFLICT(slug) DO UPDATE SET
        title = excluded.title,
        excerpt = excluded.excerpt,
@@ -442,6 +501,7 @@ async function putRuntimePost(env, post) {
        word_count = excluded.word_count,
        reading_minutes = excluded.reading_minutes,
        published = excluded.published,
+       search_text = excluded.search_text,
        updated_at = CURRENT_TIMESTAMP`,
   )
     .bind(
@@ -457,6 +517,7 @@ async function putRuntimePost(env, post) {
       post.wordCount,
       post.readingMinutes,
       post.published ? 1 : 0,
+      post.searchText,
     )
     .run();
 }
@@ -570,9 +631,9 @@ export default {
     if (request.method === 'OPTIONS') {
       return new Response(null, {
         headers: {
-          'access-control-allow-origin': '*',
           'access-control-allow-methods': 'GET,POST,PATCH,DELETE,OPTIONS',
           'access-control-allow-headers': 'authorization,content-type,x-admin-password',
+          'cache-control': CACHE.noStore,
         },
       });
     }
@@ -654,6 +715,45 @@ export default {
         ok: true,
         source: 'd1',
         posts: await listAdminRuntimePosts(env, limit),
+      });
+    }
+
+    if (url.pathname === '/api/admin/assets/orphans' && request.method === 'GET') {
+      const auth = await verifyAdmin(request, env);
+      if (!auth.ok) {
+        return json({ ok: false, message: auth.message }, { status: auth.status });
+      }
+
+      if (!env.BLOG_DB) {
+        return json(
+          { ok: false, message: 'D1 binding BLOG_DB is not configured' },
+          { status: 501 },
+        );
+      }
+
+      return json({
+        ok: true,
+        orphanAssets: await countOrphanAssets(env),
+      });
+    }
+
+    if (url.pathname === '/api/admin/assets/orphans' && request.method === 'DELETE') {
+      const auth = await verifyAdmin(request, env);
+      if (!auth.ok) {
+        return json({ ok: false, message: auth.message }, { status: auth.status });
+      }
+
+      if (!env.BLOG_DB) {
+        return json(
+          { ok: false, message: 'D1 binding BLOG_DB is not configured' },
+          { status: 501 },
+        );
+      }
+
+      const result = await deleteOrphanAssets(env);
+      return json({
+        ok: true,
+        deleted: result.deleted,
       });
     }
 
@@ -771,6 +871,7 @@ export default {
           wordCount: stats.wordCount,
           readingMinutes: stats.readingMinutes,
           published: !parsed.data.draft,
+          searchText: searchText(parsed.body),
         };
 
         await putRuntimePost(env, post);
@@ -800,6 +901,8 @@ export default {
         ok: true,
         enabled: comments.enabled,
         comments: [],
+      }, {
+        headers: { 'cache-control': CACHE.publicList },
       });
     }
 
@@ -820,11 +923,14 @@ export default {
 
     if (url.pathname === '/api/posts' && request.method === 'GET') {
       const limit = Math.min(100, Math.max(1, Number(url.searchParams.get('limit') ?? 50)));
+      const includeSearch = url.searchParams.get('include') === 'search';
       return json({
         ok: true,
         source: 'd1',
         configured: Boolean(env.BLOG_DB),
-        posts: await listRuntimePosts(env, limit),
+        posts: await listRuntimePosts(env, limit, { includeSearch }),
+      }, {
+        headers: { 'cache-control': CACHE.publicList },
       });
     }
 
@@ -833,7 +939,10 @@ export default {
       const slug = decodeURIComponent(postMatch[1]);
       const post = await getRuntimePost(env, slug);
       if (!post) return json({ ok: false, message: 'Post not found' }, { status: 404 });
-      return json({ ok: true, source: 'd1', post });
+      return json(
+        { ok: true, source: 'd1', post },
+        { headers: { 'cache-control': CACHE.publicDetail } },
+      );
     }
 
     if (url.pathname.startsWith('/api/assets/') && request.method === 'GET') {
@@ -857,8 +966,7 @@ export default {
       const headers = new Headers();
       headers.set('content-type', object.content_type || 'application/octet-stream');
       headers.set('content-length', String(object.byte_length || 0));
-      headers.set('cache-control', 'public, max-age=31536000, immutable');
-      headers.set('access-control-allow-origin', '*');
+      headers.set('cache-control', CACHE.publicAsset);
 
       const response = new Response(assetBody(object.body), { headers });
       await cache?.put(cacheRequest, response.clone()).catch(() => {});

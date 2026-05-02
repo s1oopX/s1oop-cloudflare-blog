@@ -168,14 +168,12 @@ const maxTagCount = Math.max(1, ...tagStats.map((item) => item.count));
 
     Promise.all([
       fetch('/search-index.json').then((response) => response.json()),
-      fetch('/api/posts?limit=50')
+      fetch('/api/posts?limit=50&include=search')
         .then((response) => response.ok ? response.json() : null)
         .catch(() => null),
     ])
       .then(([data, runtime]) => {
-        const runtimePosts = Array.isArray(runtime?.posts)
-          ? runtime.posts.map((post) => ({ ...post, body: '' }))
-          : [];
+        const runtimePosts = Array.isArray(runtime?.posts) ? runtime.posts : [];
         const existingHrefs = new Set(data.map((post) => post.href));
         index = data.concat(runtimePosts.filter((post) => !existingHrefs.has(post.href)));
         const query = new URLSearchParams(window.location.search).get('q')?.trim() ?? '';

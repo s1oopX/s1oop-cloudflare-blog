@@ -13,6 +13,15 @@ const latestPost = posts[0];
 const currentPage = 1;
 const totalPages = pageCount(posts, POSTS_PER_PAGE);
 const paginatedPosts = pageItems(posts, currentPage, POSTS_PER_PAGE);
+const staticPostData = posts.map((post) => ({
+  title: post.data.title,
+  excerpt: postExcerpt(post),
+  href: postHref(post),
+  date: post.data.date.toISOString(),
+  tags: post.data.tags,
+  image: postImage(post),
+  runtime: false,
+}));
 ---
 
 <BaseLayout title="全部档案 | s1oop's Blog">
@@ -24,7 +33,7 @@ const paginatedPosts = pageItems(posts, currentPage, POSTS_PER_PAGE);
     />
 
     <div class="ui-grid ui-page-body">
-      <div class="ui-stack ui-stagger" data-post-list>
+      <div class="ui-stack ui-stagger" data-post-list data-page-size={POSTS_PER_PAGE}>
         {paginatedPosts.map((post) => (
           <PostCard
             title={post.data.title}
@@ -35,7 +44,9 @@ const paginatedPosts = pageItems(posts, currentPage, POSTS_PER_PAGE);
             image={postImage(post)}
           />
         ))}
-        <Pagination currentPage={currentPage} totalPages={totalPages} baseHref="/blog/page" firstHref="/blog" />
+        <div data-post-pagination>
+          <Pagination currentPage={currentPage} totalPages={totalPages} baseHref="/blog/page" firstHref="/blog" />
+        </div>
       </div>
 
       <aside class="ui-sidebar ui-stagger">
@@ -64,8 +75,9 @@ const paginatedPosts = pageItems(posts, currentPage, POSTS_PER_PAGE);
     </div>
   </section>
 
-  <script is:inline>
+  <script is:inline define:vars={{ staticPosts: staticPostData, pageSize: POSTS_PER_PAGE }}>
     const postList = document.querySelector('[data-post-list]');
+    const pagination = document.querySelector('[data-post-pagination]');
     const postCount = document.querySelector('[data-post-count]');
     const latestPost = document.querySelector('[data-latest-post]');
 
@@ -91,7 +103,12 @@ const paginatedPosts = pageItems(posts, currentPage, POSTS_PER_PAGE);
       return badges + extraBadge;
     };
 
-    const renderRuntimePost = (post) => `
+    const normalizeTime = (value) => {
+      const time = new Date(value).getTime();
+      return Number.isFinite(time) ? time : 0;
+    };
+
+    const renderPost = (post) => `
       <article class="post-card ui-panel ui-panel-link" data-runtime-post="${escapeHtml(post.slug)}">
         <a href="${escapeHtml(post.href)}" class="post-card-link">
           <div class="post-card-media">
@@ -108,20 +125,51 @@ const paginatedPosts = pageItems(posts, currentPage, POSTS_PER_PAGE);
       </article>
     `;
 
+    const renderPagination = (currentPage, totalPages) => {
+      if (!pagination) return;
+      if (totalPages <= 1) {
+        pagination.innerHTML = '';
+        return;
+      }
+
+      const hrefForPage = (page) => page === 1 ? '/blog' : `/blog?page=${page}`;
+      const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
+      pagination.innerHTML = `
+        <nav class="ui-pagination" aria-label="分页">
+          <a class="ui-page-step ${currentPage <= 1 ? 'is-disabled' : ''}" ${currentPage > 1 ? `href="${hrefForPage(currentPage - 1)}"` : 'aria-disabled="true"'}>上一页</a>
+          <div class="ui-page-numbers">
+            ${pages.map((page) => `<a class="ui-page-number ${page === currentPage ? 'is-active' : ''}" href="${hrefForPage(page)}" ${page === currentPage ? 'aria-current="page"' : ''}>${page}</a>`).join('')}
+          </div>
+          <a class="ui-page-step ${currentPage >= totalPages ? 'is-disabled' : ''}" ${currentPage < totalPages ? `href="${hrefForPage(currentPage + 1)}"` : 'aria-disabled="true"'}>下一页</a>
+        </nav>
+      `;
+    };
+
+    const renderCombinedPosts = (runtimePosts = []) => {
+      if (!postList) return;
+
+      const existingHrefs = new Set(staticPosts.map((post) => post.href));
+      const posts = staticPosts
+        .concat(runtimePosts.filter((post) => post?.href && !existingHrefs.has(post.href)))
+        .sort((a, b) => normalizeTime(b.date) - normalizeTime(a.date));
+      const currentPage = Math.max(1, Number(new URLSearchParams(window.location.search).get('page') || 1));
+      const totalPages = Math.max(1, Math.ceil(posts.length / pageSize));
+      const boundedPage = Math.min(currentPage, totalPages);
+      const visiblePosts = posts.slice((boundedPage - 1) * pageSize, boundedPage * pageSize);
+
+      postList.querySelectorAll('.post-card').forEach((node) => node.remove());
+      postList.insertAdjacentHTML('afterbegin', visiblePosts.map(renderPost).join(''));
+      renderPagination(boundedPage, totalPages);
+
+      if (postCount) postCount.textContent = String(posts.length);
+      if (latestPost) latestPost.textContent = posts[0] ? formatDate(posts[0].date) : '-';
+    };
+
     fetch('/api/posts?limit=20')
       .then((response) => response.ok ? response.json() : null)
       .then((data) => {
         const posts = Array.isArray(data?.posts) ? data.posts : [];
-        if (!posts.length || !postList) return;
-
-        const existingHrefs = new Set(Array.from(postList.querySelectorAll('a[href]')).map((link) => link.getAttribute('href')));
-        const runtimePosts = posts.filter((post) => post?.href && !existingHrefs.has(post.href));
-        if (!runtimePosts.length) return;
-
-        postList.insertAdjacentHTML('afterbegin', runtimePosts.map(renderRuntimePost).join(''));
-
-        if (postCount) postCount.textContent = String(Number(postCount.textContent || 0) + runtimePosts.length);
-        if (latestPost) latestPost.textContent = formatDate(runtimePosts[0].date);
+        renderCombinedPosts(posts);
       })
       .catch(() => {});
   </script>
