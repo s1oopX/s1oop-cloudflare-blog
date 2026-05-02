@@ -1,0 +1,22 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "s1oop-cloudflare-blog-api",
+  "main": "workers/api.js",
+  "compatibility_date": "2026-05-02",
+  "vars": {
+    "COMMENTS_ENABLED": "false",
+    "GITHUB_BRANCH": "main",
+    "CONTENT_DIR": "content/posts"
+  },
+
+  // Optional visit counters:
+  // Create a KV namespace, then uncomment and replace the ids.
+  //
+  // "kv_namespaces": [
+  //   {
+  //     "binding": "BLOG_KV",
+  //     "id": "<production-kv-namespace-id>",
+  //     "preview_id": "<preview-kv-namespace-id>"
+  //   }
+  // ]
+}

@@ -2,6 +2,16 @@
 
 `api.js` is the preferred Worker. Keep one Worker and route by pathname.
 
+Local development is wired through the project dev script:
+
+```sh
+npm run dev
+```
+
+This starts Astro on `127.0.0.1:4322` and a local Worker API server on `127.0.0.1:8787`. Astro proxies `/api/*` to the local API server.
+
+Cloudflare deployment configuration lives in `wrangler.jsonc`.
+
 ## Reserved Routes
 
 - `GET /api/comments`: returns the closed comment state and any stored comments if KV exists.

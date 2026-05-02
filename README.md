@@ -63,16 +63,22 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:4321`.
+Open `http://127.0.0.1:4322`.
 
-For local API testing with the Worker proxy:
+`npm run dev` starts two local processes:
+
+- Astro dev server on `http://127.0.0.1:4322`
+- Local Worker API server on `http://127.0.0.1:8787`
+
+Astro proxies `/api/*` to the local Worker API server, so status, comments, and admin checks do not 404 in local development.
+
+Useful split commands:
 
 ```sh
-npm run dev -- --host 127.0.0.1 --port 4322
+npm run dev:astro
+npm run dev:api
 npm run dev:proxy
 ```
-
-Open `http://127.0.0.1:4321`.
 
 ## Build
 
@@ -90,6 +96,8 @@ Use these build settings:
 - Node.js version: `22`
 
 Prefer `workers/api.js` as the single Worker. Deploy separate Workers only if the API grows enough to justify splitting.
+
+Worker config lives in `wrangler.jsonc`.
 
 Recommended Worker routes:
 
