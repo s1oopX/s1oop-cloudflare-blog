@@ -37,14 +37,9 @@ const focusRows = [
 
 const workflowRows = [
   {
-    label: 'Static archive',
-    title: '静态文章',
-    copy: '适合长期保留的文章放在源码里，随 GitHub 和 Cloudflare Pages 构建发布。',
-  },
-  {
     label: 'Runtime post',
     title: '实时文章',
-    copy: '需要快速上传的 Markdown 进入 D1，前台会和静态文章合并排序、搜索和展示。',
+    copy: '需要快速上传的 Markdown 进入 D1，前台会和已有归档合并排序、搜索和展示。',
   },
   {
     label: 'Private entry',
@@ -71,18 +66,32 @@ const principles = [
   },
 ];
 
-const entryLinks = [
-  { label: '全部档案', href: '/blog', note: '按时间回看所有文章' },
-  { label: '专栏', href: '/collections', note: '按主题整理内容' },
-  { label: '搜索', href: '/search', note: '查找标题、标签和正文' },
-  { label: '私人入口', href: '/s1oop', note: '受保护的发布与维护入口' },
-];
-
 const sideSignals = [
-  { label: 'Frontend', value: 'Astro Static' },
-  { label: 'Deploy', value: 'Cloudflare Pages' },
-  { label: 'API', value: 'Pages Functions' },
-  { label: 'Runtime', value: 'Cloudflare D1' },
+  {
+    label: 'Frontend',
+    value: 'Astro Static',
+    note: '公开页面预渲染，首屏主要走静态分发。',
+  },
+  {
+    label: 'Deploy',
+    value: 'Cloudflare Pages',
+    note: 'GitHub main 分支推送后自动构建并发布。',
+  },
+  {
+    label: 'API',
+    value: 'Pages Functions',
+    note: '统计、评论状态、运行时文章和后台操作由边缘函数处理。',
+  },
+  {
+    label: 'Storage',
+    value: 'Cloudflare D1',
+    note: '实时文章、小图、评论设置和访问统计保存在 D1。',
+  },
+  {
+    label: 'Cache',
+    value: 'Headers + Edge',
+    note: '静态资源长缓存，API 按公开与后台接口分层控制。',
+  },
 ];
 ---
 
@@ -231,21 +240,6 @@ const sideSignals = [
 
         <section class="about-signal-panel ui-panel">
           <div class="ui-panel-header">
-            <p class="ui-eyebrow">entry</p>
-            <h2 class="about-side-title">站点入口</h2>
-          </div>
-          <div class="about-link-list">
-            {entryLinks.map((item) => (
-              <a class="about-link-item" href={item.href}>
-                <span>{item.label}</span>
-                <strong>{item.note}</strong>
-              </a>
-            ))}
-          </div>
-        </section>
-
-        <section class="about-signal-panel ui-panel">
-          <div class="ui-panel-header">
             <p class="ui-eyebrow">system</p>
             <h2 class="about-side-title">技术指纹</h2>
           </div>
@@ -254,6 +248,7 @@ const sideSignals = [
               <div>
                 <span>{item.label}</span>
                 <strong>{item.value}</strong>
+                <p>{item.note}</p>
               </div>
             ))}
           </div>

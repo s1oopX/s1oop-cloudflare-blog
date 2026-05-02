@@ -269,7 +269,7 @@
   }
 
   .about-signal-list div {
-    @apply grid grid-cols-[4.75rem_minmax(0,1fr)] gap-4 border-b border-white/10 px-5 py-4 text-sm last:border-b-0;
+    @apply grid gap-2 border-b border-white/10 px-5 py-4 text-sm last:border-b-0;
   }
 
   .about-signal-list span {
@@ -278,5 +278,9 @@
   }
 
   .about-signal-list strong {
-    @apply min-w-0 text-right font-medium text-zinc-200;
+    @apply min-w-0 text-base font-medium text-zinc-200;
+  }
+
+  .about-signal-list p {
+    @apply text-xs leading-5 text-zinc-500;
   }
