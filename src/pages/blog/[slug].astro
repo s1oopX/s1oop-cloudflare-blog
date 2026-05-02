@@ -42,15 +42,6 @@ const readingStats = postReadingStats(post);
       </div>
 
       <aside class="ui-sidebar reading-sidebar ui-stagger">
-        <section class="ui-panel article-toc-panel" data-article-toc-panel>
-          <div class="ui-panel-header">
-            <h2 class="text-sm font-medium text-white">目录</h2>
-          </div>
-          <nav class="article-toc ui-panel-body" data-article-toc aria-label="文章目录">
-            <p class="article-toc-empty">正在读取文章结构。</p>
-          </nav>
-        </section>
-
         <section class="ui-panel">
           <div class="ui-panel-header">
             <h2 class="text-sm font-medium text-white">文章信息</h2>
@@ -104,76 +95,4 @@ const readingStats = postReadingStats(post);
       </aside>
     </div>
   </article>
-
-  <script is:inline>
-    const slugifyHeading = (value) => value
-      .trim()
-      .toLowerCase()
-      .replace(/[^\p{L}\p{N}\s-]/gu, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      || 'section';
-
-    const content = document.querySelector('.post-content');
-    const toc = document.querySelector('[data-article-toc]');
-    const tocPanel = document.querySelector('[data-article-toc-panel]');
-    const headings = Array.from(content?.querySelectorAll('h2, h3') ?? []);
-
-    if (toc && tocPanel) {
-      if (!headings.length) {
-        tocPanel.hidden = true;
-      } else {
-        const usedIds = new Map();
-        toc.innerHTML = headings.map((heading, index) => {
-          const baseId = heading.id || slugifyHeading(heading.textContent || '');
-          const count = usedIds.get(baseId) ?? 0;
-          const id = count ? `${baseId}-${count + 1}` : baseId;
-          usedIds.set(baseId, count + 1);
-          heading.id = id;
-
-          const depth = heading.tagName === 'H3' ? 'is-depth-3' : 'is-depth-2';
-          const marker = heading.tagName === 'H3' ? '·' : String(index + 1).padStart(2, '0');
-          return `<a class="article-toc-link ${depth}" href="#${encodeURIComponent(id)}"><span class="article-toc-index">${marker}</span><span class="article-toc-text">${heading.textContent}</span></a>`;
-        }).join('');
-
-        const tocLinks = Array.from(toc.querySelectorAll('.article-toc-link'));
-        const byId = new Map(tocLinks.map((link) => [decodeURIComponent(link.getAttribute('href')?.slice(1) || ''), link]));
-
-        const setActive = (id) => {
-          tocLinks.forEach((link) => link.classList.toggle('is-active', link === byId.get(id)));
-        };
-
-        const updateActiveHeading = () => {
-          const anchorOffset = 86;
-          const activeHeading = headings.reduce((current, heading) => {
-            const top = heading.getBoundingClientRect().top;
-            return top <= anchorOffset ? heading : current;
-          }, headings[0]);
-
-          if (activeHeading?.id) setActive(activeHeading.id);
-        };
-
-        let ticking = false;
-        const requestActiveHeadingUpdate = () => {
-          if (ticking) return;
-          ticking = true;
-          window.requestAnimationFrame(() => {
-            updateActiveHeading();
-            ticking = false;
-          });
-        };
-
-        updateActiveHeading();
-        window.addEventListener('scroll', requestActiveHeadingUpdate, { passive: true });
-        window.addEventListener('resize', requestActiveHeadingUpdate);
-
-        tocLinks.forEach((link) => {
-          link.addEventListener('click', () => {
-            const id = decodeURIComponent(link.getAttribute('href')?.slice(1) || '');
-            if (id) window.setTimeout(() => setActive(id), 40);
-          });
-        });
-      }
-    }
-  </script>
 </BaseLayout>

@@ -26,13 +26,6 @@ import Comments from '../../components/Comments.astro';
       </div>
 
       <aside class="ui-sidebar reading-sidebar ui-stagger">
-        <section class="ui-panel article-toc-panel" data-article-toc-panel hidden>
-          <div class="ui-panel-header">
-            <h2 class="text-sm font-medium text-white">目录</h2>
-          </div>
-          <nav class="article-toc ui-panel-body" data-article-toc aria-label="文章目录"></nav>
-        </section>
-
         <section class="ui-panel">
           <div class="ui-panel-header">
             <h2 class="text-sm font-medium text-white">文章信息</h2>
@@ -71,8 +64,6 @@ import Comments from '../../components/Comments.astro';
     const wordsNode = document.querySelector('[data-live-post-words]');
     const minutesNode = document.querySelector('[data-live-post-minutes]');
     const tagsNode = document.querySelector('[data-live-post-tags]');
-    const toc = document.querySelector('[data-article-toc]');
-    const tocPanel = document.querySelector('[data-article-toc-panel]');
 
     const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
       '&': '&amp;',
@@ -86,33 +77,6 @@ import Comments from '../../components/Comments.astro';
       const date = new Date(value);
       if (Number.isNaN(date.getTime())) return value || '-';
       return date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
-    };
-
-    const slugifyHeading = (value) => value
-      .trim()
-      .toLowerCase()
-      .replace(/[^\p{L}\p{N}\s-]/gu, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      || 'section';
-
-    const refreshToc = () => {
-      const headings = Array.from(content?.querySelectorAll('h2, h3') ?? []);
-      if (!toc || !tocPanel || !headings.length) return;
-
-      tocPanel.hidden = false;
-      const usedIds = new Map();
-      toc.innerHTML = headings.map((heading, index) => {
-        const baseId = heading.id || slugifyHeading(heading.textContent || '');
-        const count = usedIds.get(baseId) ?? 0;
-        const id = count ? `${baseId}-${count + 1}` : baseId;
-        usedIds.set(baseId, count + 1);
-        heading.id = id;
-
-        const depth = heading.tagName === 'H3' ? 'is-depth-3' : 'is-depth-2';
-        const marker = heading.tagName === 'H3' ? '·' : String(index + 1).padStart(2, '0');
-        return `<a class="article-toc-link ${depth}" href="#${encodeURIComponent(id)}"><span class="article-toc-index">${marker}</span><span class="article-toc-text">${escapeHtml(heading.textContent)}</span></a>`;
-      }).join('');
     };
 
     const renderPost = (post) => {
@@ -131,7 +95,6 @@ import Comments from '../../components/Comments.astro';
           .map((tag) => `<a href="/search?q=${encodeURIComponent(tag)}" class="ui-badge no-underline hover:text-white">#${escapeHtml(tag)}</a>`)
           .join('');
       }
-      refreshToc();
     };
 
     const slug = new URLSearchParams(window.location.search).get('slug');

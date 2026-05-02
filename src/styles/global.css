@@ -1173,78 +1173,6 @@
     @apply min-w-0 text-right font-medium text-zinc-200;
   }
 
-  .article-toc-panel[hidden] {
-    display: none;
-  }
-
-  .article-toc-panel .ui-panel-header {
-    @apply px-4 py-3;
-  }
-
-  .article-toc {
-    @apply relative grid gap-0 px-4 py-3;
-    max-height: min(calc(100vh - 12rem), 34rem);
-    overflow-y: auto;
-    scrollbar-width: thin;
-  }
-
-  .article-toc::before {
-    content: '';
-    @apply absolute bottom-4 left-4 top-4 w-px;
-    background: linear-gradient(180deg, transparent, rgb(var(--accent-rgb) / 0.18), rgb(var(--accent-rgb) / 0.08), transparent);
-  }
-
-  .article-toc-empty {
-    @apply text-sm text-zinc-500;
-  }
-
-  .article-toc-link {
-    @apply relative grid grid-cols-[1.75rem_minmax(0,1fr)] items-start gap-2 rounded-md py-2 pr-2 text-sm leading-5 text-zinc-500 no-underline transition hover:text-zinc-200;
-    padding-left: 0.7rem;
-  }
-
-  .article-toc-link.is-depth-2 {
-    @apply font-medium;
-  }
-
-  .article-toc-link.is-depth-3 {
-    @apply py-1.5 text-xs;
-    padding-left: 1.45rem;
-    color: var(--muted-2);
-  }
-
-  .article-toc-link::before {
-    content: '';
-    @apply absolute left-0 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full border;
-    border-color: rgb(var(--accent-rgb) / 0.2);
-    background: var(--card);
-  }
-
-  .article-toc-link:hover::before,
-  .article-toc-link.is-active::before {
-    border-color: rgb(var(--accent-rgb) / 0.55);
-    background: var(--accent);
-    box-shadow: 0 0 14px rgb(var(--accent-rgb) / 0.18);
-  }
-
-  .article-toc-link.is-active {
-    @apply text-zinc-100;
-    background: rgb(255 255 255 / 0.025);
-  }
-
-  .article-toc-index {
-    @apply font-mono text-[0.66rem] leading-5 text-zinc-700;
-  }
-
-  .article-toc-link.is-active .article-toc-index,
-  .article-toc-link:hover .article-toc-index {
-    color: var(--accent-muted);
-  }
-
-  .article-toc-text {
-    @apply min-w-0;
-  }
-
   .article-related-list {
     @apply grid gap-0;
   }
@@ -1263,19 +1191,6 @@
 
   .article-related-title {
     @apply text-sm leading-6 text-zinc-300;
-  }
-
-  .article-toc::-webkit-scrollbar {
-    width: 0.35rem;
-  }
-
-  .article-toc::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .article-toc::-webkit-scrollbar-thumb {
-    border-radius: 999px;
-    background: rgb(var(--accent-rgb) / 0.16);
   }
 
   .status-note-list {
