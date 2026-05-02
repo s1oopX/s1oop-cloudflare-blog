@@ -3,125 +3,152 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/PageHeader.astro';
 
 const profileRows = [
+  { label: 'Owner', value: 's1oop' },
   { label: 'Runtime', value: 'Cloudflare' },
-  { label: 'Frontend', value: 'Astro' },
-  { label: 'Writing', value: 'Markdown' },
+  { label: 'Source', value: 'Markdown + D1' },
 ];
 
-const architectureRows = [
+const focusRows = [
   {
     index: '01',
-    label: 'Deployment',
-    title: '单 Cloudflare 部署',
+    label: 'Design',
+    title: '界面和阅读体验',
     copy:
-      '页面分发、接口响应和边缘计算收束在 Cloudflare 同一平台。外部看到的是轻和稳定，内部减少的是服务器维护、跨服务编排和无意义的运行层。',
-    pill: 'Cloudflare Pages / Cloudflare Workers / Edge',
+      '记录暗色阅读、排版密度、导航层级和长期阅读舒适度。这里更关心一个页面为什么这样安排，而不是只展示最终样式。',
+    pill: 'interface / typography / reading',
   },
   {
     index: '02',
-    label: 'Stack',
-    title: '文本优先的技术选型',
+    label: 'Writing',
+    title: '写作和整理方法',
     copy:
-      'Astro 负责生成前台，Markdown 保留内容源，Cloudflare Workers 承接轻接口。选型不追求“大而全”的后台，而是把内容、索引和交互拆到足够轻的层级里。',
-    pill: 'Astro / Cloudflare Workers / Markdown',
+      '把文章当成可回看的档案，而不是短暂的信息流。标题、摘要、标签和归档都为再次阅读服务。',
+    pill: 'notes / archive / review',
   },
   {
     index: '03',
-    label: 'Style',
-    title: '暗色档案视觉',
+    label: 'Build',
+    title: '轻量部署和维护',
     copy:
-      '界面不模拟信息流，也不做作品集式陈列。深色基底、细线网格、低饱和光感和克制动效共同建立一种档案感，让文章保持主体位置。',
-    pill: 'Noir / Grid / Reading',
+      '源码保留在 GitHub，公开页面由 Astro 静态生成；需要即时发布的文章写入 Cloudflare D1，不再把运行时内容回写源码仓库。',
+    pill: 'Astro / Pages / D1',
   },
 ];
 
-const stackRows = [
-  ['Cloudflare Pages'],
-  ['Cloudflare Workers'],
-  ['Astro', 'Markdown'],
+const workflowRows = [
+  {
+    label: 'Static archive',
+    title: '静态文章',
+    copy: '适合长期保留的文章放在源码里，随 GitHub 和 Cloudflare Pages 构建发布。',
+  },
+  {
+    label: 'Runtime post',
+    title: '实时文章',
+    copy: '需要快速上传的 Markdown 进入 D1，前台会和静态文章合并排序、搜索和展示。',
+  },
+  {
+    label: 'Private entry',
+    title: '私人入口',
+    copy: '受保护的管理页面用于上传 Markdown、小图、评论开关和运行时文章维护。',
+  },
 ];
 
 const principles = [
   {
-    label: 'Archive',
-    title: '反信息流',
-    copy: '内容不追逐即时热度，保留能被重新打开、重新阅读的文本。',
+    label: 'Quiet',
+    title: '界面安静',
+    copy: '视觉服务阅读，不用过度装饰抢走文章本身的注意力。',
   },
   {
-    label: 'Stack',
-    title: '反炫技',
-    copy: '技术栈不作为展品出现，只承担生成、索引、分发和维护的职责。',
+    label: 'Durable',
+    title: '内容耐放',
+    copy: '文章尽量保留判断、过程和背景，让它过一段时间仍然能被理解。',
   },
   {
-    label: 'Tone',
-    title: '反说明书',
-    copy: '个人博客不是产品文档，表达必须先成立，结构再为表达服务。',
+    label: 'Light',
+    title: '维护轻便',
+    copy: '优先使用 Cloudflare 免费能力和少量代码完成发布、搜索、评论和统计。',
   },
 ];
 
+const entryLinks = [
+  { label: '全部档案', href: '/blog', note: '按时间回看所有文章' },
+  { label: '专栏', href: '/collections', note: '按主题整理内容' },
+  { label: '搜索', href: '/search', note: '查找标题、标签和正文' },
+  { label: '私人入口', href: '/s1oop', note: '受保护的发布与维护入口' },
+];
+
 const sideSignals = [
-  { label: 'Edge', value: 'Cloudflare' },
-  { label: 'Build', value: 'Astro Static' },
-  { label: 'Source', value: 'Markdown' },
+  { label: 'Frontend', value: 'Astro Static' },
+  { label: 'Deploy', value: 'Cloudflare Pages' },
+  { label: 'API', value: 'Pages Functions' },
+  { label: 'Runtime', value: 'Cloudflare D1' },
 ];
 ---
 
 <BaseLayout
   title="关于 | s1oop's Blog"
-  description="关于 s1oop's Blog：一个整理设计、写作、阅读和长期观察的个人博客。"
+  description="关于 s1oop's Blog：一个整理设计、写作、阅读和轻量部署实践的个人博客。"
 >
   <section class="ui-page archive-page about-page">
     <PageHeader
       eyebrow="about archive"
       title="关于"
-      description="一个部署在 Cloudflare，由 Astro、Cloudflare Workers 与 Markdown 支撑的个人博客。"
+      description="这里存放设计、写作、阅读和轻量部署实践。它不是信息流，更像一个可以反复打开的个人档案。"
     />
 
     <div class="ui-grid ui-page-body">
       <div class="about-main">
         <section class="about-manifest ui-panel">
           <div class="about-manifest-kicker">
-            <p class="ui-eyebrow">cloudflare deployment / technical stack</p>
-            <span>edge-native archive</span>
+            <p class="ui-eyebrow">personal archive / quiet reading</p>
+            <span>built for rereading</span>
           </div>
           <div class="about-priority-grid">
             <div class="about-priority-block about-priority-deploy">
-              <p class="ui-eyebrow">deployment signature</p>
-              <h2>单 Cloudflare 部署</h2>
+              <p class="ui-eyebrow">position</p>
+              <h2>一个为长期回看而整理的个人博客。</h2>
               <p>
-                静态分发、轻接口和边缘执行被收束在 Cloudflare 同一平台。
-                这不是“服务器 + 博客程序”的传统组合，而是一条更短的发布与访问链路。
+                内容不会按热度排序，也不追求频繁刷新。文章、标签、专栏和搜索都围绕同一个目标：
+                让写过的内容在之后还能被找到、读懂和继续修改。
               </p>
             </div>
             <div class="about-priority-block">
-              <p class="ui-eyebrow">technical stack</p>
-              <h2>技术栈</h2>
-              <div class="about-stack-strip" aria-label="技术栈">
-                {stackRows.map((row) => (
-                  <div class="about-stack-row">
-                    {row.map((item) => <span>{item}</span>)}
-                  </div>
-                ))}
+              <p class="ui-eyebrow">scope</p>
+              <h2>主要写什么</h2>
+              <div class="about-stack-strip" aria-label="内容范围">
+                <div class="about-stack-row">
+                  <span>设计判断</span>
+                  <span>阅读体验</span>
+                </div>
+                <div class="about-stack-row">
+                  <span>写作整理</span>
+                  <span>技术实践</span>
+                </div>
+                <div class="about-stack-row">
+                  <span>Cloudflare</span>
+                  <span>Astro</span>
+                </div>
               </div>
             </div>
           </div>
           <div class="about-manifest-body">
             <div class="about-manifest-note">
-              <p class="ui-eyebrow">deployment</p>
-              <h3>部署层先收束。</h3>
+              <p class="ui-eyebrow">reading</p>
+              <h3>先保证阅读。</h3>
               <ul>
-                <li>Pages 负责静态分发</li>
-                <li>Cloudflare Workers 承接轻量接口</li>
-                <li>访问链路落在边缘网络</li>
+                <li>正文比装饰更重要</li>
+                <li>暗色界面保持低噪音</li>
+                <li>导航只保留常用入口</li>
               </ul>
             </div>
             <div class="about-manifest-note">
-              <p class="ui-eyebrow">technical selection</p>
-              <h3>技术层保持轻量。</h3>
+              <p class="ui-eyebrow">publishing</p>
+              <h3>再降低维护。</h3>
               <ul>
-                <li>Astro 生成前台</li>
-                <li>Markdown 保留内容源</li>
-                <li>索引与主题由元数据派生</li>
+                <li>源码文章走 GitHub</li>
+                <li>实时文章写入 D1</li>
+                <li>小图直接存入 D1</li>
               </ul>
             </div>
           </div>
@@ -129,11 +156,11 @@ const sideSignals = [
 
         <section class="about-architecture ui-panel">
           <div class="about-panel-head">
-            <p class="ui-eyebrow">architecture notes</p>
-            <h2>该博客的不同之处</h2>
+            <p class="ui-eyebrow">content focus</p>
+            <h2>这个博客关注什么</h2>
           </div>
           <div class="about-dossier-grid">
-            {architectureRows.map((item) => (
+            {focusRows.map((item) => (
               <article class="about-dossier-card">
                 <div class="about-dossier-topline">
                   <span class="about-row-index" aria-hidden="true">{item.index}</span>
@@ -149,10 +176,26 @@ const sideSignals = [
           </div>
         </section>
 
+        <section class="about-architecture ui-panel">
+          <div class="about-panel-head">
+            <p class="ui-eyebrow">publishing workflow</p>
+            <h2>当前发布方式</h2>
+          </div>
+          <div class="about-workflow-list">
+            {workflowRows.map((item) => (
+              <article>
+                <p class="ui-eyebrow">{item.label}</p>
+                <h3>{item.title}</h3>
+                <p>{item.copy}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
         <section class="about-principles ui-panel">
           <div class="about-panel-head">
             <p class="ui-eyebrow">editorial position</p>
-            <h2>写作立场</h2>
+            <h2>写作和维护原则</h2>
           </div>
           <div class="about-principle-list">
             {principles.map((item) => (
@@ -184,6 +227,21 @@ const sideSignals = [
               </div>
             ))}
           </dl>
+        </section>
+
+        <section class="about-signal-panel ui-panel">
+          <div class="ui-panel-header">
+            <p class="ui-eyebrow">entry</p>
+            <h2 class="about-side-title">站点入口</h2>
+          </div>
+          <div class="about-link-list">
+            {entryLinks.map((item) => (
+              <a class="about-link-item" href={item.href}>
+                <span>{item.label}</span>
+                <strong>{item.note}</strong>
+              </a>
+            ))}
+          </div>
         </section>
 
         <section class="about-signal-panel ui-panel">

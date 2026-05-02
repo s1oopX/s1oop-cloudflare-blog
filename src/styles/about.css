@@ -189,6 +189,24 @@
     @apply mt-4 text-sm leading-6 text-zinc-400;
   }
 
+  .about-workflow-list {
+    @apply grid gap-0;
+  }
+
+  .about-workflow-list article {
+    @apply border-b border-white/10 p-5 last:border-b-0 sm:p-6;
+  }
+
+  .about-workflow-list h3 {
+    @apply mt-3 text-xl font-semibold text-white;
+    font-family: var(--font-display);
+    letter-spacing: 0;
+  }
+
+  .about-workflow-list article > p:not(.ui-eyebrow) {
+    @apply mt-4 max-w-3xl text-sm leading-7 text-zinc-400;
+  }
+
   .about-profile {
     @apply p-4;
   }
@@ -262,32 +280,3 @@
   .about-signal-list strong {
     @apply min-w-0 text-right font-medium text-zinc-200;
   }
-
-  .article-related-list {
-    @apply grid gap-0;
-  }
-
-  .article-related-item {
-    @apply grid gap-1 border-b border-white/10 py-3 no-underline transition last:border-b-0 last:pb-0;
-  }
-
-  .article-related-item:hover .article-related-title {
-    color: white;
-  }
-
-  .article-related-date {
-    @apply font-mono text-[0.68rem] uppercase tracking-[0.14em] text-zinc-500;
-  }
-
-  .article-related-title {
-    @apply text-sm leading-6 text-zinc-300;
-  }
-
-  .status-note-list {
-    @apply grid gap-0;
-  }
-
-  .status-note {
-    @apply border-b border-white/10 py-4 text-sm last:border-b-0 first:pt-0 last:pb-0;
-  }
-

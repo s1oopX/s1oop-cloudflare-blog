@@ -1,0 +1,27 @@
+  .article-related-list {
+    @apply grid gap-0;
+  }
+
+  .article-related-item {
+    @apply grid gap-1 border-b border-white/10 py-3 no-underline transition last:border-b-0 last:pb-0;
+  }
+
+  .article-related-item:hover .article-related-title {
+    color: white;
+  }
+
+  .article-related-date {
+    @apply font-mono text-[0.68rem] uppercase tracking-[0.14em] text-zinc-500;
+  }
+
+  .article-related-title {
+    @apply text-sm leading-6 text-zinc-300;
+  }
+
+  .status-note-list {
+    @apply grid gap-0;
+  }
+
+  .status-note {
+    @apply border-b border-white/10 py-4 text-sm last:border-b-0 first:pt-0 last:pb-0;
+  }
