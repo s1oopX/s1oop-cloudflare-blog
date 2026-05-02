@@ -1,0 +1,61 @@
+@media (prefers-reduced-motion: reduce) {
+  .ui-stagger > *,
+  .landing-track,
+  .landing-fixed,
+  .landing-scroll-cue span,
+  .landing-portrait,
+  .landing-portrait > img,
+  .landing-title {
+    animation: none;
+    transition: none;
+  }
+
+  .landing-portrait:hover::before,
+  .landing-portrait:focus-visible::before {
+    animation: none;
+  }
+
+  .ui-stagger > *,
+  .landing-fixed {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .site-header nav {
+    @apply gap-3;
+  }
+
+  .site-brand {
+    @apply gap-2 pr-2;
+  }
+
+  .site-brand-name {
+    font-size: 1rem;
+  }
+
+  .site-nav-link {
+    @apply px-2;
+  }
+
+  .ui-search {
+    @apply h-12 gap-2 px-3;
+  }
+
+  .ui-search-button {
+    @apply h-8 px-3;
+  }
+
+  .post-card-link {
+    @apply gap-3 p-3;
+  }
+
+  .post-card-media {
+    min-height: 11rem;
+  }
+
+  .post-card-title {
+    @apply text-xl;
+  }
+}

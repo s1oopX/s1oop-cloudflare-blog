@@ -1,0 +1,169 @@
+  .private-dashboard {
+    @apply relative grid w-full max-w-none gap-5;
+    isolation: isolate;
+  }
+
+  .private-dashboard::before {
+    content: none;
+  }
+
+  .private-dashboard-status {
+    @apply grid gap-3 sm:grid-cols-2 xl:grid-cols-4;
+  }
+
+  .private-status-card {
+    @apply flex items-center justify-between gap-4 rounded-md border px-4 py-3;
+    border-color: rgb(var(--accent-rgb) / 0.12);
+    background:
+      linear-gradient(180deg, rgb(255 255 255 / 0.025), transparent),
+      color-mix(in srgb, var(--card) 82%, transparent);
+  }
+
+  .private-status-card span {
+    @apply text-xs text-zinc-500;
+  }
+
+  .private-status-card strong {
+    @apply font-mono text-xs uppercase tracking-[0.14em] text-zinc-200;
+  }
+
+  .private-status-card strong[data-tone='success'] {
+    color: var(--accent);
+  }
+
+  .private-status-card strong[data-tone='error'] {
+    @apply text-red-300;
+  }
+
+  .private-dashboard[data-auth='checking'] .private-dashboard-grid {
+    visibility: hidden;
+  }
+
+  .private-dashboard-grid {
+    @apply grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_20rem];
+  }
+
+  .private-dashboard-main,
+  .private-dashboard-side {
+    @apply grid gap-5;
+  }
+
+  .private-dashboard-side {
+    @apply lg:sticky lg:top-6;
+  }
+
+  .private-dashboard-panel {
+    @apply relative overflow-hidden rounded-md border;
+    border-color: rgb(var(--accent-rgb) / 0.13);
+    background:
+      linear-gradient(180deg, rgb(255 255 255 / 0.03), transparent 34%),
+      color-mix(in srgb, var(--card) 90%, transparent);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.045),
+      0 22px 70px rgb(var(--shadow-rgb) / 0.28);
+  }
+
+  .private-dashboard-panel::before {
+    content: '';
+    @apply pointer-events-none absolute left-5 right-5 top-0 h-px;
+    background: linear-gradient(90deg, transparent, rgb(var(--accent-rgb) / 0.52), transparent);
+  }
+
+  .private-panel-head {
+    @apply flex items-start justify-between gap-4 border-b px-5 py-4;
+    border-color: rgb(255 255 255 / 0.08);
+  }
+
+  .private-panel-head h2 {
+    @apply mt-2 text-2xl font-semibold text-white;
+    font-family: var(--font-display);
+    letter-spacing: 0;
+  }
+
+  .private-panel-badge {
+    @apply rounded-md border px-2 py-1 font-mono text-[0.68rem] uppercase tracking-[0.14em] text-zinc-400;
+    border-color: rgb(var(--accent-rgb) / 0.14);
+    background: rgb(255 255 255 / 0.025);
+  }
+
+  .private-panel-badge[data-tone='success'] {
+    color: var(--accent);
+    border-color: rgb(var(--accent-rgb) / 0.3);
+  }
+
+  .private-panel-badge[data-tone='error'] {
+    @apply text-red-300;
+    border-color: rgb(252 165 165 / 0.24);
+  }
+
+  .private-panel-action {
+    @apply h-9 px-3 text-xs;
+  }
+
+  .private-publish-panel .private-admin-form {
+    @apply p-5;
+    max-width: none;
+  }
+
+  .private-publish-panel .private-admin-input,
+  .private-publish-panel .private-admin-file {
+    @apply text-left;
+  }
+
+  .private-admin-state-inline {
+    @apply static mx-5 mb-5 min-h-5 w-auto max-w-none translate-x-0 whitespace-normal text-left;
+  }
+
+  .private-publish-result {
+    @apply mx-5 mb-5 flex justify-end;
+  }
+
+  .private-publish-result[hidden] {
+    display: none;
+  }
+
+  .private-file-summary {
+    @apply grid gap-2 text-sm sm:grid-cols-3;
+  }
+
+  .private-file-summary div {
+    @apply grid gap-1 rounded-md border px-3 py-2;
+    border-color: rgb(255 255 255 / 0.08);
+    background: rgb(255 255 255 / 0.02);
+  }
+
+  .private-file-summary span {
+    @apply font-mono text-[0.68rem] uppercase tracking-[0.14em] text-zinc-500;
+  }
+
+  .private-file-summary strong {
+    @apply truncate text-sm font-medium text-zinc-300;
+  }
+
+  .private-upload-preview {
+    @apply grid gap-2 rounded-md border p-3 text-sm;
+    border-color: rgb(255 255 255 / 0.08);
+    background:
+      linear-gradient(180deg, rgb(var(--accent-rgb) / 0.035), transparent),
+      rgb(255 255 255 / 0.018);
+  }
+
+  .private-preview-row {
+    @apply grid gap-1 border-b border-white/10 pb-2 last:border-b-0 last:pb-0 sm:grid-cols-[5rem_minmax(0,1fr)] sm:items-start;
+  }
+
+  .private-preview-row span {
+    @apply font-mono text-[0.68rem] uppercase tracking-[0.14em] text-zinc-500;
+  }
+
+  .private-preview-row strong {
+    @apply min-w-0 truncate text-sm font-medium text-zinc-300;
+  }
+
+  .private-preview-row strong[data-tone='success'] {
+    color: var(--accent);
+  }
+
+  .private-preview-row strong[data-tone='error'] {
+    @apply text-red-300;
+  }

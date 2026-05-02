@@ -1,0 +1,187 @@
+  .private-admin-root {
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    background:
+      radial-gradient(circle at 50% 20%, rgb(var(--glow-rgb) / 0.16), transparent 30rem),
+      linear-gradient(180deg, var(--background-2), var(--background) 58%, #101a16);
+  }
+
+  .private-page {
+    @apply pb-6;
+  }
+
+  .private-admin-stage {
+    @apply relative grid min-h-screen place-items-center overflow-hidden px-6 py-10;
+    min-height: 100dvh;
+  }
+
+  .private-admin-stage::before {
+    content: '';
+    @apply pointer-events-none absolute inset-0;
+    background:
+      linear-gradient(rgb(var(--accent-rgb) / 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--accent-rgb) / 0.024) 1px, transparent 1px),
+      linear-gradient(115deg, transparent 0 42%, rgb(var(--accent-rgb) / 0.05) 42% 42.15%, transparent 42.15% 100%);
+    background-size: 46px 46px, 46px 46px, auto;
+    mask-image: linear-gradient(180deg, transparent 0%, black 16%, black 86%, transparent 100%);
+  }
+
+  .private-admin-stage::after {
+    content: '';
+    @apply pointer-events-none absolute inset-x-0 top-0 h-px;
+    background: linear-gradient(90deg, transparent, rgb(var(--accent-rgb) / 0.5), transparent);
+  }
+
+  .private-admin-return {
+    @apply absolute left-6 top-6 z-20 rounded-md border px-3 py-2 text-sm text-zinc-400 no-underline transition hover:text-white sm:left-8 sm:top-8;
+    border-color: rgb(var(--accent-rgb) / 0.12);
+    background: rgb(255 255 255 / 0.025);
+  }
+
+  .private-admin-panel {
+    @apply relative z-10 grid w-full max-w-lg rounded-lg border px-7 py-8 text-center;
+    min-height: 0;
+    place-items: center;
+    border-color: rgb(var(--accent-rgb) / 0.15);
+    background:
+      linear-gradient(180deg, rgb(255 255 255 / 0.035), transparent 45%),
+      color-mix(in srgb, var(--card) 90%, transparent);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.06),
+      0 28px 90px rgb(var(--shadow-rgb) / 0.62);
+  }
+
+  .private-access-panel {
+    min-height: 28rem;
+  }
+
+  .private-admin-panel::before {
+    content: '';
+    @apply pointer-events-none absolute left-7 right-7 top-0 h-px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+
+  .private-admin-view {
+    @apply grid w-full place-items-center;
+    grid-template-rows: auto auto auto auto auto;
+    row-gap: 1rem;
+    padding-block: 1rem 1.9rem;
+  }
+
+  .private-admin-view-hidden {
+    display: none;
+  }
+
+  .private-admin-kicker {
+    @apply font-mono text-xs uppercase tracking-[0.24em];
+    color: var(--accent-muted);
+  }
+
+  .private-admin-title {
+    @apply text-4xl font-semibold leading-none text-white sm:text-5xl;
+    font-family: var(--font-display);
+    letter-spacing: 0.01em;
+  }
+
+  .private-lock-mark {
+    @apply mb-1 flex h-10 w-10 items-center justify-center rounded-md border font-mono text-xs text-zinc-500;
+    border-color: rgb(var(--accent-rgb) / 0.16);
+    background:
+      linear-gradient(180deg, rgb(var(--accent-rgb) / 0.06), transparent),
+      rgb(255 255 255 / 0.02);
+  }
+
+  .private-admin-copy {
+    @apply max-w-sm text-sm leading-7 text-zinc-400;
+  }
+
+  .private-admin-form {
+    @apply grid w-full gap-3;
+    max-width: 30.5rem;
+  }
+
+  .private-admin-input {
+    @apply h-12 w-full rounded-md border px-4 text-center text-sm text-zinc-100 outline-none transition placeholder:text-zinc-600;
+    border-color: var(--border);
+    background:
+      linear-gradient(180deg, rgb(255 255 255 / 0.02), transparent 70%),
+      color-mix(in srgb, var(--background) 82%, transparent);
+  }
+
+  .private-admin-input:focus {
+    border-color: rgb(var(--accent-rgb) / 0.36);
+    box-shadow: 0 0 0 2px rgb(var(--accent-rgb) / 0.1);
+  }
+
+  .private-admin-button,
+  .private-admin-secondary {
+    @apply inline-flex h-12 items-center justify-center rounded-md border px-6 text-sm font-medium no-underline transition active:translate-y-px;
+    outline: none;
+  }
+
+  .private-admin-button {
+    @apply text-zinc-100;
+    border-color: rgb(var(--accent-rgb) / 0.28);
+    background:
+      linear-gradient(180deg, rgb(var(--accent-rgb) / 0.14), rgb(var(--accent-rgb) / 0.05)),
+      color-mix(in srgb, var(--card-2) 82%, transparent);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.055);
+  }
+
+  .private-admin-button:hover {
+    border-color: rgb(var(--accent-rgb) / 0.42);
+    color: white;
+    background:
+      linear-gradient(180deg, rgb(var(--accent-rgb) / 0.19), rgb(var(--accent-rgb) / 0.075)),
+      color-mix(in srgb, var(--card-2) 76%, white);
+  }
+
+  .private-admin-secondary {
+    @apply text-zinc-300 hover:text-white;
+    border-color: var(--border);
+    background: rgb(255 255 255 / 0.035);
+  }
+
+  .private-access-meta {
+    @apply flex w-full flex-wrap justify-center gap-2 pt-1;
+  }
+
+  .private-access-meta span {
+    @apply rounded-md border px-2.5 py-1 font-mono text-[0.68rem] uppercase tracking-[0.14em] text-zinc-500;
+    border-color: rgb(var(--accent-rgb) / 0.1);
+    background: rgb(255 255 255 / 0.018);
+  }
+
+  .private-admin-upload {
+    @apply gap-4;
+  }
+
+  .private-admin-file {
+    @apply flex h-12 cursor-pointer items-center justify-center rounded-md border px-4 text-sm text-zinc-300 transition hover:text-white;
+    border-color: var(--border);
+    background:
+      linear-gradient(180deg, rgb(255 255 255 / 0.02), transparent 70%),
+      color-mix(in srgb, var(--background) 82%, transparent);
+  }
+
+  .private-admin-file input {
+    @apply sr-only;
+  }
+
+  .private-admin-actions {
+    @apply grid gap-3 sm:grid-cols-2;
+  }
+
+  .private-admin-state {
+    @apply absolute bottom-5 left-1/2 min-h-5 w-[calc(100%-3.5rem)] max-w-[30.5rem] -translate-x-1/2 overflow-hidden text-ellipsis whitespace-nowrap text-center text-xs leading-5 text-zinc-600;
+  }
+
+  .private-admin-state[data-tone='success'] {
+    color: var(--accent);
+  }
+
+  .private-admin-state[data-tone='error'] {
+    @apply text-red-300;
+  }
+

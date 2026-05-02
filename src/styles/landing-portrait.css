@@ -1,0 +1,199 @@
+  .landing-portrait {
+    @apply relative grid h-56 w-56 cursor-pointer place-items-center rounded-lg border p-3 shadow-2xl outline-none;
+    isolation: isolate;
+    overflow: visible;
+    border-color: var(--border-strong);
+    background:
+      radial-gradient(
+        9rem circle at 50% 50%,
+        rgb(var(--accent-rgb) / 0.12),
+        transparent 44%
+      ),
+      var(--background-2);
+    transform: scale(1);
+    transition:
+      transform 180ms ease,
+      border-color 180ms ease,
+      box-shadow 220ms ease,
+      filter 180ms ease;
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.06),
+      0 0 0 1px rgb(var(--accent-rgb) / 0.08),
+      0 0 34px rgb(var(--glow-rgb) / 0.22),
+      0 0 92px rgb(var(--glow-rgb) / 0.22),
+      0 24px 80px rgb(var(--shadow-rgb) / 0.7);
+  }
+
+  .landing-portrait:hover,
+  .landing-portrait:focus-visible {
+    border-color: rgb(var(--accent-rgb) / 0.42);
+    transform: scale(1.018);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.08),
+      0 0 0 1px rgb(var(--accent-rgb) / 0.16),
+      0 0 46px rgb(var(--accent-rgb) / 0.26),
+      0 0 120px rgb(var(--glow-rgb) / 0.28),
+      0 30px 100px rgb(var(--shadow-rgb) / 0.76);
+  }
+
+  .landing-portrait:active {
+    transform: scale(0.992);
+  }
+
+  .landing-portrait::before,
+  .landing-portrait::after {
+    content: '';
+    @apply pointer-events-none absolute;
+  }
+
+  .landing-portrait::before {
+    z-index: 4;
+    inset: -4px;
+    border-radius: 0.85rem;
+    padding: 2px;
+    background:
+      conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        transparent 245deg,
+        rgb(var(--accent-rgb) / 0.18) 270deg,
+        rgb(var(--accent-rgb) / 0.95) 302deg,
+        #ffffff 318deg,
+        rgb(var(--accent-rgb) / 0.88) 334deg,
+        transparent 360deg
+      );
+    opacity: 0;
+    transform: rotate(0deg);
+    filter: drop-shadow(0 0 10px rgb(var(--accent-rgb) / 0.55));
+    transition: opacity 160ms ease;
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+  }
+
+  .landing-portrait::after {
+    z-index: 2;
+    inset: 0.55rem;
+    border-radius: 0.45rem;
+    border: 1px solid rgb(var(--accent-rgb) / 0.16);
+    opacity: 0.9;
+    transition:
+      border-color 180ms ease,
+      box-shadow 180ms ease;
+  }
+
+  .landing-portrait:hover::before,
+  .landing-portrait:focus-visible::before {
+    opacity: 0;
+    animation: none;
+  }
+
+  .landing-portrait:hover::after,
+  .landing-portrait:focus-visible::after {
+    border-color: rgb(var(--accent-rgb) / 0.34);
+    box-shadow: 0 0 28px rgb(var(--accent-rgb) / 0.12);
+  }
+
+  .landing-portrait > img {
+    @apply relative z-10;
+    transition:
+      transform 180ms ease,
+      filter 180ms ease;
+  }
+
+  .landing-border-runner {
+    @apply pointer-events-none absolute opacity-0;
+    z-index: 30;
+    inset: -4px;
+    overflow: visible;
+    transition: opacity 140ms ease;
+    will-change: opacity;
+  }
+
+  .landing-border-runner rect {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.35;
+    stroke-linecap: round;
+    stroke-dasharray: 16 84;
+    stroke-dashoffset: 0;
+    filter: drop-shadow(0 0 4px rgb(var(--accent-rgb) / 0.8));
+  }
+
+  .landing-portrait:hover .landing-border-runner,
+  .landing-portrait:focus-visible .landing-border-runner,
+  .landing-portrait.is-running .landing-border-runner {
+    opacity: 1;
+  }
+
+  .landing-portrait:hover .landing-border-runner rect,
+  .landing-portrait:focus-visible .landing-border-runner rect,
+  .landing-portrait.is-running .landing-border-runner rect {
+    animation: avatar-border-runner 3.5s linear infinite;
+  }
+
+  .landing-portrait:hover > img,
+  .landing-portrait:focus-visible > img {
+    transform: scale(1.006);
+    filter: saturate(0.95) contrast(1.12);
+  }
+
+  .landing-portrait::selection {
+    background: transparent;
+  }
+
+  .landing-portrait img {
+    box-shadow:
+      0 0 0 1px rgb(var(--accent-rgb) / 0.12),
+      0 0 24px rgb(var(--accent-rgb) / 0.14);
+  }
+
+  .landing-avatar {
+    @apply h-full w-full rounded-md object-cover;
+    object-position: center;
+    filter: saturate(0.85) contrast(1.08);
+  }
+
+  .landing-title {
+    @apply mt-8 text-3xl font-semibold tracking-normal sm:text-4xl;
+    font-family: var(--font-display);
+    letter-spacing: 0.015em;
+    color: var(--accent);
+    text-shadow:
+      0 0 22px rgb(var(--accent-rgb) / 0.2),
+      0 1px 0 rgb(var(--shadow-rgb) / 0.72);
+    transition:
+      opacity 180ms ease,
+      transform 180ms ease,
+      text-shadow 180ms ease;
+  }
+
+  .landing-fixed:has(.landing-portrait:hover) .landing-title,
+  .landing-fixed:has(.landing-portrait:focus-visible) .landing-title {
+    text-shadow:
+      0 0 34px rgb(var(--accent-rgb) / 0.32),
+      0 1px 0 rgb(var(--shadow-rgb) / 0.72);
+  }
+
+  .landing-scroll-cue {
+    @apply absolute bottom-8 left-1/2 z-20 grid h-11 w-7 -translate-x-1/2 place-items-start rounded-full border p-1.5 no-underline transition;
+    background: color-mix(in srgb, var(--card-2) 70%, transparent);
+    border-color: rgb(var(--accent-rgb) / 0.2);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
+  }
+
+  .landing-scroll[data-panel='1'] .landing-scroll-cue {
+    @apply pointer-events-none opacity-0;
+  }
+
+  .landing-scroll-cue span {
+    @apply block h-2 w-2 rounded-full;
+    background: var(--accent);
+    animation: scroll-cue 1.5s ease-in-out infinite;
+  }
+

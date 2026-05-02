@@ -1,0 +1,94 @@
+  .landing-scroll {
+    position: relative;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    overscroll-behavior: none;
+    touch-action: none;
+    scrollbar-width: none;
+    background:
+      radial-gradient(circle at 50% 18%, rgb(var(--glow-rgb) / 0.2), transparent 30rem),
+      linear-gradient(180deg, var(--background-2), var(--background) 58%, #101a16);
+    --landing-index: 0;
+    --landing-offset: 0dvh;
+    --landing-drag: 0px;
+  }
+
+  .landing-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .landing-track {
+    height: 200vh;
+    height: 200dvh;
+    transform: translate3d(0, calc(var(--landing-offset) + var(--landing-drag)), 0);
+    transition: transform var(--motion-landing) cubic-bezier(0.34, 1.36, 0.64, 1);
+    will-change: transform;
+  }
+
+  .landing-scroll.is-dragging .landing-track {
+    transition: none;
+  }
+
+  .landing-scroll.is-nudging .landing-track {
+    transition: transform 280ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .landing-stage {
+    @apply relative grid place-items-center overflow-hidden px-6;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .landing-stage::before {
+    content: '';
+    @apply pointer-events-none absolute inset-0;
+    background:
+      linear-gradient(rgb(var(--accent-rgb) / 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(var(--accent-rgb) / 0.024) 1px, transparent 1px),
+      linear-gradient(115deg, transparent 0 42%, rgb(var(--accent-rgb) / 0.05) 42% 42.15%, transparent 42.15% 100%);
+    background-size: 46px 46px, 46px 46px, auto;
+    mask-image: linear-gradient(180deg, transparent 0%, black 18%, black 82%, transparent 100%);
+  }
+
+  .landing-stage::after {
+    content: '';
+    @apply pointer-events-none absolute inset-x-0 top-0 h-px;
+    background: linear-gradient(90deg, transparent, rgb(var(--accent-rgb) / 0.5), transparent);
+  }
+
+  .landing-stage-profile {
+    z-index: 1;
+  }
+
+  .landing-stage-entry {
+    @apply border-t;
+    border-color: rgb(var(--accent-rgb) / 0.1);
+    min-height: 100vh;
+    min-height: 100dvh;
+    background:
+      repeating-linear-gradient(90deg, rgb(var(--accent-rgb) / 0.04) 0 1px, transparent 1px 5rem),
+      radial-gradient(circle at 50% 22%, rgb(var(--glow-rgb) / 0.13), transparent 28rem),
+      linear-gradient(180deg, var(--background-2), var(--background) 52%, #101a16);
+  }
+
+  .landing-fixed {
+    @apply relative z-10 flex w-full max-w-xl flex-col items-center justify-center text-center;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 100vh;
+    min-height: 100dvh;
+    transform: translateY(1.4rem) scale(0.985);
+    opacity: 0.68;
+    transition:
+      transform 620ms cubic-bezier(0.34, 1.42, 0.64, 1),
+      opacity 360ms ease;
+  }
+
+  .landing-stage.is-active .landing-fixed {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
