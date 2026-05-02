@@ -32,6 +32,6 @@ BLOG_DB      D1 database binding
 
 Runtime publishing does not write Markdown back to GitHub. GitHub remains the source repository for code and static content.
 
-Uploaded images are stored in `blog_assets` as D1 blobs. Keep each image at or below 1 MB.
+Uploaded images are stored in `blog_assets` as small base64 payloads. Keep each image at or below 1 MB.
 
 Runtime post images are stored in D1. R2 is intentionally not required for this lightweight deployment.

@@ -137,7 +137,7 @@ Then bind it to the Pages project:
 BLOG_DB      -> s1oop-blog-content
 ```
 
-`POST /api/admin/posts` accepts a Markdown file plus optional image files. The Markdown is parsed into D1 and uploaded images are stored in `blog_assets` as small D1 blobs. Each image is limited to 1 MB, so this remains lightweight and avoids R2 billing setup. The blog archive reads `/api/posts` in the browser and prepends these runtime posts without a rebuild.
+`POST /api/admin/posts` accepts a Markdown file plus optional image files. The Markdown is parsed into D1 and uploaded images are stored in `blog_assets` as small base64 payloads. Each image is limited to 1 MB, so this remains lightweight and avoids R2 billing setup. The blog archive reads `/api/posts` in the browser and prepends these runtime posts without a rebuild.
 
 ## Static Content
 

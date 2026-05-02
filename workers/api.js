@@ -83,6 +83,16 @@ function sanitizeAssetName(value) {
   return cleaned || fallback;
 }
 
+function arrayBufferToBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  const chunkSize = 0x8000;
+  for (let index = 0; index < bytes.length; index += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(index, index + chunkSize));
+  }
+  return btoa(binary);
+}
+
 function parseScalar(value) {
   const trimmed = text(value);
   if (!trimmed) return '';
@@ -419,7 +429,7 @@ async function storeImages(env, slug, files) {
     names.set(originalName, count + 1);
     const name = count ? originalName.replace(/(\.[^.]+)?$/, `-${count + 1}$1`) : originalName;
     const key = `posts/${slug}/${name}`;
-    const body = await file.arrayBuffer();
+    const body = arrayBufferToBase64(await file.arrayBuffer());
 
     await env.BLOG_DB.prepare(
       `INSERT INTO blog_assets (key, slug, filename, content_type, body, byte_length, updated_at)
