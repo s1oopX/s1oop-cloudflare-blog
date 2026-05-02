@@ -1,0 +1,152 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
+import Comments from '../../components/Comments.astro';
+---
+
+<BaseLayout title="实时文章 | s1oop's Blog">
+  <article class="ui-page reading-page" data-live-post-page>
+    <PageHeader
+      eyebrow="runtime post"
+      title="实时文章"
+      description="这篇文章从 D1 读取，发布后无需重新构建站点。"
+    >
+      <Fragment slot="actions">
+        <a href="/blog" class="ui-button">全部档案</a>
+      </Fragment>
+    </PageHeader>
+
+    <div class="ui-grid ui-page-body">
+      <div class="ui-stack">
+        <div class="post-content reading-surface ui-panel p-6 sm:p-8" data-live-post-content>
+          <p>正在读取文章。</p>
+        </div>
+
+        <Comments />
+      </div>
+
+      <aside class="ui-sidebar reading-sidebar ui-stagger">
+        <section class="ui-panel article-toc-panel" data-article-toc-panel hidden>
+          <div class="ui-panel-header">
+            <h2 class="text-sm font-medium text-white">目录</h2>
+          </div>
+          <nav class="article-toc ui-panel-body" data-article-toc aria-label="文章目录"></nav>
+        </section>
+
+        <section class="ui-panel">
+          <div class="ui-panel-header">
+            <h2 class="text-sm font-medium text-white">文章信息</h2>
+          </div>
+          <div class="ui-panel-body grid gap-4">
+            <div class="ui-stat-row">
+              <span class="ui-stat-label">日期</span>
+              <span class="ui-stat-value" data-live-post-date>-</span>
+            </div>
+            <div class="ui-stat-row">
+              <span class="ui-stat-label">类型</span>
+              <span class="ui-stat-value">D1</span>
+            </div>
+            <div class="ui-stat-row">
+              <span class="ui-stat-label">字数</span>
+              <span class="ui-stat-value" data-live-post-words>-</span>
+            </div>
+            <div class="ui-stat-row">
+              <span class="ui-stat-label">阅读</span>
+              <span class="ui-stat-value" data-live-post-minutes>-</span>
+            </div>
+            <div class="grid gap-2 border-t border-white/10 pt-4">
+              <span class="ui-stat-label">标签</span>
+              <div class="flex flex-wrap gap-2" data-live-post-tags></div>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </article>
+
+  <script is:inline>
+    const page = document.querySelector('[data-live-post-page]');
+    const content = document.querySelector('[data-live-post-content]');
+    const dateNode = document.querySelector('[data-live-post-date]');
+    const wordsNode = document.querySelector('[data-live-post-words]');
+    const minutesNode = document.querySelector('[data-live-post-minutes]');
+    const tagsNode = document.querySelector('[data-live-post-tags]');
+    const toc = document.querySelector('[data-article-toc]');
+    const tocPanel = document.querySelector('[data-article-toc-panel]');
+
+    const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    }[character]));
+
+    const formatDate = (value) => {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value || '-';
+      return date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    };
+
+    const slugifyHeading = (value) => value
+      .trim()
+      .toLowerCase()
+      .replace(/[^\p{L}\p{N}\s-]/gu, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      || 'section';
+
+    const refreshToc = () => {
+      const headings = Array.from(content?.querySelectorAll('h2, h3') ?? []);
+      if (!toc || !tocPanel || !headings.length) return;
+
+      tocPanel.hidden = false;
+      const usedIds = new Map();
+      toc.innerHTML = headings.map((heading, index) => {
+        const baseId = heading.id || slugifyHeading(heading.textContent || '');
+        const count = usedIds.get(baseId) ?? 0;
+        const id = count ? `${baseId}-${count + 1}` : baseId;
+        usedIds.set(baseId, count + 1);
+        heading.id = id;
+
+        const depth = heading.tagName === 'H3' ? 'is-depth-3' : 'is-depth-2';
+        const marker = heading.tagName === 'H3' ? '·' : String(index + 1).padStart(2, '0');
+        return `<a class="article-toc-link ${depth}" href="#${encodeURIComponent(id)}"><span class="article-toc-index">${marker}</span><span class="article-toc-text">${escapeHtml(heading.textContent)}</span></a>`;
+      }).join('');
+    };
+
+    const renderPost = (post) => {
+      document.title = `${post.title} | s1oop's Blog`;
+      page?.querySelector('.ui-page-head h1')?.replaceChildren(document.createTextNode(post.title));
+      page?.querySelector('.ui-description')?.replaceChildren(document.createTextNode(post.excerpt || ''));
+      const eyebrow = page?.querySelector('.ui-eyebrow');
+      if (eyebrow) eyebrow.textContent = formatDate(post.date);
+
+      if (content) content.innerHTML = post.html || '<p>这篇文章暂时没有正文。</p>';
+      if (dateNode) dateNode.textContent = formatDate(post.date);
+      if (wordsNode) wordsNode.textContent = `约 ${post.wordCount || 0} 字`;
+      if (minutesNode) minutesNode.textContent = `${post.readingMinutes || 1} 分钟`;
+      if (tagsNode) {
+        tagsNode.innerHTML = (post.tags || [])
+          .map((tag) => `<a href="/search?q=${encodeURIComponent(tag)}" class="ui-badge no-underline hover:text-white">#${escapeHtml(tag)}</a>`)
+          .join('');
+      }
+      refreshToc();
+    };
+
+    const slug = new URLSearchParams(window.location.search).get('slug');
+    if (!slug) {
+      if (content) content.innerHTML = '<p>缺少文章标识。</p>';
+    } else {
+      fetch(`/api/posts/${encodeURIComponent(slug)}`)
+        .then((response) => response.ok ? response.json() : Promise.reject(new Error('not found')))
+        .then((data) => {
+          if (!data?.post) throw new Error('not found');
+          renderPost(data.post);
+        })
+        .catch(() => {
+          if (content) content.innerHTML = '<p>没有找到这篇实时文章。</p>';
+        });
+    }
+  </script>
+</BaseLayout>

@@ -19,25 +19,23 @@ Cloudflare deployment configuration lives in `wrangler.jsonc`.
 - `POST /api/stats/visit`: records a daily counter when `BLOG_KV` is bound.
 - `GET /api/stats`: returns the daily counter when `BLOG_KV` is bound, otherwise zeros.
 - `POST /api/admin/check`: verifies the private `/s1oop` password.
-- `POST /api/admin/posts`: accepts a Markdown upload and writes it to the GitHub content source.
-- `GET /api/posts`: points clients to the static `/posts.json` index.
+- `POST /api/admin/posts`: accepts a Markdown upload, stores the post in D1, and stores optional images in R2.
+- `GET /api/posts`: returns runtime D1 posts for the browser overlay.
+- `GET /api/posts/:slug`: returns one runtime D1 post.
+- `GET /api/assets/*`: serves uploaded R2 assets.
 
 ## Private Publishing
 
-The `/s1oop` page unlocks with a password and redirects to `/s1oop/admin`, which sends Markdown files to `POST /api/admin/posts`.
-Configure these Worker environment variables before using it:
+The `/s1oop` page unlocks with a password and redirects to `/s1oop/admin`, which sends Markdown files and optional images to `POST /api/admin/posts`.
+Configure this environment variable and the Cloudflare bindings before using it:
 
 ```text
 ADMIN_PASSWORD=...
-GITHUB_TOKEN=...
-GITHUB_OWNER=...
-GITHUB_REPO=...
-GITHUB_BRANCH=main
-CONTENT_DIR=content/posts
+BLOG_DB      D1 database binding
+BLOG_IMAGES  R2 bucket binding
 ```
 
-`GITHUB_TOKEN` needs permission to write repository contents. When the repository is connected to
-Cloudflare Pages, the commit created by the Worker can trigger the normal Pages rebuild.
+Runtime publishing does not write Markdown back to GitHub. GitHub remains the source repository for code and static content.
 
 ## Optional KV Binding
 
@@ -55,4 +53,4 @@ stats:daily:{yyyy-mm-dd}
 settings:site
 ```
 
-Do not add R2 until image uploads or large files are actually needed.
+Runtime post images are stored in R2 when `BLOG_IMAGES` is bound.

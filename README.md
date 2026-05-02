@@ -1,6 +1,6 @@
 # s1oop Cloudflare Blog
 
-An Astro static blog designed for quiet long-form reading, deployed on Cloudflare Pages with optional Pages Functions for stats, comments, and private Markdown publishing.
+An Astro static blog designed for quiet long-form reading, deployed on Cloudflare Pages with Pages Functions for stats, comments, and private runtime publishing.
 
 Live site: <https://s1oop.bbroot.com>
 
@@ -12,7 +12,8 @@ Live site: <https://s1oop.bbroot.com>
 - Full archive, collection pages, search index, changelog, and article pages.
 - Cloudflare Pages deployment from GitHub.
 - Optional `/api/*` functions backed by `workers/api.js`.
-- Optional private `/s1oop/admin` publishing flow when GitHub API credentials are configured.
+- Private `/s1oop/admin` publishing flow that stores new posts in Cloudflare D1 and uploaded images in R2.
+- GitHub remains the source repository and deployment trigger; new posts are not written back to GitHub.
 
 ## Tech Stack
 
@@ -20,7 +21,9 @@ Live site: <https://s1oop.bbroot.com>
 - TailwindCSS
 - Cloudflare Pages
 - Cloudflare Pages Functions
-- Cloudflare KV, optional
+- Cloudflare D1 for runtime posts
+- Cloudflare R2 for runtime post images
+- Cloudflare KV, optional for counters
 - Wrangler, for Worker config validation and deployment tooling
 
 ## Local Development
@@ -67,15 +70,14 @@ Required for private admin login:
 ADMIN_PASSWORD=...
 ```
 
-Required only if `/s1oop/admin` should publish Markdown files back to GitHub:
+Runtime publishing does not use GitHub write credentials. Configure these Cloudflare Pages Function bindings instead:
 
 ```text
-GITHUB_TOKEN=...
-GITHUB_OWNER=...
-GITHUB_REPO=...
-GITHUB_BRANCH=main
-CONTENT_DIR=content/posts
+BLOG_DB      D1 database for runtime posts
+BLOG_IMAGES  R2 bucket for uploaded post images
 ```
+
+The local Node API shim does not emulate D1 or R2. Without those bindings, `/api/admin/posts` returns a clear configuration error instead of writing to GitHub.
 
 Optional:
 
@@ -118,7 +120,31 @@ workers/api.js
 
 `wrangler.jsonc` contains the standalone Worker configuration for validation and future direct Worker deployment.
 
-## Content
+## Runtime Publishing
+
+Create the storage resources in Cloudflare:
+
+```sh
+npx wrangler d1 create s1oop-blog-content
+npx wrangler r2 bucket create s1oop-blog-images
+```
+
+Apply the D1 schema:
+
+```sh
+npx wrangler d1 execute s1oop-blog-content --file migrations/0001_runtime_posts.sql
+```
+
+Then bind them to the Pages project:
+
+```text
+BLOG_DB      -> s1oop-blog-content
+BLOG_IMAGES  -> s1oop-blog-images
+```
+
+`POST /api/admin/posts` accepts a Markdown file plus optional image files. The Markdown is parsed into D1 and images are stored under `posts/{slug}/` in R2. The blog archive reads `/api/posts` in the browser and prepends these runtime posts without a rebuild.
+
+## Static Content
 
 Add posts under `content/posts/`:
 
@@ -135,14 +161,14 @@ draft: false
 Post body.
 ```
 
-Images can be placed under `public/images/posts/` and referenced from Markdown with absolute public paths.
+Images for static posts can be placed under `public/images/posts/` and referenced from Markdown with absolute public paths.
 
 ## Repository Notes
 
-- The public blog is static-first.
+- The public blog is static-first with a D1 runtime overlay for newly uploaded posts.
 - Public comments are disabled by default.
 - Visit stats work without KV, but are not persisted until `BLOG_KV` is bound.
-- The admin publishing API requires GitHub credentials and should only be enabled for trusted deployments.
+- The admin publishing API requires `ADMIN_PASSWORD`, `BLOG_DB`, and `BLOG_IMAGES` and should only be enabled for trusted deployments.
 
 ## License
 

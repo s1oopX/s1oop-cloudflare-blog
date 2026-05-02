@@ -24,7 +24,7 @@ const paginatedPosts = pageItems(posts, currentPage, POSTS_PER_PAGE);
     />
 
     <div class="ui-grid ui-page-body">
-      <div class="ui-stack ui-stagger">
+      <div class="ui-stack ui-stagger" data-post-list>
         {paginatedPosts.map((post) => (
           <PostCard
             title={post.data.title}
@@ -48,19 +48,81 @@ const paginatedPosts = pageItems(posts, currentPage, POSTS_PER_PAGE);
           <div class="ui-panel-body grid gap-4">
             <div class="ui-stat-row">
               <span class="ui-stat-label">文章</span>
-              <span class="ui-stat-value">{posts.length}</span>
+              <span class="ui-stat-value" data-post-count>{posts.length}</span>
             </div>
             <div class="ui-stat-row">
               <span class="ui-stat-label">标签</span>
-              <span class="ui-stat-value">{tags.length}</span>
+              <span class="ui-stat-value" data-tag-count>{tags.length}</span>
             </div>
             <div class="ui-stat-row">
               <span class="ui-stat-label">最新</span>
-              <span class="ui-stat-value">{latestPost ? formatPostDate(latestPost.data.date) : '-'}</span>
+              <span class="ui-stat-value" data-latest-post>{latestPost ? formatPostDate(latestPost.data.date) : '-'}</span>
             </div>
           </div>
         </section>
       </aside>
     </div>
   </section>
+
+  <script is:inline>
+    const postList = document.querySelector('[data-post-list]');
+    const postCount = document.querySelector('[data-post-count]');
+    const latestPost = document.querySelector('[data-latest-post]');
+
+    const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    }[character]));
+
+    const formatDate = (value) => {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return escapeHtml(value || '-');
+      return date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    };
+
+    const renderTags = (tags = []) => {
+      const visibleTags = tags.slice(0, 2);
+      const extraTagCount = Math.max(0, tags.length - visibleTags.length);
+      const badges = visibleTags.map((tag) => `<span class="ui-badge">#${escapeHtml(tag)}</span>`).join('');
+      const extraBadge = extraTagCount > 0 ? `<span class="ui-badge">+${extraTagCount}</span>` : '';
+      return badges + extraBadge;
+    };
+
+    const renderRuntimePost = (post) => `
+      <article class="post-card ui-panel ui-panel-link" data-runtime-post="${escapeHtml(post.slug)}">
+        <a href="${escapeHtml(post.href)}" class="post-card-link">
+          <div class="post-card-media">
+            ${post.image ? `<img src="${escapeHtml(post.image.src)}" alt="${escapeHtml(post.image.alt)}" loading="lazy" decoding="async" />` : '<span aria-hidden="true"></span>'}
+            <time>${formatDate(post.date)}</time>
+          </div>
+          <div class="post-card-main">
+            <div class="post-card-meta">${renderTags(post.tags)}</div>
+            <h2 class="post-card-title">${escapeHtml(post.title)}</h2>
+            <p class="post-card-excerpt">${escapeHtml(post.excerpt)}</p>
+            <div class="post-card-action"><span>阅读文章</span><span aria-hidden="true">-&gt;</span></div>
+          </div>
+        </a>
+      </article>
+    `;
+
+    fetch('/api/posts?limit=20')
+      .then((response) => response.ok ? response.json() : null)
+      .then((data) => {
+        const posts = Array.isArray(data?.posts) ? data.posts : [];
+        if (!posts.length || !postList) return;
+
+        const existingHrefs = new Set(Array.from(postList.querySelectorAll('a[href]')).map((link) => link.getAttribute('href')));
+        const runtimePosts = posts.filter((post) => post?.href && !existingHrefs.has(post.href));
+        if (!runtimePosts.length) return;
+
+        postList.insertAdjacentHTML('afterbegin', runtimePosts.map(renderRuntimePost).join(''));
+
+        if (postCount) postCount.textContent = String(Number(postCount.textContent || 0) + runtimePosts.length);
+        if (latestPost) latestPost.textContent = formatDate(runtimePosts[0].date);
+      })
+      .catch(() => {});
+  </script>
 </BaseLayout>

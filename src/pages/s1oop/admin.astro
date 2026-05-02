@@ -11,7 +11,7 @@ import PageHeader from '../../components/PageHeader.astro';
     <PageHeader
       eyebrow="PRIVATE CONSOLE"
       title="个人控制台"
-      description="Markdown 发布、评论、接口状态和后续功能都放在这里管理。"
+      description="Markdown 写入 D1，配图写入 R2，发布后不再回写 GitHub。"
     >
       <a slot="actions" class="private-admin-secondary" href="/blog">回到博客</a>
       <button slot="actions" id="private-lock-button" class="private-admin-secondary" type="button">锁定</button>
@@ -24,7 +24,7 @@ import PageHeader from '../../components/PageHeader.astro';
         <strong id="admin-auth-state">验证中</strong>
       </div>
       <div class="private-status-card">
-        <span>文章发布</span>
+        <span>实时发布</span>
         <strong id="admin-workflow-state">待提交</strong>
       </div>
       <div class="private-status-card">
@@ -43,7 +43,7 @@ import PageHeader from '../../components/PageHeader.astro';
           <div class="private-panel-head">
             <div>
               <p class="private-admin-kicker">publish</p>
-              <h2 id="publish-title">发布文章</h2>
+              <h2 id="publish-title">实时发布</h2>
             </div>
             <span id="admin-file-state" class="private-panel-badge">未选择</span>
           </div>
@@ -52,6 +52,10 @@ import PageHeader from '../../components/PageHeader.astro';
             <label class="private-admin-file">
               <span id="post-file-label">选择 Markdown 文件</span>
               <input id="post-file" name="file" type="file" accept=".md,.mdx,text/markdown" required />
+            </label>
+            <label class="private-admin-file">
+              <span id="post-image-label">选择配图，可多选</span>
+              <input id="post-images" name="images" type="file" accept="image/*" multiple />
             </label>
             <input
               id="post-slug"
@@ -75,12 +79,12 @@ import PageHeader from '../../components/PageHeader.astro';
               </div>
             </div>
             <div class="private-admin-actions">
-              <button class="private-admin-button" type="submit">提交发布</button>
+              <button class="private-admin-button" type="submit">写入发布</button>
               <button id="post-clear-button" class="private-admin-secondary" type="button">清空</button>
             </div>
           </form>
 
-          <p id="post-upload-state" class="private-admin-state private-admin-state-inline">支持 .md / .mdx</p>
+          <p id="post-upload-state" class="private-admin-state private-admin-state-inline">支持 .md / .mdx，图片写入 R2</p>
         </section>
 
         <section class="private-dashboard-panel" aria-labelledby="modules-title">
@@ -93,8 +97,8 @@ import PageHeader from '../../components/PageHeader.astro';
           <div class="private-feature-list">
             <div>
               <span>内容</span>
-              <strong>Markdown 发布</strong>
-              <p>使用当前文章模板检查 frontmatter、摘要、标签和配图。</p>
+              <strong>D1 文章库</strong>
+              <p>上传后直接入库，博客列表通过公开只读接口拉取新增文章。</p>
             </div>
             <div>
               <span>评论</span>
@@ -104,7 +108,7 @@ import PageHeader from '../../components/PageHeader.astro';
             <div>
               <span>接口</span>
               <strong>/api/admin/*</strong>
-              <p>集中查看发布、鉴权、评论和未来统计接口的接入状态。</p>
+              <p>集中处理鉴权、D1 写入、R2 图片和未来统计接口。</p>
             </div>
           </div>
         </section>
@@ -120,7 +124,7 @@ import PageHeader from '../../components/PageHeader.astro';
             <li><span>Frontmatter</span><strong>title / date</strong></li>
             <li><span>摘要</span><strong>列表可读</strong></li>
             <li><span>标签</span><strong>沿用既有主题</strong></li>
-            <li><span>配图</span><strong>public/images</strong></li>
+            <li><span>配图</span><strong>R2 images</strong></li>
           </ul>
         </section>
       </main>
@@ -140,7 +144,7 @@ import PageHeader from '../../components/PageHeader.astro';
             </div>
             <div>
               <span>发布</span>
-              <strong>/api/admin/posts</strong>
+              <strong>D1 / R2</strong>
             </div>
             <div>
               <span>评论</span>
@@ -148,7 +152,7 @@ import PageHeader from '../../components/PageHeader.astro';
             </div>
             <div>
               <span>公开接口</span>
-              <strong>只读优先</strong>
+              <strong>/api/posts</strong>
             </div>
           </div>
         </section>
@@ -171,7 +175,7 @@ import PageHeader from '../../components/PageHeader.astro';
             </div>
             <div>
               <span>发布后</span>
-              <strong>等待构建刷新</strong>
+              <strong>即时显示</strong>
             </div>
           </div>
         </section>
@@ -187,7 +191,9 @@ import PageHeader from '../../components/PageHeader.astro';
     const lockButton = document.querySelector('#private-lock-button');
     const clearButton = document.querySelector('#post-clear-button');
     const fileInput = document.querySelector('#post-file');
+    const imageInput = document.querySelector('#post-images');
     const fileLabel = document.querySelector('#post-file-label');
+    const imageLabel = document.querySelector('#post-image-label');
     const authState = document.querySelector('#admin-auth-state');
     const dashboard = document.querySelector('.private-dashboard');
     const fileState = document.querySelector('#admin-file-state');
@@ -199,7 +205,8 @@ import PageHeader from '../../components/PageHeader.astro';
     const formatError = (message) => {
       if (message === 'Invalid password') return '密码不正确';
       if (message === 'ADMIN_PASSWORD is not configured') return '访问密码未配置';
-      if (message?.includes('GitHub publishing is not configured')) return 'GitHub 发布未配置';
+      if (message?.includes('D1 binding BLOG_DB is not configured')) return 'D1 文章库未绑定';
+      if (message?.includes('R2 binding BLOG_IMAGES is not configured')) return 'R2 图片桶未绑定';
       return message || '操作失败';
     };
 
@@ -284,13 +291,19 @@ import PageHeader from '../../components/PageHeader.astro';
         });
     });
 
+    imageInput?.addEventListener('change', () => {
+      const count = imageInput.files?.length ?? 0;
+      if (imageLabel) imageLabel.textContent = count ? `已选择 ${count} 张配图` : '选择配图，可多选';
+    });
+
     clearButton?.addEventListener('click', () => {
       uploadForm?.reset();
       if (fileLabel) fileLabel.textContent = '选择 Markdown 文件';
+      if (imageLabel) imageLabel.textContent = '选择配图，可多选';
       setState(fileState, '未选择');
       setState(workflowState, '待提交');
       setFileMeta();
-      setState(uploadState, '支持 .md / .mdx', 'muted');
+      setState(uploadState, '支持 .md / .mdx，图片写入 R2', 'muted');
     });
 
     uploadForm?.addEventListener('submit', async (event) => {
@@ -319,10 +332,11 @@ import PageHeader from '../../components/PageHeader.astro';
         });
         const data = await response.json().catch(() => ({}));
         if (!response.ok || !data.ok) throw new Error(data.message || '发布失败');
-        setState(uploadState, `已提交：${data.path}`, 'success');
-        setState(workflowState, '已提交', 'success');
+        setState(uploadState, `已入库：${data.href || data.path}`, 'success');
+        setState(workflowState, '已入库', 'success');
         uploadForm.reset();
         if (fileLabel) fileLabel.textContent = '选择 Markdown 文件';
+        if (imageLabel) imageLabel.textContent = '选择配图，可多选';
         setState(fileState, '未选择');
         setFileMeta();
       } catch (error) {

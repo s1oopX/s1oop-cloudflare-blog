@@ -24,11 +24,6 @@ const devVars = await parseDevVars();
 const env = {
   ADMIN_PASSWORD: devVars.ADMIN_PASSWORD ?? process.env.ADMIN_PASSWORD ?? '',
   COMMENTS_ENABLED: devVars.COMMENTS_ENABLED ?? process.env.COMMENTS_ENABLED ?? 'false',
-  GITHUB_TOKEN: devVars.GITHUB_TOKEN ?? process.env.GITHUB_TOKEN ?? '',
-  GITHUB_OWNER: devVars.GITHUB_OWNER ?? process.env.GITHUB_OWNER ?? '',
-  GITHUB_REPO: devVars.GITHUB_REPO ?? process.env.GITHUB_REPO ?? '',
-  GITHUB_BRANCH: devVars.GITHUB_BRANCH ?? process.env.GITHUB_BRANCH ?? '',
-  CONTENT_DIR: devVars.CONTENT_DIR ?? process.env.CONTENT_DIR ?? '',
 };
 
 const toHeaders = (source) => {

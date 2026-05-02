@@ -1,9 +1,9 @@
 ADMIN_PASSWORD=change-me
 COMMENTS_ENABLED=false
 
-# Optional: only needed for /s1oop/admin Markdown publishing.
-GITHUB_TOKEN=
-GITHUB_OWNER=s1oopX
-GITHUB_REPO=s1oop-cloudflare-blog
-GITHUB_BRANCH=main
-CONTENT_DIR=content/posts
+# Runtime publishing uses Cloudflare bindings, not local secrets:
+# - BLOG_DB D1 database binding
+# - BLOG_IMAGES R2 bucket binding
+#
+# The local Node API shim does not emulate D1 or R2. Use Cloudflare Pages
+# Functions or Wrangler when testing real uploads.

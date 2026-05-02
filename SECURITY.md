@@ -17,11 +17,10 @@ This project expects secrets to be configured outside Git:
 Never commit:
 
 - `ADMIN_PASSWORD`
-- `GITHUB_TOKEN`
 - Cloudflare API tokens
 - SSH private keys
 - `.dev.vars`
 
 ## Admin API
 
-The `/s1oop/admin` publishing API is optional. It should only be enabled in deployments where `ADMIN_PASSWORD` and GitHub write credentials are configured intentionally.
+The `/s1oop/admin` publishing API is optional. It should only be enabled in deployments where `ADMIN_PASSWORD`, the `BLOG_DB` D1 binding, and the `BLOG_IMAGES` R2 binding are configured intentionally.

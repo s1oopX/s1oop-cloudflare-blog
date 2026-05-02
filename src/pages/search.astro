@@ -166,10 +166,18 @@ const maxTagCount = Math.max(1, ...tagStats.map((item) => item.count));
       if (results) results.innerHTML = matched.map(renderResult).join('') || renderEmpty('没有结果', '没有找到匹配结果。可以换一个关键词，或从全部文章继续浏览。');
     };
 
-    fetch('/search-index.json')
-      .then((response) => response.json())
-      .then((data) => {
-        index = data;
+    Promise.all([
+      fetch('/search-index.json').then((response) => response.json()),
+      fetch('/api/posts?limit=50')
+        .then((response) => response.ok ? response.json() : null)
+        .catch(() => null),
+    ])
+      .then(([data, runtime]) => {
+        const runtimePosts = Array.isArray(runtime?.posts)
+          ? runtime.posts.map((post) => ({ ...post, body: '' }))
+          : [];
+        const existingHrefs = new Set(data.map((post) => post.href));
+        index = data.concat(runtimePosts.filter((post) => !existingHrefs.has(post.href)));
         const query = new URLSearchParams(window.location.search).get('q')?.trim() ?? '';
         if (query && input) input.value = query;
         renderSearch();
