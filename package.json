@@ -2,7 +2,17 @@
   "name": "s1oop-cloudflare-blog",
   "version": "0.1.0",
   "private": true,
+  "description": "Astro static blog deployed on Cloudflare Pages with optional Pages Functions.",
+  "license": "MIT",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/s1oopX/s1oop-cloudflare-blog.git"
+  },
+  "bugs": {
+    "url": "https://github.com/s1oopX/s1oop-cloudflare-blog/issues"
+  },
+  "homepage": "https://s1oop.bbroot.com",
   "engines": {
     "node": ">=22.12.0"
   },

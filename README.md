@@ -1,60 +1,27 @@
-# s1oop-cloudflare-blog
+# s1oop Cloudflare Blog
 
-Cloudflare-native Astro blog with a private Markdown publishing console.
+An Astro static blog designed for quiet long-form reading, deployed on Cloudflare Pages with optional Pages Functions for stats, comments, and private Markdown publishing.
 
-The public blog is static. `/s1oop` is a hidden password entry, and `/s1oop/admin` is the private management console for Markdown publishing, future comments, and API status. Public comments remain closed by default.
+Live site: <https://s1oop.bbroot.com>
 
-## Stack
+## Features
 
-- Astro SSG for static pages.
-- TailwindCSS for responsive styling and dark mode.
-- Cloudflare Pages for static deployment.
-- Cloudflare Workers for optional stats and API routes.
-- Cloudflare KV for optional visit counters.
+- Astro static site generation.
+- Markdown posts through Astro Content Collections.
+- Dark archive-style visual system.
+- Full archive, collection pages, search index, changelog, and article pages.
+- Cloudflare Pages deployment from GitHub.
+- Optional `/api/*` functions backed by `workers/api.js`.
+- Optional private `/s1oop/admin` publishing flow when GitHub API credentials are configured.
 
-## Directory Tree
+## Tech Stack
 
-```text
-s1oop-cloudflare-blog/
-├── astro.config.mjs
-├── package.json
-├── postcss.config.cjs
-├── tailwind.config.cjs
-├── tsconfig.json
-├── content/
-│   └── posts/
-│       └── hello-cloudflare.md
-├── public/
-│   ├── favicon.png
-│   └── images/
-├── src/
-│   ├── content.config.ts
-│   ├── components/
-│   │   ├── Comments.astro
-│   │   ├── Footer.astro
-│   │   ├── Header.astro
-│   │   ├── PostCard.astro
-│   │   └── SearchBar.astro
-│   ├── lib/
-│   │   └── posts.ts
-│   ├── layouts/
-│   │   └── BaseLayout.astro
-│   ├── pages/
-│   │   ├── index.astro
-│   │   ├── s1oop.astro
-│   │   ├── s1oop/
-│   │   │   └── admin.astro
-│   │   ├── search.astro
-│   │   ├── search-index.json.ts
-│   │   ├── blog/
-│   │   │   ├── index.astro
-│   │   │   └── [slug].astro
-│   └── styles/
-│       └── global.css
-└── workers/
-    ├── README.md
-    └── api.js
-```
+- Astro 6
+- TailwindCSS
+- Cloudflare Pages
+- Cloudflare Pages Functions
+- Cloudflare KV, optional
+- Wrangler, for Worker config validation and deployment tooling
 
 ## Local Development
 
@@ -63,21 +30,58 @@ npm install
 npm run dev
 ```
 
-Open `http://127.0.0.1:4322`.
+Open:
 
-`npm run dev` starts two local processes:
+```text
+http://127.0.0.1:4322
+```
 
-- Astro dev server on `http://127.0.0.1:4322`
-- Local Worker API server on `http://127.0.0.1:8787`
+`npm run dev` starts:
 
-Astro proxies `/api/*` to the local Worker API server, so status, comments, and admin checks do not 404 in local development.
+- Astro dev server on `127.0.0.1:4322`
+- Local API server on `127.0.0.1:8787`
 
-Useful split commands:
+Astro proxies `/api/*` to the local API server, so local stats, comments, and admin checks behave like the deployed Pages Functions.
+
+Split commands are also available:
 
 ```sh
 npm run dev:astro
 npm run dev:api
 npm run dev:proxy
+```
+
+## Environment Variables
+
+Copy the example file and fill local-only values:
+
+```sh
+cp .dev.vars.example .dev.vars
+```
+
+`.dev.vars` is ignored by Git.
+
+Required for private admin login:
+
+```text
+ADMIN_PASSWORD=...
+```
+
+Required only if `/s1oop/admin` should publish Markdown files back to GitHub:
+
+```text
+GITHUB_TOKEN=...
+GITHUB_OWNER=...
+GITHUB_REPO=...
+GITHUB_BRANCH=main
+CONTENT_DIR=content/posts
+```
+
+Optional:
+
+```text
+COMMENTS_ENABLED=false
+SITE_URL=https://example.com
 ```
 
 ## Build
@@ -87,56 +91,32 @@ npm run build
 npm run preview
 ```
 
+The static output is written to `dist/`.
+
 ## Cloudflare Pages
 
-Use these build settings:
-
-- Build command: `npm run build`
-- Build output directory: `dist`
-- Node.js version: `22`
-
-Prefer `workers/api.js` as the single Worker. Deploy separate Workers only if the API grows enough to justify splitting.
-
-Worker config lives in `wrangler.jsonc`.
-
-Recommended Worker routes:
+Recommended Pages settings:
 
 ```text
-/api/*
+Build command: npm run build
+Build output directory: dist
+Production branch: main
+Node.js version: 22
 ```
 
-Required Worker environment variables for private publishing:
+Pages Functions live in:
 
 ```text
-ADMIN_PASSWORD=...
-GITHUB_TOKEN=...
-GITHUB_OWNER=...
-GITHUB_REPO=...
-GITHUB_BRANCH=main
-CONTENT_DIR=content/posts
+functions/api/[[path]].js
 ```
 
-Optional Pages environment variable:
+That route delegates to:
 
 ```text
-SITE_URL=https://your-domain.example
+workers/api.js
 ```
 
-Optional KV binding:
-
-```text
-BLOG_KV
-```
-
-## Private Blog Rules
-
-- `/s1oop` is intentionally not linked from public navigation.
-- `/s1oop` verifies `ADMIN_PASSWORD` through `/api/admin/check`.
-- `/s1oop/admin` writes Markdown posts through `/api/admin/posts` when GitHub publishing is configured.
-- Public comments are closed.
-- Articles are Markdown/Git-first through Astro Content Collections.
-- KV is used only if you bind `BLOG_KV` for visit counters.
-- R2 is optional and should only be added when large files or image uploads become necessary.
+`wrangler.jsonc` contains the standalone Worker configuration for validation and future direct Worker deployment.
 
 ## Content
 
@@ -148,11 +128,24 @@ title: My Post
 date: 2026-04-29
 excerpt: Short summary.
 tags:
-  - Private
+  - Blog
 draft: false
 ---
 
 Post body.
 ```
 
-The site builds article pages, collection pages, `/blog`, `/s1oop`, `/s1oop/admin`, `/posts.json`, and `/search-index.json` from this content.
+Images can be placed under `public/images/posts/` and referenced from Markdown with absolute public paths.
+
+## Repository Notes
+
+- The public blog is static-first.
+- Public comments are disabled by default.
+- Visit stats work without KV, but are not persisted until `BLOG_KV` is bound.
+- The admin publishing API requires GitHub credentials and should only be enabled for trusted deployments.
+
+## License
+
+Code is released under the MIT License.
+
+Article content and images remain copyright of their respective author unless a post or asset states otherwise.
