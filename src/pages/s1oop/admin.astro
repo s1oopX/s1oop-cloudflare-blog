@@ -112,6 +112,9 @@ import PageHeader from '../../components/PageHeader.astro';
             </form>
 
             <p id="post-upload-state" class="private-admin-state private-admin-state-inline">支持 .md / .mdx，单张图片不超过 1 MB</p>
+            <div id="post-publish-result" class="private-publish-result" hidden>
+              <a id="post-open-link" class="private-admin-secondary" href="/blog" target="_blank" rel="noreferrer">打开文章</a>
+            </div>
           </section>
 
           <section class="private-dashboard-panel" aria-labelledby="runtime-posts-title">
@@ -231,6 +234,8 @@ import PageHeader from '../../components/PageHeader.astro';
     const fileLabel = document.querySelector('#post-file-label');
     const imageLabel = document.querySelector('#post-image-label');
     const imageWarning = document.querySelector('#post-image-warning');
+    const publishResult = document.querySelector('#post-publish-result');
+    const postOpenLink = document.querySelector('#post-open-link');
     const authState = document.querySelector('#admin-auth-state');
     const commentState = document.querySelector('#admin-comment-state');
     const commentToggle = document.querySelector('#comments-toggle');
@@ -338,6 +343,17 @@ import PageHeader from '../../components/PageHeader.astro';
       return match?.[2] || '';
     };
 
+    const setPublishLink = (href = '') => {
+      if (!publishResult || !postOpenLink) return;
+      if (!href) {
+        publishResult.hidden = true;
+        postOpenLink.href = '/blog';
+        return;
+      }
+      publishResult.hidden = false;
+      postOpenLink.href = href;
+    };
+
     const requestAdmin = async (path, options = {}) => {
       const password = sessionStorage.getItem(passwordKey);
       if (!password) throw new Error('Invalid password');
@@ -437,7 +453,21 @@ import PageHeader from '../../components/PageHeader.astro';
       });
     };
 
-    const updateImageState = () => {
+    const readImageDimensions = (file) => new Promise((resolve) => {
+      const url = URL.createObjectURL(file);
+      const image = new Image();
+      image.onload = () => {
+        URL.revokeObjectURL(url);
+        resolve({ width: image.naturalWidth, height: image.naturalHeight });
+      };
+      image.onerror = () => {
+        URL.revokeObjectURL(url);
+        resolve(null);
+      };
+      image.src = url;
+    });
+
+    const updateImageState = async () => {
       const files = Array.from(imageInput?.files || []);
       const problems = imageProblems();
       if (imageLabel) imageLabel.textContent = files.length ? `已选择 ${files.length} 张配图` : '选择配图，可多选';
@@ -447,8 +477,55 @@ import PageHeader from '../../components/PageHeader.astro';
         setState(imageWarning, problems.join('；'), 'error');
       } else {
         const total = files.reduce((sum, file) => sum + file.size, 0);
-        setState(imageWarning, `图片检查通过，共 ${readableSize(total)}`, 'success');
+        const dimensions = await Promise.all(files.map(readImageDimensions));
+        const large = dimensions
+          .map((size, index) => ({ size, file: files[index] }))
+          .filter((item) => item.size && Math.max(item.size.width, item.size.height) > 1920);
+        if (large.length) {
+          setState(
+            imageWarning,
+            `图片检查通过，共 ${readableSize(total)}；${large.length} 张长边超过 1920px，建议压缩后再传`,
+            'muted',
+          );
+        } else {
+          setState(imageWarning, `图片检查通过，共 ${readableSize(total)}`, 'success');
+        }
       }
+    };
+
+    const fetchRuntimePost = async (slug) => {
+      const data = await requestAdmin(`/api/admin/posts/${encodeURIComponent(slug)}`);
+      if (!data.post?.markdown) throw new Error('没有找到 Markdown');
+      return data.post;
+    };
+
+    const copyText = async (value) => {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(value);
+        return;
+      }
+
+      const textarea = document.createElement('textarea');
+      textarea.value = value;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.append(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      textarea.remove();
+    };
+
+    const downloadText = (filename, value) => {
+      const blob = new Blob([value], { type: 'text/markdown;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
     };
 
     const renderPostList = (posts) => {
@@ -468,6 +545,8 @@ import PageHeader from '../../components/PageHeader.astro';
           </div>
           <div class="private-post-actions">
             <a href="${escapeHtml(post.href)}" target="_blank" rel="noreferrer">查看</a>
+            <button type="button" data-copy-post="${escapeHtml(post.slug)}">复制</button>
+            <button type="button" data-download-post="${escapeHtml(post.slug)}">下载</button>
             <button type="button" data-delete-post="${escapeHtml(post.slug)}">删除</button>
           </div>
         </article>
@@ -559,6 +638,7 @@ import PageHeader from '../../components/PageHeader.astro';
       setFileMeta();
       renderPreview();
       updateImageState();
+      setPublishLink();
       setState(uploadState, '支持 .md / .mdx，单张图片不超过 1 MB', 'muted');
     });
 
@@ -602,8 +682,10 @@ import PageHeader from '../../components/PageHeader.astro';
         });
         const data = await response.json().catch(() => ({}));
         if (!response.ok || !data.ok) throw new Error(data.message || '发布失败');
-        setState(uploadState, `${data.overwritten ? '已覆盖' : '已新增'}：${data.href || data.path}`, 'success');
+        const href = data.href || '';
+        setState(uploadState, `${data.overwritten ? '已覆盖' : '已新增'}：${href || data.path}`, 'success');
         setState(workflowState, data.overwritten ? '已覆盖' : '已入库', 'success');
+        setPublishLink(href);
         uploadForm.reset();
         selectedMarkdown = '';
         if (fileLabel) fileLabel.textContent = '选择 Markdown 文件';
@@ -620,7 +702,41 @@ import PageHeader from '../../components/PageHeader.astro';
     });
 
     postList?.addEventListener('click', async (event) => {
+      const copyButton = event.target.closest('[data-copy-post]');
+      const downloadButton = event.target.closest('[data-download-post]');
       const button = event.target.closest('[data-delete-post]');
+      if (copyButton) {
+        const slug = copyButton.dataset.copyPost;
+        if (!slug) return;
+        copyButton.disabled = true;
+        try {
+          const post = await fetchRuntimePost(slug);
+          await copyText(post.markdown);
+          setState(uploadState, `已复制 Markdown：${slug}`, 'success');
+        } catch (error) {
+          setState(uploadState, formatError(error.message), 'error');
+        } finally {
+          copyButton.disabled = false;
+        }
+        return;
+      }
+
+      if (downloadButton) {
+        const slug = downloadButton.dataset.downloadPost;
+        if (!slug) return;
+        downloadButton.disabled = true;
+        try {
+          const post = await fetchRuntimePost(slug);
+          downloadText(`${slug}.md`, post.markdown);
+          setState(uploadState, `已准备下载：${slug}.md`, 'success');
+        } catch (error) {
+          setState(uploadState, formatError(error.message), 'error');
+        } finally {
+          downloadButton.disabled = false;
+        }
+        return;
+      }
+
       if (!button) return;
       const slug = button.dataset.deletePost;
       if (!slug || !window.confirm(`删除 D1 文章「${slug}」？`)) return;

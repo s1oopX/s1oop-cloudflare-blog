@@ -77,6 +77,12 @@ BLOG_DB      D1 database for runtime posts and uploaded small images
 
 The local Node API shim does not emulate D1. Without that binding, `/api/admin/posts` returns a clear configuration error instead of writing to GitHub.
 
+Important local testing note:
+
+- `npm run dev` is enough for static pages, login checks, and general API shape checks.
+- Real runtime publishing, D1 post listing, D1 image serving, delete operations, and comment settings must be tested through Cloudflare Pages Functions or a Wrangler environment with `BLOG_DB` bound.
+- The local shim intentionally does not create a fake D1 database, so a local upload failure with `D1 binding BLOG_DB is not configured` is expected.
+
 Optional:
 
 ```text

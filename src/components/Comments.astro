@@ -1,13 +1,42 @@
-<section class="ui-panel mt-12 border-dashed">
+<section class="ui-panel mt-12 border-dashed comments-panel" data-comments-panel hidden>
   <div class="ui-panel-header">
     <h2 class="text-lg font-semibold text-white">留言</h2>
   </div>
   <div class="ui-panel-body">
-  <p class="text-sm text-zinc-400">
-    当前仅保留安静阅读。需要交流时，会再开放更合适的联系入口。
-  </p>
-  <div class="mt-4 rounded-md border border-white/10 bg-white/[0.035] px-4 py-3 text-sm text-zinc-300">
-    安静阅读
-  </div>
+    <p class="text-sm text-zinc-400" data-comments-copy>
+      评论入口已开放。
+    </p>
+    <div class="mt-4 rounded-md border border-white/10 bg-white/[0.035] px-4 py-3 text-sm text-zinc-300">
+      <span data-comments-state>正在读取评论状态</span>
+    </div>
   </div>
 </section>
+
+<script is:inline>
+  (() => {
+    const panel = document.querySelector('[data-comments-panel]');
+    const state = document.querySelector('[data-comments-state]');
+    const copy = document.querySelector('[data-comments-copy]');
+    if (!panel) return;
+
+    const setText = (node, text) => {
+      if (node) node.textContent = text;
+    };
+
+    fetch('/api/comments/status')
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error('status failed')))
+      .then((data) => {
+        if (!data?.enabled) {
+          panel.remove();
+          return;
+        }
+
+        panel.hidden = false;
+        setText(copy, '评论区当前开放。正式提交入口会在这里接入，关闭后前台不会显示这个模块。');
+        setText(state, '评论入口开放中');
+      })
+      .catch(() => {
+        panel.remove();
+      });
+  })();
+</script>
