@@ -9,10 +9,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   mainClass="private-admin-root"
 >
   <section class="private-admin-stage" aria-label="s1oop private access">
-    <div class="private-admin-panel">
+    <a class="private-admin-return" href="/blog">返回博客</a>
+    <div class="private-admin-panel private-access-panel">
       <section class="private-admin-view" aria-label="个人页面解锁">
-        <p class="private-admin-kicker">private access</p>
-        <h1 class="private-admin-title">s1oop</h1>
+        <div class="private-lock-mark" aria-hidden="true">01</div>
+        <p class="private-admin-kicker">private desk</p>
+        <h1 class="private-admin-title">个人管理</h1>
+        <p class="private-admin-copy">Markdown 发布、内容校验与会话锁定。</p>
         <form id="private-login" class="private-admin-form" novalidate>
           <label class="sr-only" for="private-password">访问密码</label>
           <input
@@ -26,7 +29,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
           />
           <button class="private-admin-button" type="submit">开启</button>
         </form>
-        <p id="private-login-state" class="private-admin-state">个人管理入口</p>
+        <div class="private-access-meta" aria-label="入口状态">
+          <span>browser session</span>
+          <span>markdown publish</span>
+          <span>private route</span>
+        </div>
+        <p id="private-login-state" class="private-admin-state">等待访问密码</p>
       </section>
     </div>
   </section>
@@ -35,6 +43,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     const passwordKey = 's1oop-admin-password';
     const loginForm = document.querySelector('#private-login');
     const loginState = document.querySelector('#private-login-state');
+
+    const formatError = (message) => {
+      if (message === 'Invalid password') return '密码不正确';
+      if (message === 'ADMIN_PASSWORD is not configured') return '访问密码未配置';
+      if (message === 'Not Found') return '本地代理未启动';
+      return message || '密码验证失败';
+    };
 
     const setState = (node, text, tone = 'muted') => {
       if (!node) return;
@@ -84,7 +99,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         setState(loginState, '正在进入...', 'success');
         enterAdmin(password);
       } catch (error) {
-        setState(loginState, error.message || '密码验证失败', 'error');
+        setState(loginState, formatError(error.message), 'error');
       }
     });
   </script>

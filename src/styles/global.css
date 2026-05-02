@@ -1237,6 +1237,10 @@
       linear-gradient(180deg, var(--background-2), var(--background) 58%, #101a16);
   }
 
+  .private-page {
+    @apply pb-6;
+  }
+
   .private-admin-stage {
     @apply relative grid min-h-screen place-items-center overflow-hidden px-6 py-10;
     min-height: 100dvh;
@@ -1259,8 +1263,14 @@
     background: linear-gradient(90deg, transparent, rgb(var(--accent-rgb) / 0.5), transparent);
   }
 
+  .private-admin-return {
+    @apply absolute left-6 top-6 z-20 rounded-md border px-3 py-2 text-sm text-zinc-400 no-underline transition hover:text-white sm:left-8 sm:top-8;
+    border-color: rgb(var(--accent-rgb) / 0.12);
+    background: rgb(255 255 255 / 0.025);
+  }
+
   .private-admin-panel {
-    @apply relative z-10 grid w-full max-w-md rounded-lg border px-7 py-8 text-center;
+    @apply relative z-10 grid w-full max-w-lg rounded-lg border px-7 py-8 text-center;
     min-height: 0;
     place-items: center;
     border-color: rgb(var(--accent-rgb) / 0.15);
@@ -1272,6 +1282,10 @@
       0 28px 90px rgb(var(--shadow-rgb) / 0.62);
   }
 
+  .private-access-panel {
+    min-height: 28rem;
+  }
+
   .private-admin-panel::before {
     content: '';
     @apply pointer-events-none absolute left-7 right-7 top-0 h-px;
@@ -1280,9 +1294,9 @@
 
   .private-admin-view {
     @apply grid w-full place-items-center;
-    grid-template-rows: auto auto auto;
-    row-gap: 1.05rem;
-    padding-bottom: 1.7rem;
+    grid-template-rows: auto auto auto auto auto;
+    row-gap: 1rem;
+    padding-block: 1rem 1.9rem;
   }
 
   .private-admin-view-hidden {
@@ -1295,9 +1309,21 @@
   }
 
   .private-admin-title {
-    @apply text-4xl font-semibold leading-none text-white;
+    @apply text-4xl font-semibold leading-none text-white sm:text-5xl;
     font-family: var(--font-display);
     letter-spacing: 0.01em;
+  }
+
+  .private-lock-mark {
+    @apply mb-1 flex h-10 w-10 items-center justify-center rounded-md border font-mono text-xs text-zinc-500;
+    border-color: rgb(var(--accent-rgb) / 0.16);
+    background:
+      linear-gradient(180deg, rgb(var(--accent-rgb) / 0.06), transparent),
+      rgb(255 255 255 / 0.02);
+  }
+
+  .private-admin-copy {
+    @apply max-w-sm text-sm leading-7 text-zinc-400;
   }
 
   .private-admin-form {
@@ -1325,9 +1351,20 @@
   }
 
   .private-admin-button {
-    @apply text-zinc-950 hover:bg-white;
-    border-color: var(--border-strong);
-    background: var(--accent);
+    @apply text-zinc-100;
+    border-color: rgb(var(--accent-rgb) / 0.28);
+    background:
+      linear-gradient(180deg, rgb(var(--accent-rgb) / 0.14), rgb(var(--accent-rgb) / 0.05)),
+      color-mix(in srgb, var(--card-2) 82%, transparent);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.055);
+  }
+
+  .private-admin-button:hover {
+    border-color: rgb(var(--accent-rgb) / 0.42);
+    color: white;
+    background:
+      linear-gradient(180deg, rgb(var(--accent-rgb) / 0.19), rgb(var(--accent-rgb) / 0.075)),
+      color-mix(in srgb, var(--card-2) 76%, white);
   }
 
   .private-admin-secondary {
@@ -1336,12 +1373,18 @@
     background: rgb(255 255 255 / 0.035);
   }
 
-  .private-admin-upload {
-    @apply gap-4;
+  .private-access-meta {
+    @apply flex w-full flex-wrap justify-center gap-2 pt-1;
   }
 
-  #private-admin {
-    grid-template-rows: auto auto auto;
+  .private-access-meta span {
+    @apply rounded-md border px-2.5 py-1 font-mono text-[0.68rem] uppercase tracking-[0.14em] text-zinc-500;
+    border-color: rgb(var(--accent-rgb) / 0.1);
+    background: rgb(255 255 255 / 0.018);
+  }
+
+  .private-admin-upload {
+    @apply gap-4;
   }
 
   .private-admin-file {
@@ -1373,48 +1416,20 @@
   }
 
   .private-dashboard {
-    @apply relative grid w-full max-w-none gap-5 px-5 py-6 sm:px-8 sm:py-8;
-    min-height: 100vh;
-    min-height: 100dvh;
+    @apply relative grid w-full max-w-none gap-5;
     isolation: isolate;
   }
 
   .private-dashboard::before {
-    content: '';
-    @apply pointer-events-none absolute inset-0 -z-10;
-    background:
-      linear-gradient(rgb(var(--accent-rgb) / 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgb(var(--accent-rgb) / 0.02) 1px, transparent 1px),
-      radial-gradient(circle at 10% 6%, rgb(var(--accent-rgb) / 0.08), transparent 24rem);
-    background-size: 46px 46px, 46px 46px, auto;
-    mask-image: linear-gradient(180deg, black 0%, black 72%, transparent 100%);
-  }
-
-  .private-dashboard-head {
-    @apply flex flex-col gap-5 border-b pb-5 sm:flex-row sm:items-end sm:justify-between;
-    border-color: rgb(var(--accent-rgb) / 0.12);
-  }
-
-  .private-dashboard-title {
-    @apply mt-2 text-4xl font-semibold leading-none text-white sm:text-5xl;
-    font-family: var(--font-display);
-    letter-spacing: 0.01em;
-  }
-
-  .private-dashboard-copy {
-    @apply mt-3 max-w-2xl text-sm leading-7 text-zinc-400;
-  }
-
-  .private-dashboard-actions {
-    @apply flex flex-wrap gap-3;
+    content: none;
   }
 
   .private-dashboard-status {
-    @apply grid gap-3 sm:grid-cols-3;
+    @apply grid gap-3 sm:grid-cols-2 xl:grid-cols-4;
   }
 
   .private-status-card {
-    @apply flex items-center justify-between gap-4 rounded-lg border px-4 py-3;
+    @apply flex items-center justify-between gap-4 rounded-md border px-4 py-3;
     border-color: rgb(var(--accent-rgb) / 0.12);
     background:
       linear-gradient(180deg, rgb(255 255 255 / 0.025), transparent),
@@ -1433,6 +1448,14 @@
     color: var(--accent);
   }
 
+  .private-status-card strong[data-tone='error'] {
+    @apply text-red-300;
+  }
+
+  .private-dashboard[data-auth='checking'] .private-dashboard-grid {
+    visibility: hidden;
+  }
+
   .private-dashboard-grid {
     @apply grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_20rem];
   }
@@ -1447,7 +1470,7 @@
   }
 
   .private-dashboard-panel {
-    @apply relative overflow-hidden rounded-lg border;
+    @apply relative overflow-hidden rounded-md border;
     border-color: rgb(var(--accent-rgb) / 0.13);
     background:
       linear-gradient(180deg, rgb(255 255 255 / 0.03), transparent 34%),
@@ -1480,6 +1503,16 @@
     background: rgb(255 255 255 / 0.025);
   }
 
+  .private-panel-badge[data-tone='success'] {
+    color: var(--accent);
+    border-color: rgb(var(--accent-rgb) / 0.3);
+  }
+
+  .private-panel-badge[data-tone='error'] {
+    @apply text-red-300;
+    border-color: rgb(252 165 165 / 0.24);
+  }
+
   .private-publish-panel .private-admin-form {
     @apply p-5;
     max-width: none;
@@ -1490,26 +1523,63 @@
     @apply text-left;
   }
 
-  .private-publish-meta {
-    @apply grid gap-2 text-xs text-zinc-500 sm:grid-cols-3;
-  }
-
-  .private-publish-meta span {
-    @apply rounded-md border px-3 py-2;
-    border-color: rgb(255 255 255 / 0.08);
-    background: rgb(255 255 255 / 0.022);
-  }
-
   .private-admin-state-inline {
     @apply static mx-5 mb-5 min-h-5 w-auto max-w-none translate-x-0 whitespace-normal text-left;
   }
 
+  .private-file-summary {
+    @apply grid gap-2 text-sm sm:grid-cols-3;
+  }
+
+  .private-file-summary div {
+    @apply grid gap-1 rounded-md border px-3 py-2;
+    border-color: rgb(255 255 255 / 0.08);
+    background: rgb(255 255 255 / 0.02);
+  }
+
+  .private-file-summary span {
+    @apply font-mono text-[0.68rem] uppercase tracking-[0.14em] text-zinc-500;
+  }
+
+  .private-file-summary strong {
+    @apply truncate text-sm font-medium text-zinc-300;
+  }
+
   .private-checklist {
-    @apply grid gap-3 p-5 text-sm leading-6 text-zinc-300;
+    @apply grid gap-0 p-5 text-sm leading-6 text-zinc-300;
   }
 
   .private-checklist li {
-    @apply border-b border-white/10 pb-3 last:border-b-0 last:pb-0;
+    @apply flex items-center justify-between gap-4 border-b border-white/10 py-3 first:pt-0 last:border-b-0 last:pb-0;
+  }
+
+  .private-checklist span {
+    @apply text-zinc-500;
+  }
+
+  .private-checklist strong {
+    @apply text-right text-sm font-medium text-zinc-300;
+  }
+
+  .private-feature-list {
+    @apply grid gap-0 p-5;
+  }
+
+  .private-feature-list div {
+    @apply grid gap-2 border-b border-white/10 py-4 first:pt-0 last:border-b-0 last:pb-0;
+  }
+
+  .private-feature-list span {
+    @apply font-mono text-[0.68rem] uppercase tracking-[0.14em] text-zinc-500;
+  }
+
+  .private-feature-list strong {
+    @apply text-lg font-semibold text-zinc-100;
+    font-family: var(--font-display);
+  }
+
+  .private-feature-list p {
+    @apply max-w-2xl text-sm leading-6 text-zinc-500;
   }
 
   .private-operation-list {

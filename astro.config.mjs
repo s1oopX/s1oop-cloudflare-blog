@@ -1,7 +1,9 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 
+const site = process.env.SITE_URL;
+
 export default defineConfig({
-  site: 'https://example.pages.dev',
+  ...(site ? { site } : {}),
   output: 'static',
 });

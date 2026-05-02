@@ -153,7 +153,7 @@ export default {
         {
           ok: false,
           enabled: false,
-        message: 'Public comments are closed for this private blog',
+          message: 'Public comments are closed for this private blog',
         },
         { status: 403 },
       );

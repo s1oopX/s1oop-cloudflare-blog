@@ -1,8 +1,8 @@
 # s1oop-cloudflare-blog
 
-Minimal Cloudflare-native blog scaffold.
+Cloudflare-native Astro blog with a private Markdown publishing console.
 
-This private blog uses `/s1oop` as the hidden management entry and `/s1oop/admin` as the unlocked page. There is no login system, and public comments are closed.
+The public blog is static. `/s1oop` is a hidden password entry, and `/s1oop/admin` is the private management console for Markdown publishing, future comments, and API status. Public comments remain closed by default.
 
 ## Stack
 
@@ -25,7 +25,7 @@ s1oop-cloudflare-blog/
 │   └── posts/
 │       └── hello-cloudflare.md
 ├── public/
-│   ├── favicon.svg
+│   ├── favicon.png
 │   └── images/
 ├── src/
 │   ├── content.config.ts
@@ -43,6 +43,8 @@ s1oop-cloudflare-blog/
 │   ├── pages/
 │   │   ├── index.astro
 │   │   ├── s1oop.astro
+│   │   ├── s1oop/
+│   │   │   └── admin.astro
 │   │   ├── search.astro
 │   │   ├── search-index.json.ts
 │   │   ├── blog/
@@ -69,6 +71,15 @@ npm run dev
 
 Open `http://localhost:4321`.
 
+For local API testing with the Worker proxy:
+
+```sh
+npm run dev -- --host 127.0.0.1 --port 4322
+npm run dev:proxy
+```
+
+Open `http://127.0.0.1:4321`.
+
 ## Build
 
 ```sh
@@ -86,11 +97,40 @@ Use these build settings:
 
 Prefer `workers/api.js` as the single Worker. Deploy separate Workers only if the API grows enough to justify splitting.
 
+Recommended Worker routes:
+
+```text
+/api/*
+```
+
+Required Worker environment variables for private publishing:
+
+```text
+ADMIN_PASSWORD=...
+GITHUB_TOKEN=...
+GITHUB_OWNER=...
+GITHUB_REPO=...
+GITHUB_BRANCH=main
+CONTENT_DIR=content/posts
+```
+
+Optional Pages environment variable:
+
+```text
+SITE_URL=https://your-domain.example
+```
+
+Optional KV binding:
+
+```text
+BLOG_KV
+```
+
 ## Private Blog Rules
 
 - `/s1oop` is intentionally not linked from public navigation.
-- No login is implemented.
-- Guest identity is generated in the browser as `游客XXXX` and stored in `localStorage`.
+- `/s1oop` verifies `ADMIN_PASSWORD` through `/api/admin/check`.
+- `/s1oop/admin` writes Markdown posts through `/api/admin/posts` when GitHub publishing is configured.
 - Public comments are closed.
 - Articles are Markdown/Git-first through Astro Content Collections.
 - KV is used only if you bind `BLOG_KV` for visit counters.
@@ -113,4 +153,4 @@ draft: false
 Post body.
 ```
 
-The site builds article pages, tag pages, `/blog`, `/s1oop`, `/s1oop/admin`, and `/search-index.json` from this content.
+The site builds article pages, collection pages, tag pages, `/blog`, `/s1oop`, `/s1oop/admin`, `/posts.json`, and `/search-index.json` from this content.

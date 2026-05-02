@@ -1,38 +1,39 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHeader from '../../components/PageHeader.astro';
 ---
 
 <BaseLayout
   title="个人管理 | s1oop's Blog"
   description="s1oop 的个人管理页面"
-  hideChrome={true}
-  mainClass="private-admin-root"
 >
-  <section class="private-dashboard" aria-label="s1oop 个人管理">
-    <header class="private-dashboard-head">
-      <div>
-        <p class="private-admin-kicker">markdown publish</p>
-        <h1 class="private-dashboard-title">个人管理</h1>
-        <p class="private-dashboard-copy">独立的 Markdown 发布工作页，用于整理内容并提交文章</p>
-      </div>
-      <div class="private-dashboard-actions">
-        <a class="private-admin-secondary" href="/blog">回到博客</a>
-        <button id="private-lock-button" class="private-admin-secondary" type="button">锁定</button>
-      </div>
-    </header>
+  <section class="ui-page archive-page private-page" aria-label="s1oop 个人管理">
+    <PageHeader
+      eyebrow="PRIVATE CONSOLE"
+      title="个人控制台"
+      description="Markdown 发布、评论、接口状态和后续功能都放在这里管理。"
+    >
+      <a slot="actions" class="private-admin-secondary" href="/blog">回到博客</a>
+      <button slot="actions" id="private-lock-button" class="private-admin-secondary" type="button">锁定</button>
+    </PageHeader>
 
+    <div class="private-dashboard ui-page-body" data-auth="checking">
     <div class="private-dashboard-status" aria-label="管理状态">
       <div class="private-status-card">
         <span>访问状态</span>
         <strong id="admin-auth-state">验证中</strong>
       </div>
       <div class="private-status-card">
-        <span>内容来源</span>
-        <strong>Markdown</strong>
+        <span>文章发布</span>
+        <strong id="admin-workflow-state">待提交</strong>
       </div>
       <div class="private-status-card">
-        <span>发布目标</span>
-        <strong>GitHub</strong>
+        <span>评论</span>
+        <strong>预留</strong>
+      </div>
+      <div class="private-status-card">
+        <span>接口</span>
+        <strong>已接入</strong>
       </div>
     </div>
 
@@ -41,10 +42,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         <section class="private-dashboard-panel private-publish-panel" aria-labelledby="publish-title">
           <div class="private-panel-head">
             <div>
-              <p class="private-admin-kicker">compose</p>
+              <p class="private-admin-kicker">publish</p>
               <h2 id="publish-title">发布文章</h2>
             </div>
-            <span class="private-panel-badge">.md / .mdx</span>
+            <span id="admin-file-state" class="private-panel-badge">未选择</span>
           </div>
 
           <form id="post-upload" class="private-admin-form private-admin-upload" novalidate>
@@ -59,10 +60,19 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
               type="text"
               placeholder="文件名，可留空"
             />
-            <div class="private-publish-meta" aria-label="发布检查">
-              <span>需要 YAML frontmatter</span>
-              <span>建议包含 title / date / excerpt / tags</span>
-              <span>文件上限 512KB</span>
+            <div class="private-file-summary" aria-label="文件摘要">
+              <div>
+                <span>标题</span>
+                <strong id="post-meta-title">等待文件</strong>
+              </div>
+              <div>
+                <span>日期</span>
+                <strong id="post-meta-date">-</strong>
+              </div>
+              <div>
+                <span>大小</span>
+                <strong id="post-meta-size">-</strong>
+              </div>
             </div>
             <div class="private-admin-actions">
               <button class="private-admin-button" type="submit">提交发布</button>
@@ -73,18 +83,44 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
           <p id="post-upload-state" class="private-admin-state private-admin-state-inline">支持 .md / .mdx</p>
         </section>
 
+        <section class="private-dashboard-panel" aria-labelledby="modules-title">
+          <div class="private-panel-head">
+            <div>
+              <p class="private-admin-kicker">modules</p>
+              <h2 id="modules-title">功能管理</h2>
+            </div>
+          </div>
+          <div class="private-feature-list">
+            <div>
+              <span>内容</span>
+              <strong>Markdown 发布</strong>
+              <p>使用当前文章模板检查 frontmatter、摘要、标签和配图。</p>
+            </div>
+            <div>
+              <span>评论</span>
+              <strong>暂未开放</strong>
+              <p>预留审核、隐藏、删除和来源限制，后续接入评论存储。</p>
+            </div>
+            <div>
+              <span>接口</span>
+              <strong>/api/admin/*</strong>
+              <p>集中查看发布、鉴权、评论和未来统计接口的接入状态。</p>
+            </div>
+          </div>
+        </section>
+
         <section class="private-dashboard-panel" aria-labelledby="checklist-title">
           <div class="private-panel-head">
             <div>
               <p class="private-admin-kicker">review</p>
-              <h2 id="checklist-title">发布前检查</h2>
+              <h2 id="checklist-title">内容检查</h2>
             </div>
           </div>
           <ul class="private-checklist">
-            <li>标题是否能直接说明文章主题</li>
-            <li>摘要是否适合展示在文章列表</li>
-            <li>标签是否和现有内容结构一致</li>
-            <li>配图路径是否已经放入 public/images</li>
+            <li><span>Frontmatter</span><strong>title / date</strong></li>
+            <li><span>摘要</span><strong>列表可读</strong></li>
+            <li><span>标签</span><strong>沿用既有主题</strong></li>
+            <li><span>配图</span><strong>public/images</strong></li>
           </ul>
         </section>
       </main>
@@ -93,23 +129,35 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         <section class="private-dashboard-panel">
           <div class="private-panel-head">
             <div>
-              <p class="private-admin-kicker">format</p>
-              <h2>文件格式</h2>
+              <p class="private-admin-kicker">api</p>
+              <h2>接口状态</h2>
             </div>
           </div>
-          <ul class="private-checklist">
-            <li>文件扩展名使用 .md 或 .mdx</li>
-            <li>文件内容需要以 YAML frontmatter 开头</li>
-            <li>title 和 date 是发布校验必填项</li>
-            <li>slug 留空时会自动使用文件名</li>
-          </ul>
+          <div class="private-operation-list">
+            <div>
+              <span>鉴权</span>
+              <strong>/api/admin/check</strong>
+            </div>
+            <div>
+              <span>发布</span>
+              <strong>/api/admin/posts</strong>
+            </div>
+            <div>
+              <span>评论</span>
+              <strong>待接入</strong>
+            </div>
+            <div>
+              <span>公开接口</span>
+              <strong>只读优先</strong>
+            </div>
+          </div>
         </section>
 
         <section class="private-dashboard-panel">
           <div class="private-panel-head">
             <div>
-              <p class="private-admin-kicker">state</p>
-              <h2>操作状态</h2>
+              <p class="private-admin-kicker">session</p>
+              <h2>会话</h2>
             </div>
           </div>
           <div class="private-operation-list">
@@ -129,6 +177,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         </section>
       </aside>
     </div>
+    </div>
   </section>
 
   <script is:inline>
@@ -140,11 +189,42 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     const fileInput = document.querySelector('#post-file');
     const fileLabel = document.querySelector('#post-file-label');
     const authState = document.querySelector('#admin-auth-state');
+    const dashboard = document.querySelector('.private-dashboard');
+    const fileState = document.querySelector('#admin-file-state');
+    const workflowState = document.querySelector('#admin-workflow-state');
+    const metaTitle = document.querySelector('#post-meta-title');
+    const metaDate = document.querySelector('#post-meta-date');
+    const metaSize = document.querySelector('#post-meta-size');
+
+    const formatError = (message) => {
+      if (message === 'Invalid password') return '密码不正确';
+      if (message === 'ADMIN_PASSWORD is not configured') return '访问密码未配置';
+      if (message?.includes('GitHub publishing is not configured')) return 'GitHub 发布未配置';
+      return message || '操作失败';
+    };
 
     const setState = (node, text, tone = 'muted') => {
       if (!node) return;
       node.textContent = text;
       node.dataset.tone = tone;
+    };
+
+    const setFileMeta = ({ title = '等待文件', date = '-', size = '-' } = {}) => {
+      if (metaTitle) metaTitle.textContent = title;
+      if (metaDate) metaDate.textContent = date;
+      if (metaSize) metaSize.textContent = size;
+    };
+
+    const parseFrontmatterValue = (source, key) => {
+      const match = source.match(/^---\s*\n([\s\S]+?)\n---/);
+      if (!match) return null;
+      const field = match[1].match(new RegExp(`^${key}:\\s*['\"]?(.+?)['\"]?\\s*$`, 'm'));
+      return field?.[1]?.trim() || null;
+    };
+
+    const readableSize = (size) => {
+      if (size < 1024) return `${size} B`;
+      return `${Math.round(size / 1024)} KB`;
     };
 
     const verifyPassword = async (password) => {
@@ -171,6 +251,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     } else {
       verifyPassword(existingPassword)
         .then(() => {
+          if (dashboard) dashboard.dataset.auth = 'unlocked';
           setState(authState, '已解锁', 'success');
         })
         .catch(() => {
@@ -182,14 +263,33 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       const file = fileInput.files?.[0];
       if (!file) {
         if (fileLabel) fileLabel.textContent = '选择 Markdown 文件';
+        setState(fileState, '未选择');
+        setFileMeta();
         return;
       }
       if (fileLabel) fileLabel.textContent = file.name;
+      setState(fileState, '已选择', 'success');
+      setState(workflowState, '待提交');
+      setFileMeta({ title: '读取中', date: '-', size: readableSize(file.size) });
+      file.text()
+        .then((markdown) => {
+          setFileMeta({
+            title: parseFrontmatterValue(markdown, 'title') || '缺少 title',
+            date: parseFrontmatterValue(markdown, 'date') || '缺少 date',
+            size: readableSize(file.size),
+          });
+        })
+        .catch(() => {
+          setFileMeta({ title: '无法读取', date: '-', size: readableSize(file.size) });
+        });
     });
 
     clearButton?.addEventListener('click', () => {
       uploadForm?.reset();
       if (fileLabel) fileLabel.textContent = '选择 Markdown 文件';
+      setState(fileState, '未选择');
+      setState(workflowState, '待提交');
+      setFileMeta();
       setState(uploadState, '支持 .md / .mdx', 'muted');
     });
 
@@ -205,10 +305,12 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
       const file = form.get('file');
       if (!file || !file.name) {
         setState(uploadState, '请选择 .md 或 .mdx 文件', 'error');
+        setState(workflowState, '缺少文件', 'error');
         return;
       }
 
       setState(uploadState, '正在提交...', 'muted');
+      setState(workflowState, '提交中');
       try {
         const response = await fetch('/api/admin/posts', {
           method: 'POST',
@@ -218,10 +320,14 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
         const data = await response.json().catch(() => ({}));
         if (!response.ok || !data.ok) throw new Error(data.message || '发布失败');
         setState(uploadState, `已提交：${data.path}`, 'success');
+        setState(workflowState, '已提交', 'success');
         uploadForm.reset();
         if (fileLabel) fileLabel.textContent = '选择 Markdown 文件';
+        setState(fileState, '未选择');
+        setFileMeta();
       } catch (error) {
-        setState(uploadState, error.message || '发布失败', 'error');
+        setState(uploadState, formatError(error.message), 'error');
+        setState(workflowState, '失败', 'error');
       }
     });
 
