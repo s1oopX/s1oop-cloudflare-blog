@@ -20,7 +20,7 @@
       "binding": "BLOG_IMAGES",
       "bucket_name": "s1oop-blog-images"
     }
-  ],
+  ]
 
   // Optional visit counters:
   // Create a KV namespace, then uncomment and replace the ids.
