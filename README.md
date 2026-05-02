@@ -13,6 +13,7 @@ Live site: <https://s1oop.bbroot.com>
 - Cloudflare Pages deployment from GitHub.
 - `/api/*` functions backed by `workers/api.js`.
 - Private `/s1oop/admin` publishing flow that stores new posts and small uploaded images in Cloudflare D1.
+- Private admin list, delete, overwrite warning, Markdown preview, image preflight checks, and comment switch.
 - GitHub remains the source repository and deployment trigger; new posts are not written back to GitHub.
 
 ## Tech Stack
@@ -129,6 +130,7 @@ Apply the D1 schema:
 ```sh
 npx wrangler d1 execute s1oop-blog-content --file migrations/0001_runtime_posts.sql
 npx wrangler d1 execute s1oop-blog-content --file migrations/0002_blog_assets.sql
+npx wrangler d1 execute s1oop-blog-content --file migrations/0003_site_settings.sql
 ```
 
 Then bind it to the Pages project:
@@ -137,7 +139,7 @@ Then bind it to the Pages project:
 BLOG_DB      -> s1oop-blog-content
 ```
 
-`POST /api/admin/posts` accepts a Markdown file plus optional image files. The Markdown is parsed into D1 and uploaded images are stored in `blog_assets` as small base64 payloads. Each image is limited to 1 MB, so this remains lightweight and avoids R2 billing setup. The blog archive reads `/api/posts` in the browser and prepends these runtime posts without a rebuild.
+`POST /api/admin/posts` accepts a Markdown file plus optional image files. The Markdown is parsed into D1 and uploaded images are stored in `blog_assets` as small base64 payloads. Each image is limited to 1 MB, so this remains lightweight and avoids R2 billing setup. The private admin page can list and delete D1 posts, check whether an upload will overwrite an existing slug, and toggle comment availability through `site_settings`. The blog archive reads `/api/posts` in the browser and prepends these runtime posts without a rebuild.
 
 ## Static Content
 

@@ -11,6 +11,9 @@ const text = (value) => String(value ?? '').trim();
 const MAX_MARKDOWN_BYTES = 512 * 1024;
 const MAX_ASSET_BYTES = 1024 * 1024;
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
+const SETTINGS = {
+  commentsEnabled: 'comments.enabled',
+};
 
 const requireAdminPassword = (env) => {
   const password = text(env.ADMIN_PASSWORD);
@@ -329,6 +332,18 @@ function postListItem(row) {
   };
 }
 
+function adminPostListItem(row) {
+  return {
+    ...postListItem(row),
+    published: Boolean(row.published),
+    wordCount: row.word_count ?? 0,
+    readingMinutes: row.reading_minutes ?? 1,
+    imageCount: row.image_count ?? 0,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
 function fullPost(row) {
   return {
     ...postListItem(row),
@@ -353,6 +368,23 @@ async function listRuntimePosts(env, limit = 50) {
   return (result.results ?? []).map(postListItem);
 }
 
+async function listAdminRuntimePosts(env, limit = 50) {
+  if (!env.BLOG_DB) return [];
+  const result = await env.BLOG_DB.prepare(
+    `SELECT slug, title, excerpt, date, tags_json, image_src, image_alt,
+            word_count, reading_minutes, published, created_at, updated_at,
+            (
+              SELECT COUNT(*)
+              FROM blog_assets
+              WHERE blog_assets.slug = blog_posts.slug
+            ) AS image_count
+     FROM blog_posts
+     ORDER BY date DESC, updated_at DESC
+     LIMIT ?`,
+  ).bind(limit).all();
+  return (result.results ?? []).map(adminPostListItem);
+}
+
 async function getRuntimePost(env, slug) {
   if (!env.BLOG_DB) return null;
   const row = await env.BLOG_DB.prepare(
@@ -362,6 +394,33 @@ async function getRuntimePost(env, slug) {
      WHERE slug = ? AND published = 1`,
   ).bind(slug).first();
   return row ? fullPost(row) : null;
+}
+
+async function getAdminRuntimePost(env, slug) {
+  if (!env.BLOG_DB) return null;
+  const row = await env.BLOG_DB.prepare(
+    `SELECT slug, title, excerpt, date, tags_json, markdown, html, image_src, image_alt,
+            word_count, reading_minutes, published, created_at, updated_at
+     FROM blog_posts
+     WHERE slug = ?`,
+  ).bind(slug).first();
+  return row ? { ...fullPost(row), published: Boolean(row.published) } : null;
+}
+
+async function deleteRuntimePost(env, slug) {
+  const existing = await getAdminRuntimePost(env, slug);
+  if (!existing) return { deleted: false, assetCount: 0 };
+
+  const assets = await env.BLOG_DB.prepare(
+    `SELECT COUNT(*) AS count
+     FROM blog_assets
+     WHERE slug = ?`,
+  ).bind(slug).first();
+
+  await env.BLOG_DB.prepare('DELETE FROM blog_assets WHERE slug = ?').bind(slug).run();
+  await env.BLOG_DB.prepare('DELETE FROM blog_posts WHERE slug = ?').bind(slug).run();
+
+  return { deleted: true, assetCount: assets?.count ?? 0 };
 }
 
 async function putRuntimePost(env, post) {
@@ -400,6 +459,35 @@ async function putRuntimePost(env, post) {
       post.published ? 1 : 0,
     )
     .run();
+}
+
+async function getSetting(env, key, fallback) {
+  if (!env.BLOG_DB) return fallback;
+  try {
+    const row = await env.BLOG_DB.prepare(
+      'SELECT value FROM site_settings WHERE key = ?',
+    ).bind(key).first();
+    return row?.value ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+async function setSetting(env, key, value) {
+  await env.BLOG_DB.prepare(
+    `INSERT INTO site_settings (key, value, updated_at)
+     VALUES (?, ?, CURRENT_TIMESTAMP)
+     ON CONFLICT(key) DO UPDATE SET
+       value = excluded.value,
+       updated_at = CURRENT_TIMESTAMP`,
+  ).bind(key, value).run();
+}
+
+async function getCommentSettings(env) {
+  const enabled = await getSetting(env, SETTINGS.commentsEnabled, 'false');
+  return {
+    enabled: enabled === 'true',
+  };
 }
 
 async function storeImages(env, slug, files) {
@@ -483,7 +571,7 @@ export default {
       return new Response(null, {
         headers: {
           'access-control-allow-origin': '*',
-          'access-control-allow-methods': 'GET,POST,OPTIONS',
+          'access-control-allow-methods': 'GET,POST,PATCH,DELETE,OPTIONS',
           'access-control-allow-headers': 'authorization,content-type,x-admin-password',
         },
       });
@@ -501,6 +589,117 @@ export default {
           d1: Boolean(env.BLOG_DB),
           assets: 'd1',
         },
+      });
+    }
+
+    if (url.pathname === '/api/admin/settings' && request.method === 'GET') {
+      const auth = await verifyAdmin(request, env);
+      if (!auth.ok) {
+        return json({ ok: false, message: auth.message }, { status: auth.status });
+      }
+
+      return json({
+        ok: true,
+        configured: Boolean(env.BLOG_DB),
+        comments: await getCommentSettings(env),
+      });
+    }
+
+    if (url.pathname === '/api/admin/settings' && request.method === 'PATCH') {
+      const auth = await verifyAdmin(request, env);
+      if (!auth.ok) {
+        return json({ ok: false, message: auth.message }, { status: auth.status });
+      }
+
+      if (!env.BLOG_DB) {
+        return json(
+          { ok: false, message: 'D1 binding BLOG_DB is not configured' },
+          { status: 501 },
+        );
+      }
+
+      const body = await request.json().catch(() => ({}));
+      const commentsEnabled = Boolean(body.commentsEnabled);
+
+      try {
+        await setSetting(env, SETTINGS.commentsEnabled, commentsEnabled ? 'true' : 'false');
+      } catch {
+        return json(
+          { ok: false, message: 'D1 settings table is not configured' },
+          { status: 501 },
+        );
+      }
+
+      return json({
+        ok: true,
+        comments: { enabled: commentsEnabled },
+      });
+    }
+
+    if (url.pathname === '/api/admin/posts' && request.method === 'GET') {
+      const auth = await verifyAdmin(request, env);
+      if (!auth.ok) {
+        return json({ ok: false, message: auth.message }, { status: auth.status });
+      }
+
+      if (!env.BLOG_DB) {
+        return json(
+          { ok: false, message: 'D1 binding BLOG_DB is not configured' },
+          { status: 501 },
+        );
+      }
+
+      const limit = Math.min(100, Math.max(1, Number(url.searchParams.get('limit') ?? 50)));
+      return json({
+        ok: true,
+        source: 'd1',
+        posts: await listAdminRuntimePosts(env, limit),
+      });
+    }
+
+    const adminPostMatch = url.pathname.match(/^\/api\/admin\/posts\/([^/]+)$/);
+    if (adminPostMatch && request.method === 'GET') {
+      const auth = await verifyAdmin(request, env);
+      if (!auth.ok) {
+        return json({ ok: false, message: auth.message }, { status: auth.status });
+      }
+
+      if (!env.BLOG_DB) {
+        return json(
+          { ok: false, message: 'D1 binding BLOG_DB is not configured' },
+          { status: 501 },
+        );
+      }
+
+      const slug = decodeURIComponent(adminPostMatch[1]);
+      const post = await getAdminRuntimePost(env, slug);
+      return json({ ok: true, exists: Boolean(post), post });
+    }
+
+    if (adminPostMatch && request.method === 'DELETE') {
+      const auth = await verifyAdmin(request, env);
+      if (!auth.ok) {
+        return json({ ok: false, message: auth.message }, { status: auth.status });
+      }
+
+      if (!env.BLOG_DB) {
+        return json(
+          { ok: false, message: 'D1 binding BLOG_DB is not configured' },
+          { status: 501 },
+        );
+      }
+
+      const slug = decodeURIComponent(adminPostMatch[1]);
+      const result = await deleteRuntimePost(env, slug);
+      if (!result.deleted) {
+        return json({ ok: false, message: 'Post not found' }, { status: 404 });
+      }
+
+      return json({
+        ok: true,
+        slug,
+        deleted: true,
+        assetCount: result.assetCount,
       });
     }
 
@@ -539,6 +738,16 @@ export default {
       let markdown = await file.text();
 
       try {
+        const firstParsed = parseFrontmatter(markdown);
+        if (firstParsed.error) {
+          return json({ ok: false, message: firstParsed.error }, { status: 400 });
+        }
+
+        const existing = await getAdminRuntimePost(env, slug);
+        if (existing) {
+          await env.BLOG_DB.prepare('DELETE FROM blog_assets WHERE slug = ?').bind(slug).run();
+        }
+
         const { markdownRewrites, assets } = await storeImages(env, slug, imageFiles);
         markdown = rewriteMarkdownImages(markdown, markdownRewrites);
 
@@ -573,6 +782,8 @@ export default {
           href: `/blog/live?slug=${encodeURIComponent(slug)}`,
           path: `D1:blog_posts/${slug}`,
           images: assets,
+          mode: existing ? 'updated' : 'created',
+          overwritten: Boolean(existing),
         });
       } catch (error) {
         if (error instanceof Response) return error;
@@ -581,6 +792,30 @@ export default {
           { status: 500 },
         );
       }
+    }
+
+    if ((url.pathname === '/api/comments' || url.pathname === '/api/comments/status') && request.method === 'GET') {
+      const comments = await getCommentSettings(env);
+      return json({
+        ok: true,
+        enabled: comments.enabled,
+        comments: [],
+      });
+    }
+
+    if (url.pathname === '/api/comments' && request.method === 'POST') {
+      const comments = await getCommentSettings(env);
+      if (!comments.enabled) {
+        return json(
+          { ok: false, enabled: false, message: 'Comments are closed' },
+          { status: 403 },
+        );
+      }
+
+      return json(
+        { ok: false, enabled: true, message: 'Comment storage is not configured' },
+        { status: 501 },
+      );
     }
 
     if (url.pathname === '/api/posts' && request.method === 'GET') {
