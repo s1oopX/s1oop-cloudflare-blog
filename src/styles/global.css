@@ -438,6 +438,71 @@
     @apply font-mono text-zinc-100;
   }
 
+  .site-status-header {
+    @apply flex items-center justify-between gap-3 px-5 py-3;
+  }
+
+  .site-status-title {
+    @apply text-xl font-semibold text-white;
+    font-family: var(--font-display);
+  }
+
+  .site-status-chip {
+    @apply shrink-0 rounded-full border px-2 py-1 font-mono text-[0.66rem] uppercase tracking-[0.12em] text-zinc-500;
+    border-color: rgb(var(--accent-rgb) / 0.16);
+  }
+
+  .site-status-body {
+    @apply px-5 py-4;
+  }
+
+  .site-status-console {
+    @apply flex items-center justify-between gap-4 py-1.5;
+  }
+
+  .site-status-console::before {
+    content: none;
+  }
+
+  .site-status-label {
+    @apply min-w-0 truncate font-mono text-[0.68rem] uppercase tracking-[0.14em] text-zinc-500;
+  }
+
+  .site-status-value {
+    @apply inline-flex shrink-0 items-center gap-2 text-sm font-medium text-zinc-100;
+  }
+
+  .site-status-light {
+    position: relative;
+    width: 0.72rem;
+    height: 0.72rem;
+    flex: 0 0 0.72rem;
+    border-radius: 9999px;
+    contain: layout paint;
+  }
+
+  .site-status-light::before,
+  .site-status-light::after {
+    content: '';
+    position: absolute;
+    border-radius: 9999px;
+    transform: translateZ(0);
+    will-change: opacity;
+    backface-visibility: hidden;
+  }
+
+  .site-status-light::before {
+    inset: 0.15rem;
+    background: radial-gradient(circle, rgb(240 253 244) 0 16%, rgb(134 239 172) 42%, rgb(22 163 74) 100%);
+    animation: site-status-light-breathe 1.7s ease-in-out infinite alternate;
+  }
+
+  .site-status-light::after {
+    inset: 0.02rem;
+    background: radial-gradient(circle, rgb(220 252 231 / 0.76) 0 18%, rgb(74 222 128 / 0.54) 44%, rgb(22 163 74 / 0.16) 72%, transparent 100%);
+    animation: site-status-light-glow 1.7s ease-in-out infinite alternate;
+  }
+
   .sidebar-link-list {
     @apply grid gap-0;
   }
@@ -676,23 +741,6 @@
     @apply text-sm leading-6 text-zinc-500;
   }
 
-  .search-layout {
-    @apply grid gap-5;
-    max-width: min(64rem, 100%);
-  }
-
-  .search-console {
-    @apply grid gap-3 border-y border-white/10 py-6;
-  }
-
-  .search-console-foot {
-    @apply flex flex-wrap items-center justify-between gap-3;
-  }
-
-  .search-console-foot span {
-    @apply font-mono text-[0.68rem] uppercase tracking-[0.12em] text-zinc-500;
-  }
-
   .search-page .ui-search {
     @apply h-14 rounded-md;
     border-color: rgb(var(--accent-rgb) / 0.18);
@@ -715,6 +763,14 @@
       inset 0 1px 0 rgb(255 255 255 / 0.035),
       0 0 0 1px rgb(var(--accent-rgb) / 0.1),
       0 16px 42px rgb(var(--shadow-rgb) / 0.16);
+  }
+
+  .search-topic-panel .ui-panel-header {
+    @apply border-b border-white/10;
+  }
+
+  .search-topic-grid {
+    @apply p-5;
   }
 
   .search-results {
@@ -819,6 +875,16 @@
     @apply mt-3 max-w-3xl text-sm leading-7 text-zinc-300;
   }
 
+  .changelog-entry-context {
+    @apply mt-4 grid gap-2 border-l pl-4 text-sm leading-6 text-zinc-400;
+    border-color: rgb(var(--accent-rgb) / 0.18);
+  }
+
+  .changelog-entry-context span:first-child {
+    @apply font-mono text-[0.68rem] uppercase tracking-[0.12em];
+    color: var(--accent-muted);
+  }
+
   .changelog-entry ul {
     @apply mt-5 flex flex-wrap gap-2 text-sm leading-6 text-zinc-300;
   }
@@ -831,6 +897,15 @@
 
   .changelog-entry li::before {
     content: none;
+  }
+
+  .changelog-entry-link {
+    @apply mt-5 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.12em] no-underline transition;
+    color: var(--accent);
+  }
+
+  .changelog-entry-link:hover {
+    color: white;
   }
 
   .about-main {
@@ -1096,23 +1171,6 @@
 
   .about-signal-list strong {
     @apply min-w-0 text-right font-medium text-zinc-200;
-  }
-
-  .about-route-list {
-    @apply grid gap-0;
-  }
-
-  .about-route-list a {
-    @apply grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 border-b border-white/10 py-3 text-sm text-zinc-300 no-underline transition first:pt-0 last:border-b-0 last:pb-0 hover:text-white;
-  }
-
-  .about-route-list span {
-    @apply font-mono text-xs;
-    color: var(--accent-muted);
-  }
-
-  .about-route-list strong {
-    @apply font-medium;
   }
 
   .article-toc-panel[hidden] {
@@ -2125,6 +2183,26 @@
   to {
     opacity: 0.85;
     width: calc(100% - 3rem);
+  }
+}
+
+@keyframes site-status-light-breathe {
+  from {
+    opacity: 0.4;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes site-status-light-glow {
+  from {
+    opacity: 0.4;
+  }
+
+  to {
+    opacity: 1;
   }
 }
 

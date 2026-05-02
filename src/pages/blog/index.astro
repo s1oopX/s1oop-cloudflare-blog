@@ -2,54 +2,45 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
+import Pagination from '../../components/Pagination.astro';
 import PostCard from '../../components/PostCard.astro';
-import { POSTS_PER_PAGE, collectTags, formatPostDate, pageItems, postExcerpt, postHref, postImage, postsWithinRecentDays, visiblePosts } from '../../lib/posts';
+import SiteStatusPanel from '../../components/SiteStatusPanel.astro';
+import { POSTS_PER_PAGE, collectTags, formatPostDate, pageCount, pageItems, postExcerpt, postHref, postImage, visiblePosts } from '../../lib/posts';
 
 const posts = visiblePosts(await getCollection('posts'));
-const recentPosts = postsWithinRecentDays(posts, 1);
-const tags = collectTags(recentPosts);
-const latestPost = recentPosts[0];
-const latestPosts = pageItems(recentPosts, 1, POSTS_PER_PAGE);
+const tags = collectTags(posts);
+const latestPost = posts[0];
+const currentPage = 1;
+const totalPages = pageCount(posts, POSTS_PER_PAGE);
+const paginatedPosts = pageItems(posts, currentPage, POSTS_PER_PAGE);
 ---
 
-<BaseLayout title="最近 | s1oop's Blog">
+<BaseLayout title="全部档案 | s1oop's Blog">
   <section class="ui-page archive-page">
     <PageHeader
-      eyebrow="latest entries"
-      title="最近"
-      description="最近 1 天内发布的文章会先放在这里。"
-    >
-      <Fragment slot="actions">
-        <a href="/blog/archive" class="ui-button">查看全部</a>
-      </Fragment>
-    </PageHeader>
+      eyebrow="full archive"
+      title="全部档案"
+      description="所有已经整理好的文章都保留在这里。这里是默认入口，适合慢慢回看。"
+    />
 
     <div class="ui-grid ui-page-body">
-      <div class="ui-stack">
-        <section class="ui-stack">
-          <div class="ui-stagger grid gap-5">
-            {latestPosts.map((post) => (
-              <PostCard
-                title={post.data.title}
-                excerpt={postExcerpt(post)}
-                href={postHref(post)}
-                date={formatPostDate(post.data.date)}
-                tags={post.data.tags}
-                image={postImage(post)}
-              />
-            ))}
-          </div>
-        </section>
-
-        {recentPosts.length === 0 && (
-          <div class="ui-panel p-6">
-            <h2 class="text-lg font-semibold text-white">最近 1 天没有新文章</h2>
-            <p class="mt-2 text-sm text-zinc-400">可以前往全部文章回看已经整理好的内容。</p>
-          </div>
-        )}
+      <div class="ui-stack ui-stagger">
+        {paginatedPosts.map((post) => (
+          <PostCard
+            title={post.data.title}
+            excerpt={postExcerpt(post)}
+            href={postHref(post)}
+            date={formatPostDate(post.data.date)}
+            tags={post.data.tags}
+            image={postImage(post)}
+          />
+        ))}
+        <Pagination currentPage={currentPage} totalPages={totalPages} baseHref="/blog/page" firstHref="/blog" />
       </div>
 
       <aside class="ui-sidebar ui-stagger">
+        <SiteStatusPanel />
+
         <section class="ui-panel">
           <div class="ui-panel-header">
             <h2 class="text-sm font-medium text-white">阅读概览</h2>
@@ -57,10 +48,10 @@ const latestPosts = pageItems(recentPosts, 1, POSTS_PER_PAGE);
           <div class="ui-panel-body grid gap-4">
             <div class="ui-stat-row">
               <span class="ui-stat-label">文章</span>
-              <span class="ui-stat-value">{recentPosts.length}</span>
+              <span class="ui-stat-value">{posts.length}</span>
             </div>
             <div class="ui-stat-row">
-              <span class="ui-stat-label">主题</span>
+              <span class="ui-stat-label">标签</span>
               <span class="ui-stat-value">{tags.length}</span>
             </div>
             <div class="ui-stat-row">

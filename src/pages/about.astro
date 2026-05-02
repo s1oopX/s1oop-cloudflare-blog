@@ -2,12 +2,6 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/PageHeader.astro';
 
-const readingRoutes = [
-  { href: '/blog', label: '最近文章' },
-  { href: '/collections', label: '专栏' },
-  { href: '/tags', label: '主题索引' },
-];
-
 const profileRows = [
   { label: 'Runtime', value: 'Cloudflare' },
   { label: 'Frontend', value: 'Astro' },
@@ -205,22 +199,6 @@ const sideSignals = [
               </div>
             ))}
           </div>
-        </section>
-
-        <section class="about-routes-panel ui-panel">
-          <div class="ui-panel-header">
-            <p class="ui-eyebrow">routes</p>
-            <h2 class="about-side-title">阅读入口</h2>
-          </div>
-          <nav class="ui-panel-body about-route-list" aria-label="阅读入口">
-            {readingRoutes.map((item, index) => (
-              <a href={item.href}>
-                <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
-                <strong>{item.label}</strong>
-                <span aria-hidden="true">-&gt;</span>
-              </a>
-            ))}
-          </nav>
         </section>
       </aside>
     </div>

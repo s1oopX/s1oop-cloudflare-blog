@@ -1,0 +1,61 @@
+<section class="ui-panel site-status-panel" data-site-status>
+  <div class="ui-panel-header site-status-header">
+    <h2 class="site-status-title">站点状态</h2>
+    <span class="site-status-chip">实时情况</span>
+  </div>
+  <div class="ui-panel-body site-status-body">
+    <div class="site-status-console" aria-label="站点运行状态">
+      <span class="site-status-label">archive node</span>
+      <div class="site-status-value">
+        <span class="site-status-light" aria-hidden="true"></span>
+        <span data-site-state>运行正常</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script is:inline>
+  const panel = document.querySelector('[data-site-status]');
+  const state = panel?.querySelector('[data-site-state]');
+  const visitorKey = 's1oop:visitor-id';
+
+  const ensureVisitorId = () => {
+    try {
+      const existing = localStorage.getItem(visitorKey);
+      if (existing) return existing;
+      const next = `visitor-${crypto.randomUUID?.() ?? Math.random().toString(36).slice(2)}`;
+      localStorage.setItem(visitorKey, next);
+      return next;
+    } catch {
+      return 'anonymous';
+    }
+  };
+
+  const updateStatus = (stats) => {
+    if (state) state.textContent = '运行正常';
+  };
+
+  const markStatic = () => {
+    if (state) state.textContent = '运行正常';
+  };
+
+  if (panel) {
+    fetch('/api/stats/visit', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ visitorId: ensureVisitorId(), path: location.pathname }),
+    })
+      .then((response) => response.ok ? response.json() : null)
+      .then((visitStats) => {
+        if (visitStats?.ok) {
+          updateStatus(visitStats);
+          return;
+        }
+
+        return fetch('/api/stats')
+          .then((response) => response.ok ? response.json() : null)
+          .then((stats) => stats?.ok ? updateStatus(stats) : markStatic());
+      })
+      .catch(markStatic);
+  }
+</script>

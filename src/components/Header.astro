@@ -1,13 +1,13 @@
 ---
 const navItems = [
-  { href: '/blog', label: '最近', match: (path: string) => path === '/blog' || (path.startsWith('/blog/') && !path.startsWith('/blog/archive')) },
-  { href: '/blog/archive', label: '全部', match: (path: string) => path === '/blog/archive' || path.startsWith('/blog/archive/') },
+  { href: '/blog', label: '全部档案', match: (path: string) => path === '/blog' || path.startsWith('/blog/') },
   { href: '/collections', label: '专栏' },
   { href: '/search', label: '搜索' },
   { href: '/about', label: '关于' },
 ];
 
-const pathname = Astro.url.pathname;
+const normalizePath = (path: string) => path !== '/' && path.endsWith('/') ? path.slice(0, -1) : path;
+const pathname = normalizePath(Astro.url.pathname);
 const isNavActive = (item: typeof navItems[number]) => item.match
   ? item.match(pathname)
   : pathname === item.href || pathname.startsWith(`${item.href}/`);

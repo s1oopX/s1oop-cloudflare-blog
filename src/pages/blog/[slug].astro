@@ -28,7 +28,7 @@ const readingStats = postReadingStats(post);
       description={post.data.excerpt}
     >
       <Fragment slot="actions">
-        <a href="/blog" class="ui-button">最近</a>
+        <a href="/blog" class="ui-button">全部档案</a>
       </Fragment>
     </PageHeader>
 
@@ -76,7 +76,7 @@ const readingStats = postReadingStats(post);
               <span class="ui-stat-label">标签</span>
               <div class="flex flex-wrap gap-2">
                 {post.data.tags.map((tag) => (
-                  <a href={`/tags/${tag.toLowerCase()}`} class="ui-badge no-underline hover:text-white">
+                  <a href={`/search?q=${encodeURIComponent(tag)}`} class="ui-badge no-underline hover:text-white">
                     #{tag}
                   </a>
                 ))}

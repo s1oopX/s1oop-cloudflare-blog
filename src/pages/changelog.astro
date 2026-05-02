@@ -4,14 +4,46 @@ import PageHeader from '../components/PageHeader.astro';
 
 const records = [
   {
+    date: '2026/05/02',
+    label: 'reading contrast',
+    title: '暗色阅读的对比度被重新校准。',
+    summary: '围绕暗色阅读页补充了文字、线条和留白的判断。页面不再只追求“看得清”，而是把标题、正文、边框和辅助信息放回同一套阅读层级里。',
+    scope: '文章页 / 列表卡片 / 暗色视觉',
+    impact: '长时间阅读时，正文更稳定，界面装饰不会反复抢走注意力。',
+    link: {
+      href: '/blog/dark-reading-contrast',
+      label: '查看文章',
+    },
+    notes: [
+      '补充暗色对比度文章',
+      '统一标题和正文的明度层级',
+      '降低边框与图片对正文的干扰',
+    ],
+  },
+  {
+    date: '2026/05/02',
+    label: 'archive signal',
+    title: '站点状态改成克制的绿色呼吸灯。',
+    summary: '侧栏状态不再模拟复杂检测流程，只保留一个固定尺寸的绿色光源。它以深浅变化暗示站点仍在运行，同时不打断档案页的阅读节奏。',
+    scope: '全部档案 / 侧栏状态',
+    impact: '状态提示更像环境信号，而不是突兀的功能卡片。',
+    notes: [
+      '固定光点尺寸',
+      '只动画透明度',
+      '绿色渐变与暗色底版保持一致',
+    ],
+  },
+  {
     date: '2026/04/30',
     label: 'reading order',
     title: '入口被重新收束。',
-    summary: '最近、全部、专栏、搜索和关于被固定为主要入口。读者不需要理解站内结构，只需要选择时间、主题或关键词。',
+    summary: '全部档案、专栏、搜索和关于被固定为主要入口。读者不需要理解站内结构，只需要选择档案、专栏或关键词。',
+    scope: '顶部导航 / 全部档案 / 专栏 / 搜索',
+    impact: '访问路径从“找页面”变成“选阅读方式”。',
     notes: [
-      '最近只呈现短期内的新内容',
       '全部文章保留完整脉络',
       '专栏承担连续阅读路线',
+      '搜索合并相近主题入口',
     ],
   },
   {
@@ -19,6 +51,8 @@ const records = [
     label: 'reading surface',
     title: '文章页开始服务长时间停留。',
     summary: '目录、文章信息和继续阅读被放回阅读场景里。页面不追求热闹，而是让一篇文章能被安静读完，也能继续接到下一篇。',
+    scope: '文章详情 / 目录 / 继续阅读',
+    impact: '读者可以先判断篇幅，再决定跳读、通读或继续读相近主题。',
     notes: [
       '长文目录辅助跳转',
       '日期、字数和阅读时间保留判断依据',
@@ -30,6 +64,12 @@ const records = [
     label: 'visual system',
     title: '视觉回到暗色档案气质。',
     summary: '头像、图片、卡片和阅读页保持同一种克制感。图片负责给出内容线索，不抢走文章本身的位置。',
+    scope: '首页 / 文章卡片 / 阅读页',
+    impact: '站点开始形成稳定的个人档案识别，而不是一组分散模板。',
+    link: {
+      href: '/blog/noir-archive-design',
+      label: '查看文章',
+    },
     notes: [
       '列表使用图文并置',
       '图片统一降低饱和和亮度',
@@ -40,11 +80,51 @@ const records = [
     date: '2026/04/29',
     label: 'first layer',
     title: '博客从可访问开始。',
-    summary: '第一批入口只解决一件事：让文章被找到、被读到、被重新打开。之后的整理都围绕这个基础继续收紧。',
+    summary: '第一批入口只解决一件事：让文章被找到、被读到、被重新打开。这里先确定博客的内容方向，再让之后的整理围绕这个基础继续收紧。',
+    scope: '首页 / 第一篇文章 / 基础入口',
+    impact: '读者能先理解这里会写什么，再进入具体文章。',
+    link: {
+      href: '/blog/hello-cloudflare',
+      label: '查看文章',
+    },
     notes: [
-      '最近文章可直接进入',
-      '主题索引连接相近内容',
+      '全部档案可直接进入',
+      '内容方向被写入第一篇说明',
       '搜索用于回找具体片段',
+    ],
+  },
+  {
+    date: '2026/04/28',
+    label: 'content order',
+    title: '文章整理方式被固定下来。',
+    summary: '围绕标题、摘要、主题和专栏建立更稳定的整理方式。文章可以保持个人表达，但进入公开阅读前需要有可回看的结构。',
+    scope: '文章元信息 / 专栏 / 搜索索引',
+    impact: '后续文章可以自然进入同一套列表、主题和搜索系统。',
+    link: {
+      href: '/blog/astro-cloudflare-workflow',
+      label: '查看文章',
+    },
+    notes: [
+      '标题和摘要承担判断入口',
+      '主题标签减少分散',
+      '专栏用于组织连续阅读路线',
+    ],
+  },
+  {
+    date: '2026/04/27',
+    label: 'publishing checklist',
+    title: '公开文章有了发布前检查清单。',
+    summary: '在内容进入博客之前，先检查标题是否具体、摘要是否有效、主题是否准确、正文是否有层级。它让个人记录更适合被之后重新阅读。',
+    scope: '写作流程 / 发布前检查',
+    impact: '减少临时碎片进入公开页面，让档案保持长期可读。',
+    link: {
+      href: '/blog/private-blog-editing-checklist',
+      label: '查看文章',
+    },
+    notes: [
+      '检查标题、摘要和主题',
+      '控制段落长度和层级',
+      '保留结尾收束',
     ],
   },
 ];
@@ -71,11 +151,21 @@ const records = [
               <p class="ui-eyebrow">{record.label}</p>
               <h2>{record.title}</h2>
               <p>{record.summary}</p>
+              <div class="changelog-entry-context">
+                <span>{record.scope}</span>
+                <span>{record.impact}</span>
+              </div>
               <ul>
                 {record.notes.map((item) => (
                   <li>{item}</li>
                 ))}
               </ul>
+              {record.link && (
+                <a class="changelog-entry-link" href={record.link.href}>
+                  {record.link.label}
+                  <span aria-hidden="true">-&gt;</span>
+                </a>
+              )}
             </div>
           </article>
         ))}

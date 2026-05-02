@@ -3,11 +3,12 @@ interface Props {
   currentPage: number;
   totalPages: number;
   baseHref: string;
+  firstHref?: string;
 }
 
-const { currentPage, totalPages, baseHref } = Astro.props;
+const { currentPage, totalPages, baseHref, firstHref } = Astro.props;
 
-const hrefForPage = (page: number) => (page === 1 ? baseHref : `${baseHref}/${page}`);
+const hrefForPage = (page: number) => (page === 1 ? firstHref ?? baseHref : `${baseHref}/${page}`);
 const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
 ---
 

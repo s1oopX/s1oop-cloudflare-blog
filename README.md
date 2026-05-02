@@ -34,8 +34,7 @@ s1oop-cloudflare-blog/
 │   │   ├── Footer.astro
 │   │   ├── Header.astro
 │   │   ├── PostCard.astro
-│   │   ├── SearchBar.astro
-│   │   └── VisitorBadge.astro
+│   │   └── SearchBar.astro
 │   ├── lib/
 │   │   └── posts.ts
 │   ├── layouts/
@@ -50,16 +49,11 @@ s1oop-cloudflare-blog/
 │   │   ├── blog/
 │   │   │   ├── index.astro
 │   │   │   └── [slug].astro
-│   │   └── tags/
-│   │       ├── index.astro
-│   │       └── [tag].astro
 │   └── styles/
 │       └── global.css
 └── workers/
     ├── README.md
-    ├── api.js
-    ├── comments.js
-    └── search.js
+    └── api.js
 ```
 
 ## Local Development
@@ -153,4 +147,4 @@ draft: false
 Post body.
 ```
 
-The site builds article pages, collection pages, tag pages, `/blog`, `/s1oop`, `/s1oop/admin`, `/posts.json`, and `/search-index.json` from this content.
+The site builds article pages, collection pages, `/blog`, `/s1oop`, `/s1oop/admin`, `/posts.json`, and `/search-index.json` from this content.
