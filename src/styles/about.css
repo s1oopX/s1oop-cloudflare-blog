@@ -269,18 +269,18 @@
   }
 
   .about-signal-list div {
-    @apply grid gap-2 border-b border-white/10 px-5 py-4 text-sm last:border-b-0;
+    @apply grid gap-1.5 border-b border-white/10 px-5 py-3.5 text-sm last:border-b-0;
   }
 
   .about-signal-list span {
-    @apply font-mono text-[0.68rem] uppercase tracking-[0.14em];
+    @apply font-mono text-[0.64rem] uppercase tracking-[0.13em];
     color: var(--accent-muted);
   }
 
   .about-signal-list strong {
-    @apply min-w-0 text-base font-medium text-zinc-200;
+    @apply min-w-0 text-sm font-medium leading-5 text-zinc-200;
   }
 
   .about-signal-list p {
-    @apply text-xs leading-5 text-zinc-500;
+    @apply text-[0.72rem] leading-5 text-zinc-500;
   }
