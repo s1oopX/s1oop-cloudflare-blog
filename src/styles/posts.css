@@ -2,6 +2,34 @@
     border-radius: 0.55rem;
   }
 
+  .archive-post-list > .post-card:first-child {
+    border-color: rgb(var(--accent-rgb) / 0.24);
+    background:
+      radial-gradient(ellipse 72% 44% at 22% 0%, rgb(var(--glow-rgb) / 0.13), transparent 68%),
+      linear-gradient(135deg, rgb(var(--accent-rgb) / 0.055), transparent 42%),
+      color-mix(in srgb, var(--card) 94%, transparent);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.055),
+      0 22px 64px rgb(var(--shadow-rgb) / 0.34);
+  }
+
+  .archive-post-list > .post-card:first-child .post-card-link {
+    padding: 1rem;
+  }
+
+  .archive-post-list > .post-card:first-child .post-card-media {
+    min-height: 16rem;
+    border-color: rgb(var(--accent-rgb) / 0.2);
+  }
+
+  .archive-post-list > .post-card:first-child .post-card-title {
+    @apply text-3xl;
+  }
+
+  .archive-post-list > .post-card:first-child .post-card-excerpt {
+    -webkit-line-clamp: 3;
+  }
+
   .post-card-link {
     @apply grid gap-4 no-underline sm:grid-cols-[10rem_minmax(0,1fr)];
     padding: 0.9rem;
@@ -89,27 +117,41 @@
   }
 
   @media (min-width: 640px) {
-    .ui-stack > .post-card:first-child .post-card-link {
-      @apply gap-5;
-      grid-template-columns: minmax(18rem, 0.95fr) minmax(0, 1fr);
-      padding: 1rem;
+    .archive-post-list > .post-card:first-child .post-card-link {
+      @apply gap-6;
+      grid-template-columns: minmax(20rem, 1.08fr) minmax(0, 1fr);
+      padding: 1.25rem;
     }
 
-    .ui-stack > .post-card:first-child .post-card-media {
-      min-height: 15rem;
+    .archive-post-list > .post-card:first-child .post-card-media {
+      min-height: 17rem;
     }
 
-    .ui-stack > .post-card:first-child .post-card-media img,
-    .ui-stack > .post-card:first-child .post-card-media > span {
+    .archive-post-list > .post-card:first-child .post-card-media img,
+    .archive-post-list > .post-card:first-child .post-card-media > span {
       aspect-ratio: 16 / 9;
     }
 
-    .ui-stack > .post-card:first-child .post-card-title {
-      @apply text-3xl;
+    .archive-post-list > .post-card:first-child .post-card-title {
+      @apply text-4xl;
     }
 
-    .ui-stack > .post-card:first-child .post-card-excerpt {
-      -webkit-line-clamp: 3;
+    .archive-post-list > .post-card:first-child .post-card-action {
+      @apply mt-6;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .archive-post-list > .post-card:first-child .post-card-link {
+      padding: 0.85rem;
+    }
+
+    .archive-post-list > .post-card:first-child .post-card-media {
+      min-height: 13.5rem;
+    }
+
+    .archive-post-list > .post-card:first-child .post-card-title {
+      @apply text-2xl;
     }
   }
 

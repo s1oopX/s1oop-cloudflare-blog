@@ -175,6 +175,10 @@
     @apply border-b border-white/10 px-5 py-4;
   }
 
+  .ui-panel-title {
+    @apply text-sm font-medium text-white;
+  }
+
   .ui-panel-body {
     @apply p-5;
   }
