@@ -61,9 +61,8 @@ const compressImageFile = async (file) => {
       return { file, compressed: false, originalSize: file.size };
     }
 
-    const name = file.name.replace(/\.[^.]+$/, '') || 'image';
     return {
-      file: new File([blob], `${name}.webp`, { type: 'image/webp', lastModified: file.lastModified }),
+      file: new File([blob], file.name || 'image', { type: 'image/webp', lastModified: file.lastModified }),
       compressed: true,
       originalSize: file.size,
     };

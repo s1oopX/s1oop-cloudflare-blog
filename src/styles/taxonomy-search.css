@@ -74,10 +74,21 @@
   .tag-index-meter::before {
     content: '';
     @apply block h-full;
-    width: var(--tag-share);
+    width: 100%;
     background: linear-gradient(90deg, var(--accent), rgb(var(--warm-rgb) / 0.78));
     box-shadow: 0 0 18px rgb(var(--accent-rgb) / 0.2);
   }
+
+  .tag-index-card[data-share-bucket="10"] .tag-index-meter::before { width: 10%; }
+  .tag-index-card[data-share-bucket="20"] .tag-index-meter::before { width: 20%; }
+  .tag-index-card[data-share-bucket="30"] .tag-index-meter::before { width: 30%; }
+  .tag-index-card[data-share-bucket="40"] .tag-index-meter::before { width: 40%; }
+  .tag-index-card[data-share-bucket="50"] .tag-index-meter::before { width: 50%; }
+  .tag-index-card[data-share-bucket="60"] .tag-index-meter::before { width: 60%; }
+  .tag-index-card[data-share-bucket="70"] .tag-index-meter::before { width: 70%; }
+  .tag-index-card[data-share-bucket="80"] .tag-index-meter::before { width: 80%; }
+  .tag-index-card[data-share-bucket="90"] .tag-index-meter::before { width: 90%; }
+  .tag-index-card[data-share-bucket="100"] .tag-index-meter::before { width: 100%; }
 
   .search-status {
     @apply text-sm leading-6 text-zinc-500;

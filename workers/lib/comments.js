@@ -1,5 +1,6 @@
 const MAX_AUTHOR_LENGTH = 32;
-const MAX_BODY_LENGTH = 800;
+const MIN_BODY_LENGTH = 5;
+const MAX_BODY_LENGTH = 30;
 const MAX_URL_LENGTH = 160;
 const MAX_COMMENTS_PER_IP = 2;
 const PUBLIC_COMMENT_LIMIT = 50;
@@ -13,8 +14,7 @@ const cleanText = (value, limit) => String(value ?? '')
 const cleanBody = (value) => String(value ?? '')
   .replace(/\r\n/g, '\n')
   .replace(/\n{3,}/g, '\n\n')
-  .trim()
-  .slice(0, MAX_BODY_LENGTH);
+  .trim();
 
 const cleanSlug = (value) => String(value ?? '')
   .trim()
@@ -113,6 +113,14 @@ export async function createComment(env, request) {
     return { error: 'D1 binding BLOG_DB is not configured', status: 501 };
   }
 
+  const contentType = request.headers.get('content-type') || '';
+  if (!contentType.toLowerCase().includes('application/json')) {
+    return { error: 'Invalid comment content type', status: 415 };
+  }
+
+  const contentLength = Number(request.headers.get('content-length') || 0);
+  if (contentLength > 8192) return { error: 'Comment payload is too large', status: 413 };
+
   const input = await request.json().catch(() => null);
   if (!input || typeof input !== 'object') return { error: 'Invalid comment payload', status: 400 };
   if (String(input.website ?? '').trim()) return { error: 'Comment rejected', status: 400 };
@@ -131,7 +139,9 @@ export async function createComment(env, request) {
 
   if (!postSlug) return { error: 'Post slug is required', status: 400 };
   if (authorName.length < 1) return { error: 'Name is required', status: 400 };
-  if (body.length < 2) return { error: 'Comment is too short', status: 400 };
+  if (body.length < MIN_BODY_LENGTH || body.length > MAX_BODY_LENGTH) {
+    return { error: '留言需要 5 到 30 个字', status: 400 };
+  }
 
   const comment = {
     id: crypto.randomUUID(),

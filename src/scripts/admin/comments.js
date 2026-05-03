@@ -44,7 +44,7 @@ export const loadComments = async (requestAdmin, nodes) => {
     renderComments(nodes, data.comments || []);
   } catch (error) {
     setState(commentCount, '失败', 'error');
-    commentList.innerHTML = `<p class="private-list-empty">${formatError(error.message)}</p>`;
+    commentList.innerHTML = `<p class="private-list-empty">${escapeHtml(formatError(error.message))}</p>`;
   }
 };
 

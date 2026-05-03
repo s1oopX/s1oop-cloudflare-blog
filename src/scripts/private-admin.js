@@ -100,6 +100,16 @@ const splitTemplateTags = (value) => String(value || '')
   .map((tag) => tag.trim())
   .filter(Boolean);
 
+const markdownAssetName = (value) => String(value || 'image')
+  .split(/[\\/]/)
+  .pop()
+  ?.normalize('NFKD')
+  .replace(/[^\w.\s-]/g, '')
+  .trim()
+  .replace(/[\s_]+/g, '-')
+  .replace(/-+/g, '-')
+  .replace(/^-|-$/g, '') || 'image';
+
 const templateHasContent = () => Boolean(
   templateTitle?.value?.trim()
     || templateExcerpt?.value?.trim()
@@ -156,7 +166,7 @@ const templateMarkdown = () => {
   const imageFile = imageInput?.files?.[0];
   const hasImage = Boolean(firstMarkdownImage(body));
   const imageMarkdown = imageFile && !hasImage
-    ? `![${templateImageAlt?.value?.trim() || title}](${imageFile.name})\n\n`
+    ? `![${templateImageAlt?.value?.trim() || title}](${markdownAssetName(imageFile.name)})\n\n`
     : '';
 
   return {

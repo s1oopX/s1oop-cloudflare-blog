@@ -41,7 +41,7 @@ export const loadPosts = async (requestAdmin, nodes) => {
     renderPostList(nodes, data.posts || []);
   } catch (error) {
     if (postCount) postCount.textContent = '-';
-    postList.innerHTML = `<p class="private-list-empty">${formatError(error.message)}</p>`;
+    postList.innerHTML = `<p class="private-list-empty">${escapeHtml(formatError(error.message))}</p>`;
   }
 };
 
