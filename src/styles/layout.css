@@ -6,6 +6,25 @@
     @apply w-full flex-1;
   }
 
+  .skip-link {
+    @apply fixed left-5 top-4 z-50 rounded-md border px-4 py-2 text-sm font-medium no-underline opacity-0 shadow-lg transition;
+    pointer-events: none;
+    transform: translateY(-0.75rem);
+    border-color: var(--border-strong);
+    background:
+      linear-gradient(180deg, rgb(var(--accent-rgb) / 0.12), rgb(var(--accent-rgb) / 0.04)),
+      color-mix(in srgb, var(--card) 96%, black);
+    color: var(--foreground);
+  }
+
+  .skip-link:focus-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+    outline: 2px solid rgb(var(--accent-rgb) / 0.55);
+    outline-offset: 3px;
+  }
+
   .card {
     @apply rounded-xl border p-5 shadow-sm transition;
     border-color: var(--border);

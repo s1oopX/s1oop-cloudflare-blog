@@ -51,7 +51,7 @@ const archivePaths = collections.map((collection) => ({
               image={postImage(post)}
             />
             {index === 3 && paginatedPosts.length > 4 && (
-              <section class="archive-path-break ui-panel" data-archive-path-break>
+              <section class="archive-path-break ui-panel" aria-label="按专栏继续阅读" data-archive-path-break>
                 <div>
                   <p class="ui-eyebrow">reading paths</p>
                   <h2>换一条路线继续读</h2>
