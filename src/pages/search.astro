@@ -16,7 +16,8 @@ const matchesTopic = (post: typeof posts[number], tag: string) => (
 const tagStats = tags.map((tag) => ({
   tag,
   count: posts.filter((post) => matchesTopic(post, tag)).length,
-}));
+})).sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
+const visibleTagStats = tagStats.slice(0, 6);
 const maxTagCount = Math.max(1, ...tagStats.map((item) => item.count));
 const shareBucket = (count: number) => String(Math.max(10, Math.min(100, Math.ceil((count / maxTagCount) * 10) * 10)));
 ---
@@ -36,7 +37,7 @@ const shareBucket = (count: number) => String(Math.max(10, Math.min(100, Math.ce
             <SearchBar />
             <div class="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4">
               <p id="search-status" class="search-status">输入关键词后显示结果。</p>
-              <span class="font-mono text-[0.68rem] uppercase tracking-[0.12em] text-zinc-500" data-search-summary>{posts.length} 篇文章 / {tags.length} 个入口</span>
+              <span class="font-mono text-[0.68rem] uppercase tracking-[0.12em] text-zinc-500" data-search-summary>{posts.length} 篇文章 / 常用入口</span>
             </div>
           </div>
         </section>
@@ -51,7 +52,7 @@ const shareBucket = (count: number) => String(Math.max(10, Math.min(100, Math.ce
             </div>
           </div>
           <div class="tag-index-grid search-topic-grid" data-search-topic-grid>
-            {tagStats.map(({ tag, count }) => (
+            {visibleTagStats.map(({ tag, count }) => (
               <a
                 href={`/search?q=${encodeURIComponent(tag)}`}
                 class="tag-index-card ui-panel ui-panel-link no-underline"

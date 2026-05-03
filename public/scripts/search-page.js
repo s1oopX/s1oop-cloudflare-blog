@@ -55,19 +55,20 @@ const topicCountsFor = (posts = []) => {
       tag,
       count: posts.filter((post) => matchesKeyword(post, tag)).length,
     }))
-    .sort((a, b) => a.tag.localeCompare(b.tag));
+    .sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
 };
 
 const renderTopicIndex = () => {
   const tagStats = topicCountsFor(index);
+  const visibleTagStats = tagStats.slice(0, 6);
   const maxTagCount = Math.max(1, ...tagStats.map((item) => item.count));
 
-  if (summary) summary.textContent = `${index.length} 篇文章 / ${tagStats.length} 个入口`;
+  if (summary) summary.textContent = `${index.length} 篇文章 / 常用入口`;
   if (postCount) postCount.textContent = String(index.length);
   if (tagCount) tagCount.textContent = String(tagStats.length);
   if (!topicGrid) return;
 
-  topicGrid.innerHTML = tagStats.map(({ tag, count }) => `
+  topicGrid.innerHTML = visibleTagStats.map(({ tag, count }) => `
     <a
       href="/search?q=${encodeURIComponent(tag)}"
       class="tag-index-card ui-panel ui-panel-link no-underline"
