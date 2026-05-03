@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import { collectionHref, collections, postsForCollection } from '../../lib/collections';
-import { postHref, postImage, visiblePosts } from '../../lib/posts';
+import { visiblePosts } from '../../lib/posts';
 
 const posts = visiblePosts(await getCollection('posts'));
 const collectionMeta = collections.map((collection) => ({
@@ -27,8 +27,7 @@ const collectionMeta = collections.map((collection) => ({
     >
       {collections.map((collection) => {
         const collectionPosts = postsForCollection(collection, posts);
-        const leadPost = collectionPosts[0];
-        const image = leadPost ? postImage(leadPost) : null;
+        const image = collection.image;
 
         return (
           <a href={collectionHref(collection)} class="collection-card ui-panel ui-panel-link no-underline" data-collection-card={collection.slug}>
