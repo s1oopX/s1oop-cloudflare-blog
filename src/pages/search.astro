@@ -4,7 +4,6 @@ import PageHeader from '../components/PageHeader.astro';
 import SearchBar from '../components/SearchBar.astro';
 import { getCollection } from 'astro:content';
 import { collectTags, visiblePosts } from '../lib/posts';
-import '../styles/taxonomy-search.css';
 
 const posts = visiblePosts(await getCollection('posts'));
 const tags = collectTags(posts);
