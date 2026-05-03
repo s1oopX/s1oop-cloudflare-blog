@@ -265,6 +265,32 @@
     background: rgb(255 255 255 / 0.025);
   }
 
+  .about-contact-list {
+    @apply grid gap-0;
+  }
+
+  .about-contact-list div {
+    @apply flex items-center justify-between gap-4 border-b px-5 py-4 text-sm last:border-b-0;
+    border-color: rgb(255 255 255 / 0.08);
+    background:
+      linear-gradient(90deg, rgb(var(--accent-rgb) / 0.026), transparent 62%),
+      color-mix(in srgb, var(--card) 90%, transparent);
+  }
+
+  .about-contact-list span {
+    @apply font-mono text-[0.62rem] uppercase tracking-[0.13em];
+    color: var(--accent-muted);
+  }
+
+  .about-contact-list a,
+  .about-contact-list strong {
+    @apply min-w-0 text-right text-sm font-semibold leading-6 text-zinc-100;
+  }
+
+  .about-contact-list a {
+    @apply underline-offset-4 transition hover:text-white hover:underline;
+  }
+
   .about-signal-summary {
     @apply border-b px-5 py-4 text-sm leading-6 text-zinc-400;
     border-color: rgb(255 255 255 / 0.08);

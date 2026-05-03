@@ -3,10 +3,26 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/PageHeader.astro';
 import '../styles/about.css';
 
+const githubUrl = 'https://github.com/s1oopX';
+const gmailAddress = 's1oopp1337@gmail.com';
+
 const profileRows = [
   { label: 'Owner', value: 's1oop' },
   { label: 'Runtime', value: 'Cloudflare' },
   { label: 'Source', value: 'D1' },
+];
+
+const contactRows = [
+  {
+    label: 'GitHub',
+    value: 's1oopX',
+    href: githubUrl,
+  },
+  {
+    label: 'Gmail',
+    value: gmailAddress || '待补充',
+    href: gmailAddress ? `mailto:${gmailAddress}` : '',
+  },
 ];
 
 const focusRows = [
@@ -69,38 +85,38 @@ const principles = [
 
 const sideSignals = [
   {
-    label: 'Frontend',
-    value: 'Astro Static',
-    detail: '公开壳页面预渲染，文章内容由 D1 接口填充。',
+    label: 'Site',
+    value: 'Personal archive',
+    detail: '面向长期回看和稳定检索，不按信息流方式组织内容。',
   },
   {
-    label: 'Deploy',
-    value: 'Cloudflare Pages',
-    detail: 'GitHub main 分支推送后自动构建并发布。',
+    label: 'Repository',
+    value: 'GitHub',
+    detail: '源码、页面结构和样式在 GitHub 维护，公开内容不再放入静态文章源。',
   },
   {
-    label: 'API',
-    value: 'Pages Functions',
-    detail: '统计、评论状态、运行时文章和后台操作由边缘函数处理。',
+    label: 'Runtime',
+    value: 'Cloudflare',
+    detail: '公开页面、边缘函数和数据入口由 Cloudflare Pages 体系承载。',
   },
   {
-    label: 'Data',
+    label: 'Content',
     value: 'D1',
-    detail: '运行时文章、评论和小图元数据写入 D1。',
+    detail: '文章、小图和运行时元数据统一进入 D1，前台只读取同一套内容源。',
   },
 ];
 
 const systemFlow = [
-  { label: 'Write', value: 'Markdown' },
-  { label: 'Build', value: 'Astro' },
-  { label: 'Edge', value: 'Pages' },
-  { label: 'Live', value: 'D1' },
+  { label: 'Shell', value: 'Astro' },
+  { label: 'Code', value: 'GitHub' },
+  { label: 'Runtime', value: 'Pages' },
+  { label: 'Data', value: 'D1' },
 ];
 
 const systemNotes = [
-  '文章统一进入 D1，避免静态 Markdown 和运行时文章形成两套入口。',
-  'GitHub 只负责代码、样式和页面壳，不再承载公开文章源。',
-  '公开阅读路径保留静态壳，内容、搜索和推荐交给边缘函数。',
+  '公开文章只保留 D1 live 入口，避免出现两套内容来源。',
+  'GitHub 负责站点代码和样式演进，保持发布链路清楚。',
+  '搜索、专栏、阅读页和推荐都围绕同一套运行时内容组织。',
 ];
 ---
 
@@ -249,13 +265,41 @@ const systemNotes = [
         <section class="about-signal-panel ui-panel">
           <div class="about-signal-head">
             <div>
-              <p class="ui-eyebrow">system</p>
-              <h2 class="about-side-title">技术指纹</h2>
+              <p class="ui-eyebrow">contact</p>
+              <h2 class="about-side-title">正式联系</h2>
             </div>
-            <span>edge stack</span>
+            <span>public</span>
+          </div>
+          <div class="about-contact-list">
+            {contactRows.map((item) => (
+              <div>
+                <span>{item.label}</span>
+                {item.href ? (
+                  <a
+                    href={item.href}
+                    target={item.href.startsWith('mailto:') ? undefined : '_blank'}
+                    rel={item.href.startsWith('mailto:') ? undefined : 'noreferrer'}
+                  >
+                    {item.value}
+                  </a>
+                ) : (
+                  <strong>{item.value}</strong>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section class="about-signal-panel ui-panel">
+          <div class="about-signal-head">
+            <div>
+              <p class="ui-eyebrow">project</p>
+              <h2 class="about-side-title">项目指纹</h2>
+            </div>
+            <span>public stack</span>
           </div>
           <p class="about-signal-summary">
-            这个站点不是纯静态，也不是完整后台系统。公开页面尽量预渲染，实时发布、评论和管理入口交给 Cloudflare 的边缘能力。
+            这个站点的重点不是展示完整后台，而是把个人内容、公开页面和轻量维护流程放在一条清楚的发布线上。
           </p>
           <div class="about-system-flow" aria-label="站点运行链路">
             {systemFlow.map((item) => (
