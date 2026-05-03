@@ -70,28 +70,19 @@ const principles = [
 const sideSignals = [
   {
     label: 'Frontend',
-    value: 'Astro Static',
-    note: '公开页面预渲染，首屏主要走静态分发。',
+    value: 'Astro',
   },
   {
     label: 'Deploy',
-    value: 'Cloudflare Pages',
-    note: 'GitHub main 分支推送后自动构建并发布。',
+    value: 'Pages',
   },
   {
     label: 'API',
-    value: 'Pages Functions',
-    note: '统计、评论状态、运行时文章和后台操作由边缘函数处理。',
+    value: 'Functions',
   },
   {
-    label: 'Storage',
-    value: 'Cloudflare D1',
-    note: '实时文章、小图、评论设置和访问统计保存在 D1。',
-  },
-  {
-    label: 'Cache',
-    value: 'Headers + Edge',
-    note: '静态资源长缓存，API 按公开与后台接口分层控制。',
+    label: 'Data',
+    value: 'D1',
   },
 ];
 ---
@@ -240,16 +231,18 @@ const sideSignals = [
         </section>
 
         <section class="about-signal-panel ui-panel">
-          <div class="ui-panel-header">
-            <p class="ui-eyebrow">system</p>
-            <h2 class="about-side-title">技术指纹</h2>
+          <div class="about-signal-head">
+            <div>
+              <p class="ui-eyebrow">system</p>
+              <h2 class="about-side-title">技术指纹</h2>
+            </div>
+            <span>2026</span>
           </div>
           <div class="about-signal-list">
             {sideSignals.map((item) => (
               <div>
                 <span>{item.label}</span>
                 <strong>{item.value}</strong>
-                <p>{item.note}</p>
               </div>
             ))}
           </div>

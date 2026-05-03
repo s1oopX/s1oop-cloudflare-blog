@@ -34,6 +34,37 @@
     @apply grid max-w-5xl gap-5;
   }
 
+  .changelog-overview {
+    @apply grid gap-5 p-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:p-6;
+  }
+
+  .changelog-overview h2 {
+    @apply mt-2 text-2xl font-semibold text-white;
+    font-family: var(--font-display);
+    letter-spacing: 0;
+  }
+
+  .changelog-overview p:not(.ui-eyebrow) {
+    @apply mt-3 max-w-2xl text-sm leading-7 text-zinc-300;
+  }
+
+  .changelog-overview dl {
+    @apply grid gap-3 sm:min-w-72 sm:grid-cols-3;
+  }
+
+  .changelog-overview dl > div {
+    @apply border-l pl-3;
+    border-color: rgb(var(--accent-rgb) / 0.18);
+  }
+
+  .changelog-overview dt {
+    @apply font-mono text-[0.66rem] uppercase tracking-[0.14em] text-zinc-500;
+  }
+
+  .changelog-overview dd {
+    @apply mt-1 text-sm font-medium text-zinc-100;
+  }
+
   .changelog-entry {
     @apply relative grid gap-5 p-5 sm:grid-cols-[8rem_minmax(0,1fr)] sm:p-6;
   }
@@ -129,3 +160,25 @@
     color: white;
   }
 
+  @media (max-width: 640px) {
+    .changelog-list {
+      padding-left: 1.35rem;
+    }
+
+    .changelog-list::before {
+      left: 0.3rem;
+    }
+
+    .changelog-list::after {
+      left: -0.02rem;
+    }
+
+    .changelog-branch {
+      left: -1.35rem;
+      width: 1.6rem;
+    }
+
+    .changelog-branch::before {
+      transform: translateY(-50%) rotate(-5deg);
+    }
+  }

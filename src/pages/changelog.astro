@@ -5,6 +5,58 @@ import '../styles/changelog.css';
 
 const records = [
   {
+    date: '2026/05/03',
+    label: 'landing detail',
+    title: '首页滚动提示回到中轴。',
+    summary: '入口页底部的胶囊提示保持原来的呼吸节奏，但内部光点不再贴向左侧。这个调整很小，只处理视觉重心，让头像、标题和下滑提示落在同一条垂直线上。',
+    scope: '首页入口 / 滚动提示 / 视觉对齐',
+    impact: '第一屏的中心线更稳定，细节不会在静态截图里显得偏移。',
+    notes: [
+      '滚动提示光点水平居中',
+      '保留原有上下浮动动画',
+      '不影响分页圆点和入口交互',
+    ],
+  },
+  {
+    date: '2026/05/03',
+    label: 'comment workflow',
+    title: '评论系统接入 D1，并加入同网限制。',
+    summary: '评论不再只是页面占位。前台可以读取、提交和展示留言，后台可以查看与删除评论；同一网络最多保留 2 条评论，超过时给出明确的中文提示。',
+    scope: '文章页 / D1 / 评论 API / 后台管理',
+    impact: '留言能力从静态展示变成可运营流程，同时避免单个来源反复刷屏。',
+    notes: [
+      '新增 blog_comments 数据表',
+      '评论开关控制读取和提交',
+      '超过限制返回“同一网络最多留言 2 条”',
+    ],
+  },
+  {
+    date: '2026/05/03',
+    label: 'private admin',
+    title: '个人后台的安全边界被收紧。',
+    summary: '后台入口、密码校验和运行时脚本加载被重新梳理。管理功能仍然保持轻量，但不会把未授权访问、脚本加载顺序和接口错误混在一起。',
+    scope: '个人后台 / 管理 API / 脚本加载',
+    impact: '管理页的失败状态更清楚，发布和设置操作不容易被前端脚本状态拖偏。',
+    notes: [
+      '强化私有入口校验',
+      '修复后台脚本打包和加载顺序',
+      '管理模块拆分为更明确的运行时职责',
+    ],
+  },
+  {
+    date: '2026/05/02',
+    label: 'runtime publishing',
+    title: '运行时发布链路更轻。',
+    summary: '文章、图片和后台工具被拆成更小的运行时模块。静态构建继续负责公开页面，D1 和 Worker 负责需要即时变更的内容。',
+    scope: '发布工具 / Worker API / 文章运行时',
+    impact: '后台发布不用等待整站重新整理，本地开发和线上接口也更容易分别定位问题。',
+    notes: [
+      '优化文章运行时读取',
+      '拆分后台管理脚本',
+      '降低图片和样式资源负担',
+    ],
+  },
+  {
     date: '2026/05/02',
     label: 'reading contrast',
     title: '暗色阅读的对比度被重新校准。',
@@ -129,6 +181,13 @@ const records = [
     ],
   },
 ];
+
+const latestRecord = records[0];
+const releaseStats = [
+  { label: 'latest', value: latestRecord.date },
+  { label: 'records', value: String(records.length).padStart(2, '0') },
+  { label: 'focus', value: 'reading / admin / runtime' },
+];
 ---
 
 <BaseLayout title="更新记录 | s1oop's Blog">
@@ -136,10 +195,26 @@ const records = [
     <PageHeader
       eyebrow="site updates"
       title="更新记录"
-      description="只保留会改变阅读入口、内容秩序和视觉判断的节点。"
+      description="只保留会改变阅读入口、内容秩序、后台流程和视觉判断的节点。"
     />
 
     <div class="changelog-shell ui-page-body">
+      <section class="changelog-overview ui-panel" aria-label="更新记录概览">
+        <div>
+          <p class="ui-eyebrow">current state</p>
+          <h2>{latestRecord.title}</h2>
+          <p>{latestRecord.impact}</p>
+        </div>
+        <dl>
+          {releaseStats.map((item) => (
+            <div>
+              <dt>{item.label}</dt>
+              <dd>{item.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
       <div class="changelog-list ui-stagger">
         {records.map((record, index) => (
           <article class="changelog-entry ui-panel">
