@@ -23,6 +23,34 @@ export const readableSize = (size) => {
   return `${(size / 1024 / 1024).toFixed(2)} MB`;
 };
 
+const toDate = (value) => {
+  if (!value) return null;
+  const text = String(value);
+  const normalized = /^\d{4}-\d{2}-\d{2}$/.test(text)
+    ? `${text}T00:00:00`
+    : `${text.replace(' ', 'T')}${/[zZ]|[+-]\d{2}:?\d{2}$/.test(text) ? '' : 'Z'}`;
+  const date = new Date(normalized);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
+export const formatDate = (value) => {
+  const date = toDate(value);
+  if (!date) return value || '-';
+  return date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+};
+
+export const formatDateTime = (value) => {
+  const date = toDate(value);
+  if (!date) return value || '-';
+  return date.toLocaleString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+};
+
 export const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
   '&': '&amp;',
   '<': '&lt;',

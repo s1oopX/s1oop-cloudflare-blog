@@ -1,4 +1,4 @@
-import { copyText, downloadText, escapeHtml, formatError, setState } from './utils.js';
+import { copyText, downloadText, escapeHtml, formatDate, formatDateTime, formatError, setState } from './utils.js';
 
 export const fetchRuntimePost = async (requestAdmin, slug) => {
   const data = await requestAdmin(`/api/admin/posts/${encodeURIComponent(slug)}`);
@@ -17,12 +17,13 @@ const renderPostList = ({ postList, postCount }, posts) => {
   postList.innerHTML = posts.map((post) => `
     <article class="private-post-row">
       <div>
-        <span>${escapeHtml(post.date || '-')}</span>
+        <span>发布 ${escapeHtml(formatDate(post.date))}</span>
         <h3>${escapeHtml(post.title || post.slug)}</h3>
-        <p>${escapeHtml(post.slug)} · ${post.published ? '已发布' : '草稿'} · ${post.imageCount || 0} 图</p>
+        <p>${escapeHtml(post.slug)} · ${post.published ? '已发布' : '草稿'} · ${post.imageCount || 0} 图 · 编辑 ${escapeHtml(formatDateTime(post.updatedAt))}</p>
       </div>
       <div class="private-post-actions">
         <a href="${escapeHtml(post.href)}" target="_blank" rel="noreferrer">查看</a>
+        <button type="button" data-edit-post="${escapeHtml(post.slug)}">编辑</button>
         <button type="button" data-copy-post="${escapeHtml(post.slug)}">复制</button>
         <button type="button" data-download-post="${escapeHtml(post.slug)}">下载</button>
         <button type="button" data-delete-post="${escapeHtml(post.slug)}">删除</button>
@@ -46,12 +47,29 @@ export const loadPosts = async (requestAdmin, nodes) => {
 
 export const bindPostListActions = (requestAdmin, nodes, callbacks = {}) => {
   const { postList, uploadState, orphanAssetsButton } = nodes;
-  const { loadPosts: reloadPosts, checkOverwrite } = callbacks;
+  const { editPost, loadPosts: reloadPosts, checkOverwrite } = callbacks;
 
   postList?.addEventListener('click', async (event) => {
+    const editButton = event.target.closest('[data-edit-post]');
     const copyButton = event.target.closest('[data-copy-post]');
     const downloadButton = event.target.closest('[data-download-post]');
     const deleteButton = event.target.closest('[data-delete-post]');
+
+    if (editButton) {
+      const slug = editButton.dataset.editPost;
+      if (!slug) return;
+      editButton.disabled = true;
+      try {
+        const post = await fetchRuntimePost(requestAdmin, slug);
+        editPost?.(post);
+        setState(uploadState, `已载入编辑：${slug}`, 'success');
+      } catch (error) {
+        setState(uploadState, formatError(error.message), 'error');
+      } finally {
+        editButton.disabled = false;
+      }
+      return;
+    }
 
     if (copyButton) {
       const slug = copyButton.dataset.copyPost;

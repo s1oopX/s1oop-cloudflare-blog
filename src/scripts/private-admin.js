@@ -4,7 +4,7 @@ import { firstMarkdownImage, parseFrontmatter } from './admin/markdown.js';
 import { bindCommentActions, loadComments as loadRuntimeComments } from './admin/comments.js';
 import { bindPostListActions, loadPosts as loadRuntimePosts } from './admin/runtime-posts.js';
 import { bindCommentToggle, loadSettings as loadAdminSettings } from './admin/settings.js';
-import { formatError, readableSize, setState, toSlug } from './admin/utils.js';
+import { formatDate, formatError, readableSize, setState, toSlug } from './admin/utils.js';
 
 const passwordKey = 's1oop-admin-password';
 const uploadForm = document.querySelector('#post-upload');
@@ -106,6 +106,38 @@ const renderPreview = () => {
   setState(workflowState, parsed.error ? '需修正' : '待提交', parsed.error ? 'error' : 'muted');
 };
 
+const loadPostForEdit = (post) => {
+  if (!fileInput || !post?.markdown) {
+    setState(uploadState, '当前浏览器无法载入编辑，请下载后重新上传', 'error');
+    return;
+  }
+
+  try {
+    const transfer = new DataTransfer();
+    transfer.items.add(new File([post.markdown], `${post.slug}.md`, { type: 'text/markdown' }));
+    fileInput.files = transfer.files;
+  } catch {
+    setState(uploadState, '当前浏览器无法载入编辑，请下载后重新上传', 'error');
+    return;
+  }
+
+  selectedMarkdown = post.markdown;
+  if (slugInput) slugInput.value = post.slug || '';
+  if (fileLabel) fileLabel.textContent = `正在编辑 ${post.slug}.md`;
+  if (imageLabel) imageLabel.textContent = '保留已有配图，可选择新图替换';
+  setState(fileState, '编辑中', 'success');
+  setState(workflowState, '覆盖更新');
+  setState(
+    imageWarning,
+    '不重新选择配图会保留已有 D1 图片；选择新图会替换旧图。',
+    'muted',
+  );
+  setPublishLink(post.href || '');
+  renderPreview();
+  checkOverwrite();
+  uploadForm?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+};
+
 const checkOverwrite = async () => {
   const slug = currentSlug();
   const checkId = overwriteCheckId + 1;
@@ -120,7 +152,11 @@ const checkOverwrite = async () => {
   try {
     const data = await requestAdmin(`/api/admin/posts/${encodeURIComponent(slug)}`);
     if (checkId !== overwriteCheckId) return;
-    setState(previewOverwrite, data.exists ? '将覆盖已有文章' : '将新增文章', data.exists ? 'error' : 'success');
+    setState(
+      previewOverwrite,
+      data.exists ? `更新已有文章，保留发布日 ${formatDate(data.post?.date)}` : '将新增文章',
+      data.exists ? 'error' : 'success',
+    );
   } catch (error) {
     if (checkId !== overwriteCheckId) return;
     setState(previewOverwrite, formatError(error.message), 'error');
@@ -300,7 +336,7 @@ uploadForm?.addEventListener('submit', async (event) => {
 bindPostListActions(
   requestAdmin,
   { postList, uploadState, orphanAssetsButton },
-  { loadPosts, checkOverwrite },
+  { editPost: loadPostForEdit, loadPosts, checkOverwrite },
 );
 
 refreshButton?.addEventListener('click', loadPosts);

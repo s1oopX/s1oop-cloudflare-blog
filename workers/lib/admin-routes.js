@@ -83,7 +83,9 @@ const handlePostUpload = async (request, env) => {
     if (firstParsed.error) return json({ ok: false, message: firstParsed.error }, { status: 400 });
 
     const existing = await getAdminRuntimePost(env, slug);
-    if (existing) await env.BLOG_DB.prepare('DELETE FROM blog_assets WHERE slug = ?').bind(slug).run();
+    if (existing && imageFiles.length) {
+      await env.BLOG_DB.prepare('DELETE FROM blog_assets WHERE slug = ?').bind(slug).run();
+    }
 
     const { markdownRewrites, assets } = await storeImages(env, slug, imageFiles);
     markdown = rewriteMarkdownImages(markdown, markdownRewrites);
@@ -92,11 +94,12 @@ const handlePostUpload = async (request, env) => {
     if (parsed.error) return json({ ok: false, message: parsed.error }, { status: 400 });
 
     const stats = readingStats(parsed.body);
+    const publicationDate = existing?.date || parsed.data.date;
     await putRuntimePost(env, {
       slug,
       title: parsed.data.title,
       excerpt: parsed.data.excerpt || '这是一篇个人博客文章。',
-      date: parsed.data.date,
+      date: publicationDate,
       tags: parsed.data.tags ?? [],
       markdown,
       html: markdownToHtml(parsed.body),
@@ -116,6 +119,8 @@ const handlePostUpload = async (request, env) => {
       images: assets,
       mode: existing ? 'updated' : 'created',
       overwritten: Boolean(existing),
+      publishedDate: publicationDate,
+      preservedPublishedDate: Boolean(existing),
     });
   } catch (error) {
     if (error instanceof Response) return error;

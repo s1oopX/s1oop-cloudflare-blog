@@ -39,6 +39,10 @@
   }
 
   .private-post-actions button {
+    @apply text-zinc-300;
+  }
+
+  .private-post-actions button[data-delete-post] {
     @apply text-red-200;
   }
 
