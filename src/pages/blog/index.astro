@@ -18,6 +18,7 @@ const archivePaths = collections.map((collection) => ({
   href: collectionHref(collection),
   title: collection.title,
   count: postsForCollection(collection, posts).length,
+  runtimeTags: collection.runtimeTags,
 }));
 const staticPostData = posts.map((post) => ({
   title: post.data.title,
@@ -103,6 +104,7 @@ const staticPostData = posts.map((post) => ({
     const postList = document.querySelector('[data-post-list]');
     const pagination = document.querySelector('[data-post-pagination]');
     const postCount = document.querySelector('[data-post-count]');
+    const tagCount = document.querySelector('[data-tag-count]');
     const latestPost = document.querySelector('[data-latest-post]');
 
     const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
@@ -149,14 +151,34 @@ const staticPostData = posts.map((post) => ({
       </article>
     `;
 
-    const renderArchiveBreak = () => `
+    const tagCountsFor = (posts = []) => {
+      const counts = new Map();
+      for (const post of posts) {
+        for (const tag of post.tags || []) {
+          counts.set(tag, (counts.get(tag) || 0) + 1);
+        }
+      }
+      return counts;
+    };
+
+    const belongsToArchivePath = (post, path) => {
+      const tags = new Set((post.tags || []).map((tag) => String(tag).toLowerCase()));
+      return (path.runtimeTags || []).some((tag) => tags.has(String(tag).toLowerCase()));
+    };
+
+    const archivePathsFor = (runtimePosts = []) => archivePaths.map((path) => ({
+      ...path,
+      count: path.count + runtimePosts.filter((post) => belongsToArchivePath(post, path)).length,
+    }));
+
+    const renderArchiveBreak = (paths = archivePaths) => `
       <section class="archive-path-break ui-panel" aria-label="按专栏继续阅读" data-archive-path-break>
         <div>
           <p class="ui-eyebrow">reading paths</p>
           <h2>换一条路线继续读</h2>
         </div>
         <div class="archive-path-links">
-          ${archivePaths.map((path) => `
+          ${paths.map((path) => `
             <a href="${escapeHtml(path.href)}">
               <span>${escapeHtml(path.count)} 篇</span>
               <strong>${escapeHtml(path.title)}</strong>
@@ -190,9 +212,11 @@ const staticPostData = posts.map((post) => ({
       if (!postList) return;
 
       const existingHrefs = new Set(staticPosts.map((post) => post.href));
+      const uniqueRuntimePosts = runtimePosts.filter((post) => post?.href && !existingHrefs.has(post.href));
       const posts = staticPosts
-        .concat(runtimePosts.filter((post) => post?.href && !existingHrefs.has(post.href)))
+        .concat(uniqueRuntimePosts)
         .sort((a, b) => normalizeTime(b.date) - normalizeTime(a.date));
+      const archivePathCounts = archivePathsFor(uniqueRuntimePosts);
       const currentPage = Math.max(1, Number(new URLSearchParams(window.location.search).get('page') || 1));
       const totalPages = Math.max(1, Math.ceil(posts.length / pageSize));
       const boundedPage = Math.min(currentPage, totalPages);
@@ -200,16 +224,17 @@ const staticPostData = posts.map((post) => ({
 
       postList.querySelectorAll('.post-card, [data-archive-path-break]').forEach((node) => node.remove());
       const renderedPosts = visiblePosts.map((post, index) => (
-        renderPost(post) + (index === 3 && visiblePosts.length > 4 ? renderArchiveBreak() : '')
+        renderPost(post) + (index === 3 && visiblePosts.length > 4 ? renderArchiveBreak(archivePathCounts) : '')
       )).join('');
       postList.insertAdjacentHTML('afterbegin', renderedPosts);
       renderPagination(boundedPage, totalPages);
 
       if (postCount) postCount.textContent = String(posts.length);
+      if (tagCount) tagCount.textContent = String(tagCountsFor(posts).size);
       if (latestPost) latestPost.textContent = posts[0] ? formatDate(posts[0].date) : '-';
     };
 
-    fetch('/api/posts?limit=20')
+    fetch('/api/posts?limit=100')
       .then((response) => response.ok ? response.json() : null)
       .then((data) => {
         const posts = Array.isArray(data?.posts) ? data.posts : [];

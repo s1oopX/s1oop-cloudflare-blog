@@ -7,6 +7,10 @@ import { postHref, postImage, visiblePosts } from '../../lib/posts';
 import '../../styles/taxonomy-search.css';
 
 const posts = visiblePosts(await getCollection('posts'));
+const collectionMeta = collections.map((collection) => ({
+  slug: collection.slug,
+  runtimeTags: collection.runtimeTags,
+}));
 ---
 
 <BaseLayout title="专栏 | s1oop's Blog">
@@ -24,7 +28,7 @@ const posts = visiblePosts(await getCollection('posts'));
         const image = leadPost ? postImage(leadPost) : null;
 
         return (
-          <a href={collectionHref(collection)} class="collection-card ui-panel ui-panel-link no-underline">
+          <a href={collectionHref(collection)} class="collection-card ui-panel ui-panel-link no-underline" data-collection-card={collection.slug}>
             {image && (
               <div class="collection-card-image">
                 <img src={image.src} alt={image.alt} loading="lazy" decoding="async" />
@@ -33,11 +37,11 @@ const posts = visiblePosts(await getCollection('posts'));
             <div class="collection-card-body">
               <p class="ui-eyebrow">{collection.eyebrow}</p>
               <div class="mt-3 flex flex-wrap gap-2">
-                <span class="ui-badge">{collectionPosts.length} 篇</span>
+                <span class="ui-badge" data-collection-count>{collectionPosts.length} 篇</span>
               </div>
               <h2>{collection.title}</h2>
               <p>{collection.description}</p>
-              <div class="collection-card-list">
+              <div class="collection-card-list" data-collection-list>
                 {collectionPosts.slice(0, 2).map((post) => (
                   <span>{post.data.title}</span>
                 ))}
@@ -48,4 +52,42 @@ const posts = visiblePosts(await getCollection('posts'));
       })}
     </div>
   </section>
+
+  <script is:inline define:vars={{ collectionMeta }}>
+    const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    }[character]));
+
+    const belongsToCollection = (post, collection) => {
+      const tags = new Set((post.tags || []).map((tag) => String(tag).toLowerCase()));
+      return (collection.runtimeTags || []).some((tag) => tags.has(String(tag).toLowerCase()));
+    };
+
+    fetch('/api/posts?limit=100')
+      .then((response) => response.ok ? response.json() : null)
+      .then((data) => {
+        const runtimePosts = Array.isArray(data?.posts) ? data.posts.filter((post) => post?.runtime) : [];
+        for (const collection of collectionMeta) {
+          const card = document.querySelector(`[data-collection-card="${collection.slug}"]`);
+          if (!card) continue;
+
+          const runtimeMatches = runtimePosts.filter((post) => belongsToCollection(post, collection));
+          if (!runtimeMatches.length) continue;
+
+          const countNode = card.querySelector('[data-collection-count]');
+          const listNode = card.querySelector('[data-collection-list]');
+          const staticTitles = Array.from(listNode?.querySelectorAll('span') || []).map((node) => node.textContent || '');
+          const titles = runtimeMatches.map((post) => post.title).concat(staticTitles).slice(0, 2);
+          const staticCount = Number.parseInt(countNode?.textContent || '0', 10) || 0;
+
+          if (countNode) countNode.textContent = `${staticCount + runtimeMatches.length} 篇`;
+          if (listNode) listNode.innerHTML = titles.map((title) => `<span>${escapeHtml(title)}</span>`).join('');
+        }
+      })
+      .catch(() => {});
+  </script>
 </BaseLayout>

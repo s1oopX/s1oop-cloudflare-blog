@@ -22,6 +22,24 @@ const totalPages = pageCount(collectionPosts, POSTS_PER_PAGE);
 const paginatedPosts = pageItems(collectionPosts, currentPage, POSTS_PER_PAGE);
 const otherCollections = collections.filter((item) => item.slug !== collection.slug);
 const latestCollectionPost = collectionPosts[0];
+const staticPostData = collectionPosts.map((post) => ({
+  title: post.data.title,
+  excerpt: postExcerpt(post),
+  href: postHref(post),
+  date: post.data.date.toISOString(),
+  tags: post.data.tags,
+  image: postImage(post),
+  runtime: false,
+}));
+const collectionMeta = {
+  slug: collection.slug,
+  runtimeTags: collection.runtimeTags,
+};
+const otherCollectionMeta = otherCollections.map((item) => ({
+  slug: item.slug,
+  runtimeTags: item.runtimeTags,
+  staticCount: postsForCollection(item, posts).length,
+}));
 ---
 
 <BaseLayout title={`${collection.title} | s1oop's Blog`}>
@@ -37,7 +55,7 @@ const latestCollectionPost = collectionPosts[0];
     </PageHeader>
 
     <div class="ui-grid ui-page-body">
-      <div class="ui-stack ui-stagger">
+      <div class="ui-stack ui-stagger" data-collection-post-list data-page-size={POSTS_PER_PAGE}>
         {paginatedPosts.map((post) => (
           <PostCard
             title={post.data.title}
@@ -49,9 +67,11 @@ const latestCollectionPost = collectionPosts[0];
           />
         ))}
         {collectionPosts.length === 0 && (
-          <div class="ui-panel p-5 text-sm text-zinc-400">该专栏暂无文章。</div>
+          <div class="ui-panel p-5 text-sm text-zinc-400" data-collection-empty>该专栏暂无文章。</div>
         )}
-        <Pagination currentPage={currentPage} totalPages={totalPages} baseHref={`/collections/${collection.slug}`} />
+        <div data-collection-pagination>
+          <Pagination currentPage={currentPage} totalPages={totalPages} baseHref={`/collections/${collection.slug}`} />
+        </div>
       </div>
 
       <aside class="ui-sidebar ui-stagger">
@@ -63,11 +83,11 @@ const latestCollectionPost = collectionPosts[0];
             <p class="text-sm leading-6 text-zinc-400">{collection.description}</p>
             <div class="ui-stat-row">
               <span class="ui-stat-label">文章</span>
-              <span class="ui-stat-value">{collectionPosts.length}</span>
+              <span class="ui-stat-value" data-collection-total>{collectionPosts.length}</span>
             </div>
             <div class="ui-stat-row">
               <span class="ui-stat-label">最新</span>
-              <span class="ui-stat-value">{latestCollectionPost ? formatPostDate(latestCollectionPost.data.date) : '-'}</span>
+              <span class="ui-stat-value" data-collection-latest>{latestCollectionPost ? formatPostDate(latestCollectionPost.data.date) : '-'}</span>
             </div>
           </div>
         </section>
@@ -79,7 +99,7 @@ const latestCollectionPost = collectionPosts[0];
           <div class="ui-panel-body sidebar-link-list">
             {otherCollections.map((item) => (
               <a href={`/collections/${item.slug}`} class="sidebar-link-item no-underline">
-                <span class="sidebar-link-kicker">{postsForCollection(item, posts).length} 篇</span>
+                <span class="sidebar-link-kicker" data-other-collection-count={item.slug}>{postsForCollection(item, posts).length} 篇</span>
                 <span class="sidebar-link-title">{item.title}</span>
               </a>
             ))}
@@ -92,4 +112,88 @@ const latestCollectionPost = collectionPosts[0];
       </aside>
     </div>
   </section>
+
+  <script is:inline define:vars={{ staticPosts: staticPostData, collectionMeta, otherCollectionMeta, pageSize: POSTS_PER_PAGE }}>
+    const postList = document.querySelector('[data-collection-post-list]');
+    const pagination = document.querySelector('[data-collection-pagination]');
+    const totalNode = document.querySelector('[data-collection-total]');
+    const latestNode = document.querySelector('[data-collection-latest]');
+
+    const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    }[character]));
+
+    const formatDate = (value) => {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return escapeHtml(value || '-');
+      return date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    };
+
+    const normalizeTime = (value) => {
+      const time = new Date(value).getTime();
+      return Number.isFinite(time) ? time : 0;
+    };
+
+    const belongsToCollection = (post, collection) => {
+      const tags = new Set((post.tags || []).map((tag) => String(tag).toLowerCase()));
+      return (collection.runtimeTags || []).some((tag) => tags.has(String(tag).toLowerCase()));
+    };
+
+    const renderTags = (tags = []) => {
+      const visibleTags = tags.slice(0, 2);
+      const extraTagCount = Math.max(0, tags.length - visibleTags.length);
+      const badges = visibleTags.map((tag) => `<span class="ui-badge">#${escapeHtml(tag)}</span>`).join('');
+      const extraBadge = extraTagCount > 0 ? `<span class="ui-badge">+${extraTagCount}</span>` : '';
+      return badges + extraBadge;
+    };
+
+    const renderPost = (post) => `
+      <article class="post-card ui-panel ui-panel-link">
+        <a href="${escapeHtml(post.href)}" class="post-card-link">
+          <div class="post-card-media">
+            ${post.image ? `<img src="${escapeHtml(post.image.src)}" alt="${escapeHtml(post.image.alt)}" loading="lazy" decoding="async" />` : '<span aria-hidden="true"></span>'}
+            <time>${formatDate(post.date)}</time>
+          </div>
+          <div class="post-card-main">
+            <div class="post-card-meta">${renderTags(post.tags)}</div>
+            <h2 class="post-card-title">${escapeHtml(post.title)}</h2>
+            <p class="post-card-excerpt">${escapeHtml(post.excerpt)}</p>
+            <div class="post-card-action"><span>阅读文章</span><span aria-hidden="true">-&gt;</span></div>
+          </div>
+        </a>
+      </article>
+    `;
+
+    fetch('/api/posts?limit=100')
+      .then((response) => response.ok ? response.json() : null)
+      .then((data) => {
+        const runtimePosts = Array.isArray(data?.posts) ? data.posts.filter((post) => post?.runtime) : [];
+        const runtimeMatches = runtimePosts.filter((post) => belongsToCollection(post, collectionMeta));
+        const existingHrefs = new Set(staticPosts.map((post) => post.href));
+        const posts = runtimeMatches
+          .filter((post) => post?.href && !existingHrefs.has(post.href))
+          .concat(staticPosts)
+          .sort((a, b) => normalizeTime(b.date) - normalizeTime(a.date));
+
+        if (totalNode) totalNode.textContent = String(posts.length);
+        if (latestNode) latestNode.textContent = posts[0] ? formatDate(posts[0].date) : '-';
+
+        for (const other of otherCollectionMeta) {
+          const count = other.staticCount + runtimePosts.filter((post) => belongsToCollection(post, other)).length;
+          const node = document.querySelector(`[data-other-collection-count="${other.slug}"]`);
+          if (node) node.textContent = `${count} 篇`;
+        }
+
+        if (!runtimeMatches.length || !postList) return;
+        postList.querySelectorAll('.post-card, [data-collection-empty]').forEach((node) => node.remove());
+        const visiblePosts = posts.slice(0, pageSize);
+        postList.insertAdjacentHTML('afterbegin', visiblePosts.map(renderPost).join(''));
+        if (pagination) pagination.hidden = posts.length <= pageSize;
+      })
+      .catch(() => {});
+  </script>
 </BaseLayout>

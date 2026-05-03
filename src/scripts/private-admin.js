@@ -41,11 +41,24 @@ const previewOverwrite = document.querySelector('#preview-overwrite');
 const postList = document.querySelector('#runtime-post-list');
 const commentList = document.querySelector('#runtime-comments-list');
 const commentCount = document.querySelector('#runtime-comments-count');
+const templateTitle = document.querySelector('#template-title');
+const templateDate = document.querySelector('#template-date');
+const templateCollection = document.querySelector('#template-collection');
+const templateTags = document.querySelector('#template-tags');
+const templateExcerpt = document.querySelector('#template-excerpt');
+const templateImageAlt = document.querySelector('#template-image-alt');
+const templateBody = document.querySelector('#template-body');
+const templateBuildButton = document.querySelector('#template-build-button');
+const templateState = document.querySelector('#template-state');
 
 let selectedMarkdown = '';
 let overwriteCheckId = 0;
 
-
+const collectionTags = {
+  hot: '热点',
+  tech: '方法',
+  learn: '学习',
+};
 
 const setPublishLink = (href = '') => {
   if (!publishResult || !postOpenLink) return;
@@ -73,6 +86,141 @@ const currentSlug = () => {
   const file = fileInput?.files?.[0];
   return explicit || toSlug(file?.name || '');
 };
+
+const todayDate = () => {
+  const date = new Date();
+  const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
+  return offsetDate.toISOString().slice(0, 10);
+};
+
+const yamlValue = (value) => `'${String(value ?? '').replace(/'/g, "''")}'`;
+
+const splitTemplateTags = (value) => String(value || '')
+  .split(/[,，、/\\\n]+/)
+  .map((tag) => tag.trim())
+  .filter(Boolean);
+
+const templateHasContent = () => Boolean(
+  templateTitle?.value?.trim()
+    || templateExcerpt?.value?.trim()
+    || templateTags?.value?.trim()
+    || templateBody?.value?.trim()
+    || templateImageAlt?.value?.trim(),
+);
+
+const templateTagsFor = () => {
+  const tags = [];
+  const collectionTag = collectionTags[templateCollection?.value || ''];
+  if (collectionTag) tags.push(collectionTag);
+  tags.push(...splitTemplateTags(templateTags?.value));
+  return Array.from(new Set(tags)).slice(0, 4);
+};
+
+const setMarkdownFile = (markdown, slug) => {
+  if (!fileInput) {
+    setState(templateState, '当前浏览器无法生成 Markdown 文件', 'error');
+    return false;
+  }
+
+  try {
+    const transfer = new DataTransfer();
+    transfer.items.add(new File([markdown], `${slug || 'runtime-post'}.md`, { type: 'text/markdown' }));
+    fileInput.files = transfer.files;
+  } catch {
+    setState(templateState, '当前浏览器无法生成 Markdown 文件', 'error');
+    return false;
+  }
+
+  selectedMarkdown = markdown;
+  if (fileLabel) fileLabel.textContent = `模板生成 ${slug || 'runtime-post'}.md`;
+  setState(fileState, '模板', 'success');
+  renderPreview();
+  checkOverwrite();
+  return true;
+};
+
+const templateMarkdown = () => {
+  const title = templateTitle?.value?.trim() || '';
+  const date = templateDate?.value || todayDate();
+  const excerpt = templateExcerpt?.value?.trim() || '';
+  const body = templateBody?.value?.trim() || '';
+  const slug = toSlug(slugInput?.value || title);
+  const tags = templateTagsFor();
+
+  if (!title) throw new Error('模板缺少标题');
+  if (!date) throw new Error('模板缺少发布日期');
+  if (!excerpt) throw new Error('模板缺少摘要');
+  if (!tags.length) throw new Error('至少选择一个专栏或填写一个标签');
+  if (!body) throw new Error('模板缺少正文');
+
+  const imageFile = imageInput?.files?.[0];
+  const hasImage = Boolean(firstMarkdownImage(body));
+  const imageMarkdown = imageFile && !hasImage
+    ? `![${templateImageAlt?.value?.trim() || title}](${imageFile.name})\n\n`
+    : '';
+
+  return {
+    slug,
+    markdown: [
+      '---',
+      `title: ${yamlValue(title)}`,
+      `date: ${date}`,
+      `excerpt: ${yamlValue(excerpt)}`,
+      'tags:',
+      ...tags.map((tag) => `  - ${yamlValue(tag)}`),
+      'draft: false',
+      '---',
+      '',
+      `${imageMarkdown}${body}`,
+      '',
+    ].join('\n'),
+  };
+};
+
+const buildTemplateMarkdown = ({ silent = false } = {}) => {
+  try {
+    const { markdown, slug } = templateMarkdown();
+    if (slugInput && !slugInput.value.trim()) slugInput.value = slug;
+    if (!setMarkdownFile(markdown, slug)) return false;
+    setState(templateState, `已生成规范 Markdown：${slug}.md`, 'success');
+    return true;
+  } catch (error) {
+    if (!silent) setState(templateState, formatError(error.message), 'error');
+    return false;
+  }
+};
+
+const fillTemplateFromMarkdown = (markdown, slug = '') => {
+  const parsed = parseFrontmatter(markdown);
+  if (parsed.error) return;
+  const tags = parsed.data.tags || [];
+  const collectionKey = Object.entries(collectionTags)
+    .find(([, tag]) => tags.includes(tag))?.[0] || '';
+  const extraTags = tags.filter((tag) => tag !== collectionTags[collectionKey]);
+
+  if (templateTitle) templateTitle.value = parsed.data.title || '';
+  if (templateDate) templateDate.value = parsed.data.date || todayDate();
+  if (templateCollection) templateCollection.value = collectionKey;
+  if (templateTags) templateTags.value = extraTags.join(', ');
+  if (templateExcerpt) templateExcerpt.value = parsed.data.excerpt || '';
+  if (templateImageAlt) templateImageAlt.value = parsed.data.title || '';
+  if (templateBody) templateBody.value = parsed.body.trim();
+  if (slugInput && slug) slugInput.value = slug;
+  setState(templateState, '已载入到模板，可继续编辑后生成发布', 'success');
+};
+
+const resetTemplate = () => {
+  if (templateTitle) templateTitle.value = '';
+  if (templateDate) templateDate.value = todayDate();
+  if (templateCollection) templateCollection.value = '';
+  if (templateTags) templateTags.value = '';
+  if (templateExcerpt) templateExcerpt.value = '';
+  if (templateImageAlt) templateImageAlt.value = '';
+  if (templateBody) templateBody.value = '';
+  setState(templateState, '填写模板后可直接生成规范 Markdown；也可以继续使用下方高级上传。', 'muted');
+};
+
+resetTemplate();
 
 const setFileMeta = ({ title = '等待文件', date = '-', size = '-' } = {}) => {
   if (metaTitle) metaTitle.textContent = title;
@@ -122,6 +270,7 @@ const loadPostForEdit = (post) => {
   }
 
   selectedMarkdown = post.markdown;
+  fillTemplateFromMarkdown(post.markdown, post.slug || '');
   if (slugInput) slugInput.value = post.slug || '';
   if (fileLabel) fileLabel.textContent = `正在编辑 ${post.slug}.md`;
   if (imageLabel) imageLabel.textContent = '保留已有配图，可选择新图替换';
@@ -250,6 +399,7 @@ imageInput?.addEventListener('change', updateImageState);
 clearButton?.addEventListener('click', () => {
   uploadForm?.reset();
   selectedMarkdown = '';
+  resetTemplate();
   if (fileLabel) fileLabel.textContent = '选择 Markdown 文件';
   if (imageLabel) imageLabel.textContent = '选择配图，可多选';
   setState(fileState, '未选择');
@@ -261,10 +411,27 @@ clearButton?.addEventListener('click', () => {
   setState(uploadState, '支持 .md / .mdx，单张图片不超过 1 MB', 'muted');
 });
 
+templateBuildButton?.addEventListener('click', () => {
+  buildTemplateMarkdown();
+});
+
+templateTitle?.addEventListener('blur', () => {
+  if (!slugInput?.value?.trim() && templateTitle.value.trim()) {
+    slugInput.value = toSlug(templateTitle.value);
+    renderPreview();
+    checkOverwrite();
+  }
+});
+
 uploadForm?.addEventListener('submit', async (event) => {
   event.preventDefault();
   if (!getPassword()) {
     lockAndExit();
+    return;
+  }
+
+  if (templateHasContent() && !buildTemplateMarkdown()) {
+    setState(workflowState, '模板需修正', 'error');
     return;
   }
 
@@ -320,6 +487,7 @@ uploadForm?.addEventListener('submit', async (event) => {
     setPublishLink(href);
     uploadForm.reset();
     selectedMarkdown = '';
+    resetTemplate();
     if (fileLabel) fileLabel.textContent = '选择 Markdown 文件';
     if (imageLabel) imageLabel.textContent = '选择配图，可多选';
     setState(fileState, '未选择');

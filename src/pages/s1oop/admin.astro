@@ -52,9 +52,60 @@ import '../../styles/private-management.css';
             </div>
 
             <form id="post-upload" class="private-admin-form private-admin-upload" novalidate>
+              <div class="private-template-box" aria-label="模板发布">
+                <div class="private-template-head">
+                  <div>
+                    <p class="private-admin-kicker">template</p>
+                    <h3>模板发布</h3>
+                  </div>
+                  <button id="template-build-button" class="private-admin-secondary private-inline-action" type="button">生成 Markdown</button>
+                </div>
+
+                <div class="private-template-grid">
+                  <label>
+                    <span>标题</span>
+                    <input id="template-title" class="private-admin-input" type="text" autocomplete="off" placeholder="例如：安静阅读的整理方式" />
+                  </label>
+                  <label>
+                    <span>发布日期</span>
+                    <input id="template-date" class="private-admin-input" type="date" />
+                  </label>
+                  <label>
+                    <span>所属专栏</span>
+                    <select id="template-collection" class="private-admin-input">
+                      <option value="">不归入专栏</option>
+                      <option value="hot">热点分享</option>
+                      <option value="tech">方法记录</option>
+                      <option value="learn">学习分享</option>
+                    </select>
+                  </label>
+                  <label>
+                    <span>补充标签</span>
+                    <input id="template-tags" class="private-admin-input" type="text" autocomplete="off" placeholder="写作, 博客，最多补到 4 个" />
+                  </label>
+                </div>
+
+                <label class="private-template-wide">
+                  <span>摘要</span>
+                  <textarea id="template-excerpt" class="private-admin-input" rows="2" maxlength="90" placeholder="一句话说明文章主题，适合显示在文章列表。"></textarea>
+                </label>
+
+                <label class="private-template-wide">
+                  <span>封面 alt</span>
+                  <input id="template-image-alt" class="private-admin-input" type="text" autocomplete="off" placeholder="选择配图后会插入为正文第一张图" />
+                </label>
+
+                <label class="private-template-wide">
+                  <span>正文</span>
+                  <textarea id="template-body" class="private-admin-input private-template-body" rows="14" placeholder="开头说明这篇文章解决什么问题。\n\n## 第一节\n\n写具体判断。\n\n## 保持克制\n\n收束到一个可以长期回看的结论。"></textarea>
+                </label>
+
+                <p id="template-state" class="private-admin-state private-admin-state-inline" aria-live="polite">填写模板后可直接生成规范 Markdown；也可以继续使用下方高级上传。</p>
+              </div>
+
               <label class="private-admin-file">
                 <span id="post-file-label">选择 Markdown 文件</span>
-                <input id="post-file" name="file" type="file" accept=".md,.mdx,text/markdown" required />
+                <input id="post-file" name="file" type="file" accept=".md,.mdx,text/markdown" />
               </label>
               <label class="private-admin-file">
                 <span id="post-image-label">选择配图，可多选</span>

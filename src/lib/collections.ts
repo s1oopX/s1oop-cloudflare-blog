@@ -8,6 +8,7 @@ export const collections = [
     eyebrow: 'recent focus',
     description: '当前阶段更值得先看的内容，包含视觉方向、博客定位和近期最能代表这里气质的文章。',
     posts: ['noir-archive-design', 'hello-cloudflare'],
+    runtimeTags: ['热点'],
   },
   {
     slug: 'tech',
@@ -15,6 +16,7 @@ export const collections = [
     eyebrow: 'practical notes',
     description: '围绕阅读体验、内容整理、视觉气质和长期回看的实践记录，强调能直接带走的判断。',
     posts: ['astro-cloudflare-workflow', 'noir-archive-design'],
+    runtimeTags: ['方法'],
   },
   {
     slug: 'learn',
@@ -22,6 +24,7 @@ export const collections = [
     eyebrow: 'learning notes',
     description: '写作、阅读、工具和方法相关记录，保留可复用的学习过程与经验。',
     posts: ['astro-cloudflare-workflow', 'private-blog-editing-checklist'],
+    runtimeTags: ['学习'],
   },
 ];
 

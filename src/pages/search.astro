@@ -30,7 +30,7 @@ const maxTagCount = Math.max(1, ...tagStats.map((item) => item.count));
             <SearchBar />
             <div class="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4">
               <p id="search-status" class="search-status">输入关键词后显示结果。</p>
-              <span class="font-mono text-[0.68rem] uppercase tracking-[0.12em] text-zinc-500">{posts.length} 篇文章 / {tags.length} 个主题</span>
+              <span class="font-mono text-[0.68rem] uppercase tracking-[0.12em] text-zinc-500" data-search-summary>{posts.length} 篇文章 / {tags.length} 个主题</span>
             </div>
           </div>
         </section>
@@ -44,7 +44,7 @@ const maxTagCount = Math.max(1, ...tagStats.map((item) => item.count));
               <h2 id="search-topics-title" class="mt-2 text-2xl font-semibold text-white">主题</h2>
             </div>
           </div>
-          <div class="tag-index-grid search-topic-grid">
+          <div class="tag-index-grid search-topic-grid" data-search-topic-grid>
             {tagStats.map(({ tag, count }) => (
               <a
                 href={`/search?q=${encodeURIComponent(tag)}`}
@@ -68,11 +68,11 @@ const maxTagCount = Math.max(1, ...tagStats.map((item) => item.count));
           <div class="ui-panel-body grid gap-4">
             <div class="ui-stat-row">
               <span class="ui-stat-label">文章</span>
-              <span class="ui-stat-value">{posts.length}</span>
+              <span class="ui-stat-value" data-search-post-count>{posts.length}</span>
             </div>
             <div class="ui-stat-row">
               <span class="ui-stat-label">主题</span>
-              <span class="ui-stat-value">{tags.length}</span>
+              <span class="ui-stat-value" data-search-tag-count>{tags.length}</span>
             </div>
             <div class="ui-stat-row">
               <span class="ui-stat-label">状态</span>
@@ -99,6 +99,10 @@ const maxTagCount = Math.max(1, ...tagStats.map((item) => item.count));
     const results = document.querySelector('#search-results');
     const status = document.querySelector('#search-status');
     const sidebarState = document.querySelector('#search-sidebar-state');
+    const summary = document.querySelector('[data-search-summary]');
+    const postCount = document.querySelector('[data-search-post-count]');
+    const tagCount = document.querySelector('[data-search-tag-count]');
+    const topicGrid = document.querySelector('[data-search-topic-grid]');
     let index = [];
 
     const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
@@ -127,6 +131,44 @@ const maxTagCount = Math.max(1, ...tagStats.map((item) => item.count));
         </div>
       </article>
     `;
+
+    const normalizeTime = (value) => {
+      const time = new Date(value).getTime();
+      return Number.isFinite(time) ? time : 0;
+    };
+
+    const tagCountsFor = (posts = []) => {
+      const counts = new Map();
+      for (const post of posts) {
+        for (const tag of post.tags || []) {
+          counts.set(tag, (counts.get(tag) || 0) + 1);
+        }
+      }
+      return Array.from(counts, ([tag, count]) => ({ tag, count }))
+        .sort((a, b) => a.tag.localeCompare(b.tag));
+    };
+
+    const renderTopicIndex = () => {
+      const tagStats = tagCountsFor(index);
+      const maxTagCount = Math.max(1, ...tagStats.map((item) => item.count));
+
+      if (summary) summary.textContent = `${index.length} 篇文章 / ${tagStats.length} 个主题`;
+      if (postCount) postCount.textContent = String(index.length);
+      if (tagCount) tagCount.textContent = String(tagStats.length);
+      if (!topicGrid) return;
+
+      topicGrid.innerHTML = tagStats.map(({ tag, count }) => `
+        <a
+          href="/search?q=${encodeURIComponent(tag)}"
+          class="tag-index-card ui-panel ui-panel-link no-underline"
+          style="--tag-share: ${(count / maxTagCount) * 100}%"
+        >
+          <span class="tag-index-name">#${escapeHtml(tag)}</span>
+          <span class="tag-index-count">${count} 篇</span>
+          <span class="tag-index-meter" aria-hidden="true"></span>
+        </a>
+      `).join('');
+    };
 
     const renderResult = (post) => `
       <article class="post-card ui-panel ui-panel-link">
@@ -158,7 +200,7 @@ const maxTagCount = Math.max(1, ...tagStats.map((item) => item.count));
       }
 
       const matched = index.filter((post) => {
-        const haystack = [post.title, post.excerpt, post.body, post.tags.join(' ')].join(' ').toLowerCase();
+        const haystack = [post.title, post.excerpt, post.body, (post.tags || []).join(' ')].join(' ').toLowerCase();
         return haystack.includes(keyword);
       });
 
@@ -169,14 +211,17 @@ const maxTagCount = Math.max(1, ...tagStats.map((item) => item.count));
 
     Promise.all([
       fetch('/search-index.json').then((response) => response.json()),
-      fetch('/api/posts?limit=50&include=search')
+      fetch('/api/posts?limit=100&include=search')
         .then((response) => response.ok ? response.json() : null)
         .catch(() => null),
     ])
       .then(([data, runtime]) => {
         const runtimePosts = Array.isArray(runtime?.posts) ? runtime.posts : [];
         const existingHrefs = new Set(data.map((post) => post.href));
-        index = data.concat(runtimePosts.filter((post) => !existingHrefs.has(post.href)));
+        index = data
+          .concat(runtimePosts.filter((post) => !existingHrefs.has(post.href)))
+          .sort((a, b) => normalizeTime(b.date) - normalizeTime(a.date));
+        renderTopicIndex();
         const query = new URLSearchParams(window.location.search).get('q')?.trim() ?? '';
         if (query && input) input.value = query;
         renderSearch();
@@ -189,6 +234,14 @@ const maxTagCount = Math.max(1, ...tagStats.map((item) => item.count));
 
     form?.addEventListener('submit', (event) => {
       event.preventDefault();
+      const keyword = input?.value?.trim() ?? '';
+      const url = new URL(window.location.href);
+      if (keyword) {
+        url.searchParams.set('q', keyword);
+      } else {
+        url.searchParams.delete('q');
+      }
+      window.history.replaceState({}, '', url);
       renderSearch();
     });
 

@@ -161,8 +161,53 @@
     @apply text-left;
   }
 
+  .private-template-box {
+    @apply grid gap-4 rounded-md border p-4;
+    border-color: rgb(var(--accent-rgb) / 0.13);
+    background:
+      linear-gradient(180deg, rgb(var(--accent-rgb) / 0.04), transparent 42%),
+      rgb(255 255 255 / 0.018);
+  }
+
+  .private-template-head {
+    @apply flex flex-wrap items-start justify-between gap-3 border-b border-white/10 pb-4;
+  }
+
+  .private-template-head h3 {
+    @apply mt-2 text-xl font-semibold text-white;
+    font-family: var(--font-display);
+  }
+
+  .private-template-grid {
+    @apply grid gap-3 sm:grid-cols-2;
+  }
+
+  .private-template-grid label,
+  .private-template-wide {
+    @apply grid gap-2;
+  }
+
+  .private-template-grid span,
+  .private-template-wide span {
+    @apply font-mono text-[0.68rem] uppercase tracking-[0.14em] text-zinc-500;
+  }
+
+  .private-template-wide textarea.private-admin-input {
+    @apply h-auto py-3 text-left;
+    resize: vertical;
+  }
+
+  .private-template-body {
+    min-height: 18rem;
+    line-height: 1.75;
+  }
+
   .private-admin-state-inline {
     @apply static mx-5 mb-5 min-h-5 w-auto max-w-none translate-x-0 whitespace-normal text-left;
+  }
+
+  .private-template-box .private-admin-state-inline {
+    @apply m-0;
   }
 
   .private-publish-result {
