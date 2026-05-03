@@ -3,6 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Comments from '../../components/Comments.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import { getCollection, render } from 'astro:content';
+import { collections, postsForCollection } from '../../lib/collections';
 import { formatPostDate, postHref, postReadingStats, postSlug, relatedPostsFor, visiblePosts } from '../../lib/posts';
 import '../../styles/reading.css';
 import '../../styles/article-sidebar.css';
@@ -20,6 +21,29 @@ const { Content } = await render(post);
 const posts = visiblePosts(await getCollection('posts'));
 const relatedPosts = relatedPostsFor(post, posts);
 const readingStats = postReadingStats(post);
+const currentSlug = postSlug(post);
+const currentTags = new Set(post.data.tags.map((tag) => tag.toLowerCase()));
+const collectionSequence = collections
+  .map((collection) => postsForCollection(collection, posts))
+  .find((items) => {
+    const currentIndex = items.findIndex((item) => item.id === post.id);
+    return currentIndex >= 0 && items.length > 1;
+  });
+const tagSequence = posts.filter((item) => (
+  item.id === post.id || item.data.tags.some((tag) => currentTags.has(tag.toLowerCase()))
+));
+const neighborsFor = (sequence: typeof posts) => {
+  const currentIndex = sequence.findIndex((item) => postSlug(item) === currentSlug);
+  return {
+    previous: currentIndex > 0 ? sequence[currentIndex - 1] : null,
+    next: currentIndex >= 0 && currentIndex < sequence.length - 1 ? sequence[currentIndex + 1] : null,
+  };
+};
+const collectionNeighbors = collectionSequence ? neighborsFor(collectionSequence) : { previous: null, next: null };
+const tagNeighbors = tagSequence.length > 1 ? neighborsFor(tagSequence) : { previous: null, next: null };
+const timeNeighbors = neighborsFor(posts);
+const previousPost = collectionNeighbors.previous ?? tagNeighbors.previous ?? timeNeighbors.previous;
+const nextPost = collectionNeighbors.next ?? tagNeighbors.next ?? timeNeighbors.next;
 ---
 
 <BaseLayout title={`${post.data.title} | s1oop's Blog`}>
@@ -39,6 +63,23 @@ const readingStats = postReadingStats(post);
         <div class="post-content reading-surface ui-panel p-6 sm:p-8">
           <Content />
         </div>
+
+        {(previousPost || nextPost) && (
+          <nav class="reading-nav" aria-label="文章导航">
+            {previousPost && (
+              <a href={postHref(previousPost)} class="reading-nav-link reading-nav-prev">
+                <span class="reading-nav-label">上一篇</span>
+                <span class="reading-nav-title">{previousPost.data.title}</span>
+              </a>
+            )}
+            {nextPost && (
+              <a href={postHref(nextPost)} class="reading-nav-link reading-nav-next">
+                <span class="reading-nav-label">下一篇</span>
+                <span class="reading-nav-title">{nextPost.data.title}</span>
+              </a>
+            )}
+          </nav>
+        )}
 
         <Comments slug={postSlug(post)} />
       </div>

@@ -93,6 +93,10 @@
     @apply grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_18rem];
   }
 
+  .ui-grid > * {
+    min-width: 0;
+  }
+
   .ui-sidebar {
     @apply grid gap-6 lg:sticky lg:top-24;
   }

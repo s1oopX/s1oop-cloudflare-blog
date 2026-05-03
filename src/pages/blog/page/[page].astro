@@ -5,6 +5,7 @@ import PageHeader from '../../../components/PageHeader.astro';
 import Pagination from '../../../components/Pagination.astro';
 import PostCard from '../../../components/PostCard.astro';
 import SiteStatusPanel from '../../../components/SiteStatusPanel.astro';
+import { collectionHref, collections, postsForCollection } from '../../../lib/collections';
 import { POSTS_PER_PAGE, collectTags, formatPostDate, pageCount, pageItems, postExcerpt, postHref, postImage, visiblePosts } from '../../../lib/posts';
 
 export async function getStaticPaths() {
@@ -22,6 +23,11 @@ const latestPost = posts[0];
 const currentPage = Number(Astro.params.page);
 const totalPages = pageCount(posts, POSTS_PER_PAGE);
 const paginatedPosts = pageItems(posts, currentPage, POSTS_PER_PAGE);
+const archivePaths = collections.map((collection) => ({
+  href: collectionHref(collection),
+  title: collection.title,
+  count: postsForCollection(collection, posts).length,
+}));
 ---
 
 <BaseLayout title={`全部档案 · 第 ${currentPage} 页 | s1oop's Blog`}>
@@ -34,15 +40,33 @@ const paginatedPosts = pageItems(posts, currentPage, POSTS_PER_PAGE);
 
     <div class="ui-grid ui-page-body">
       <div class="ui-stack ui-stagger">
-        {paginatedPosts.map((post) => (
-          <PostCard
-            title={post.data.title}
-            excerpt={postExcerpt(post)}
-            href={postHref(post)}
-            date={formatPostDate(post.data.date)}
-            tags={post.data.tags}
-            image={postImage(post)}
-          />
+        {paginatedPosts.map((post, index) => (
+          <>
+            <PostCard
+              title={post.data.title}
+              excerpt={postExcerpt(post)}
+              href={postHref(post)}
+              date={formatPostDate(post.data.date)}
+              tags={post.data.tags}
+              image={postImage(post)}
+            />
+            {index === 3 && paginatedPosts.length > 4 && (
+              <section class="archive-path-break ui-panel" data-archive-path-break>
+                <div>
+                  <p class="ui-eyebrow">reading paths</p>
+                  <h2>换一条路线继续读</h2>
+                </div>
+                <div class="archive-path-links">
+                  {archivePaths.map((path) => (
+                    <a href={path.href}>
+                      <span>{path.count} 篇</span>
+                      <strong>{path.title}</strong>
+                    </a>
+                  ))}
+                </div>
+              </section>
+            )}
+          </>
         ))}
         <Pagination currentPage={currentPage} totalPages={totalPages} baseHref="/blog/page" firstHref="/blog" />
       </div>

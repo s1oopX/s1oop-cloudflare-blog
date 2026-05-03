@@ -62,6 +62,7 @@
     @apply mt-3 text-xl font-semibold text-white sm:text-2xl;
     font-family: var(--font-display);
     letter-spacing: 0;
+    overflow-wrap: anywhere;
   }
 
   .post-card-excerpt {
@@ -69,6 +70,7 @@
     display: -webkit-box;
     overflow: hidden;
     min-height: 3.5rem;
+    overflow-wrap: anywhere;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
   }
@@ -84,6 +86,63 @@
 
   .ui-panel-link:hover .post-card-action span:last-child {
     transform: translateX(0.25rem);
+  }
+
+  @media (min-width: 640px) {
+    .ui-stack > .post-card:first-child .post-card-link {
+      @apply gap-5;
+      grid-template-columns: minmax(18rem, 0.95fr) minmax(0, 1fr);
+      padding: 1rem;
+    }
+
+    .ui-stack > .post-card:first-child .post-card-media {
+      min-height: 15rem;
+    }
+
+    .ui-stack > .post-card:first-child .post-card-media img,
+    .ui-stack > .post-card:first-child .post-card-media > span {
+      aspect-ratio: 16 / 9;
+    }
+
+    .ui-stack > .post-card:first-child .post-card-title {
+      @apply text-3xl;
+    }
+
+    .ui-stack > .post-card:first-child .post-card-excerpt {
+      -webkit-line-clamp: 3;
+    }
+  }
+
+  .archive-path-break {
+    @apply grid gap-4 p-5 sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)] sm:items-center;
+    background:
+      linear-gradient(90deg, rgb(var(--accent-rgb) / 0.045), transparent 58%),
+      color-mix(in srgb, var(--card) 92%, transparent);
+  }
+
+  .archive-path-break h2 {
+    @apply mt-2 text-2xl font-semibold text-white;
+    font-family: var(--font-display);
+    letter-spacing: 0;
+  }
+
+  .archive-path-links {
+    @apply grid gap-2 sm:grid-cols-3;
+  }
+
+  .archive-path-links a {
+    @apply grid min-h-20 rounded-md border p-3 no-underline transition hover:-translate-y-0.5 hover:text-white;
+    border-color: rgb(var(--accent-rgb) / 0.14);
+    background: rgb(255 255 255 / 0.025);
+  }
+
+  .archive-path-links span {
+    @apply font-mono text-[0.66rem] uppercase tracking-[0.14em];
+    color: var(--accent-muted);
+  }
+
+  .archive-path-links strong {
+    @apply mt-2 text-sm font-medium leading-5 text-zinc-200;
   }
 
   .archive-page::before,

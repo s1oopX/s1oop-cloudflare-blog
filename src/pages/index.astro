@@ -1,8 +1,13 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { formatPostDate, postExcerpt, postHref, visiblePosts } from '../lib/posts';
 import '../styles/landing-shell.css';
 import '../styles/landing-portrait.css';
 import '../styles/landing-entry.css';
+
+const posts = visiblePosts(await getCollection('posts'));
+const latestPost = posts[0];
 ---
 
 <BaseLayout
@@ -40,6 +45,13 @@ import '../styles/landing-entry.css';
         <div class="landing-entry-panel">
           <p class="landing-kicker">quiet archive</p>
           <a class="landing-enter" href="/blog">进入档案</a>
+          {latestPost && (
+            <a class="landing-latest" href={postHref(latestPost)}>
+              <span>最近 / {formatPostDate(latestPost.data.date)}</span>
+              <strong>{latestPost.data.title}</strong>
+              <em>{postExcerpt(latestPost)}</em>
+            </a>
+          )}
         </div>
       </div>
     </section>

@@ -26,6 +26,22 @@
     background: transparent;
   }
 
+  .archive-page .ui-page-head {
+    background: radial-gradient(
+      ellipse 60% 40% at 50% 0%,
+      rgb(var(--glow-rgb) / 0.1),
+      transparent 72%
+    );
+  }
+
+  .reading-page .ui-page-head {
+    background: radial-gradient(
+      ellipse 50% 50% at 50% 20%,
+      rgb(var(--glow-rgb) / 0.08),
+      transparent 74%
+    );
+  }
+
   .ui-page-head::before {
     content: '';
     @apply pointer-events-none absolute inset-y-0 right-0 w-2/5 opacity-20;
@@ -61,10 +77,38 @@
 
   .ui-stack {
     @apply grid gap-5;
+    min-width: 0;
+  }
+
+  .ui-stagger > * {
+    opacity: 0;
+    transform: translateY(1.2rem);
+    animation: card-enter var(--motion-page) ease-out forwards;
+  }
+
+  .ui-stagger > *:nth-child(1) {
+    animation-delay: 0ms;
+  }
+
+  .ui-stagger > *:nth-child(2) {
+    animation-delay: 70ms;
+  }
+
+  .ui-stagger > *:nth-child(3) {
+    animation-delay: 140ms;
+  }
+
+  .ui-stagger > *:nth-child(4) {
+    animation-delay: 210ms;
+  }
+
+  .ui-stagger > *:nth-child(5) {
+    animation-delay: 280ms;
   }
 
   .ui-panel {
     @apply relative overflow-hidden border shadow-sm transition;
+    min-width: 0;
     border-color: var(--border);
     border-radius: var(--radius);
     background:
@@ -85,14 +129,17 @@
 
   .ui-panel-link:hover {
     border-color: var(--border-strong);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.06),
+      0 18px 50px rgb(var(--shadow-rgb) / 0.38);
   }
 
   .ui-panel::before {
     content: '';
     @apply pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300;
     background: radial-gradient(
-      18rem circle at var(--pointer-x, 50%) var(--pointer-y, 50%),
-      rgb(var(--accent-rgb) / 0.08),
+      20rem circle at var(--pointer-x, 50%) var(--pointer-y, 50%),
+      rgb(var(--accent-rgb) / 0.1),
       transparent 42%
     );
   }
@@ -146,6 +193,7 @@
 
   .site-brand {
     @apply inline-flex h-11 items-center gap-3 rounded-lg px-1.5 pr-3 no-underline transition;
+    flex-shrink: 0;
   }
 
   .site-brand:hover {
@@ -177,7 +225,9 @@
 
   .site-nav-group {
     @apply flex items-center gap-1 overflow-x-auto rounded-lg border p-1 text-sm;
+    min-width: 0;
     max-width: min(100%, 30rem);
+    flex-shrink: 1;
     scrollbar-width: none;
     border-color: var(--border);
     background: rgb(255 255 255 / 0.03);
@@ -188,7 +238,7 @@
   }
 
   .site-nav-link {
-    @apply rounded-md px-3 py-1.5 text-zinc-400 no-underline transition hover:bg-white/[0.06] hover:text-white;
+    @apply whitespace-nowrap rounded-md px-3 py-1.5 text-zinc-400 no-underline transition hover:bg-white/[0.06] hover:text-white;
   }
 
   .site-nav-link-active {
@@ -258,3 +308,9 @@
     color: var(--accent);
   }
 
+@keyframes card-enter {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
