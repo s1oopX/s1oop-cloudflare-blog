@@ -148,6 +148,10 @@
     box-shadow: 0 16px 42px rgb(var(--shadow-rgb) / 0.28);
   }
 
+  .reading-nav-link:only-child {
+    @apply sm:col-span-2;
+  }
+
   .reading-nav-next {
     @apply text-right;
   }
