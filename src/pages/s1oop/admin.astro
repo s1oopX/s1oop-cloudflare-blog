@@ -1,6 +1,9 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHeader from '../../components/PageHeader.astro';
+import '../../styles/private-access.css';
+import '../../styles/private-dashboard.css';
+import '../../styles/private-management.css';
 ---
 
 <BaseLayout
@@ -222,5 +225,5 @@ import PageHeader from '../../components/PageHeader.astro';
     </div>
   </section>
 
-  <script src="../../scripts/private-admin.js"></script>
+  <script type="module" src="../../scripts/private-admin.js"></script>
 </BaseLayout>

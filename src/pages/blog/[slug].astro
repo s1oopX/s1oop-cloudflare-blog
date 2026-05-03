@@ -4,6 +4,8 @@ import Comments from '../../components/Comments.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import { getCollection, render } from 'astro:content';
 import { formatPostDate, postHref, postReadingStats, postSlug, relatedPostsFor, visiblePosts } from '../../lib/posts';
+import '../../styles/reading.css';
+import '../../styles/article-sidebar.css';
 
 export async function getStaticPaths() {
   const posts = visiblePosts(await getCollection('posts'));
