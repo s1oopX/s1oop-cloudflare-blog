@@ -3,12 +3,37 @@ import { arrayBufferToBase64, sanitizeAssetName } from './strings.js';
 const MAX_ASSET_BYTES = 1024 * 1024;
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/gif']);
 
+const uploadToken = () => (
+  globalThis.crypto?.randomUUID?.() || `upload-${Date.now()}-${Math.random().toString(16).slice(2)}`
+).replace(/[^a-zA-Z0-9-]/g, '');
+
+function assetKeyFromSource(source) {
+  const value = String(source || '');
+  if (!value) return '';
+
+  const fromPath = (path) => (
+    path.startsWith('/api/assets/')
+      ? decodeURIComponent(path.slice('/api/assets/'.length))
+      : ''
+  );
+
+  if (value.startsWith('/api/assets/')) return fromPath(value.split(/[?#]/)[0]);
+
+  try {
+    const url = new URL(value, 'https://s1oop.local');
+    return fromPath(url.pathname);
+  } catch {
+    return '';
+  }
+}
+
 export async function storeImages(env, slug, files) {
   if (!files.length) return { markdownRewrites: new Map(), assets: [] };
 
   const markdownRewrites = new Map();
   const assets = [];
   const names = new Map();
+  const batch = uploadToken();
   for (const file of files) {
     if (!file || typeof file === 'string') continue;
     if (!IMAGE_TYPES.has(file.type)) {
@@ -29,7 +54,7 @@ export async function storeImages(env, slug, files) {
     const count = names.get(originalName) ?? 0;
     names.set(originalName, count + 1);
     const name = count ? originalName.replace(/(\.[^.]+)?$/, `-${count + 1}$1`) : originalName;
-    const key = `posts/${slug}/${name}`;
+    const key = `posts/${slug}/${batch}/${name}`;
     const body = arrayBufferToBase64(await file.arrayBuffer());
 
     await env.BLOG_DB.prepare(
@@ -53,13 +78,59 @@ export async function storeImages(env, slug, files) {
   return { markdownRewrites, assets };
 }
 
-export function rewriteMarkdownImages(markdown, rewrites) {
-  if (!rewrites.size) return markdown;
+export function rewriteMarkdownImages(markdown, rewrites, options = {}) {
+  const uploadedAssets = Array.isArray(options.assets) ? options.assets : [];
+  if (!rewrites.size && !uploadedAssets.length) return markdown;
+
+  const slug = String(options.slug || '');
+  const postAssetPrefix = slug ? `posts/${slug}/` : '';
+  let existingAssetIndex = 0;
+  const consumeAsset = (href) => {
+    if (uploadedAssets[existingAssetIndex]?.href === href) existingAssetIndex += 1;
+  };
+
   return markdown.replace(/(!\[[^\]]*]\()([^) \t]+)((?:\s+"[^"]*")?\))/g, (match, prefix, source, suffix) => {
     const basename = source.split(/[\\/]/).pop()?.toLowerCase() ?? '';
     const replacement = rewrites.get(source.toLowerCase()) || rewrites.get(basename);
-    return replacement ? `${prefix}${replacement}${suffix}` : match;
+    if (replacement) {
+      consumeAsset(replacement);
+      return `${prefix}${replacement}${suffix}`;
+    }
+
+    const key = assetKeyFromSource(source);
+    if (postAssetPrefix && key.startsWith(postAssetPrefix) && existingAssetIndex < uploadedAssets.length) {
+      const asset = uploadedAssets[existingAssetIndex];
+      existingAssetIndex += 1;
+      return asset?.href ? `${prefix}${asset.href}${suffix}` : match;
+    }
+
+    return match;
   });
+}
+
+export function referencedAssetKeys(markdown, slug) {
+  const prefix = `posts/${slug}/`;
+  const keys = new Set();
+  for (const match of String(markdown || '').matchAll(/!\[[^\]]*]\(([^) \t]+)(?:\s+"[^"]*")?\)/g)) {
+    const key = assetKeyFromSource(match[1]);
+    if (key.startsWith(prefix)) keys.add(key);
+  }
+  return Array.from(keys);
+}
+
+export async function deleteUnreferencedImages(env, slug, markdown) {
+  const keys = referencedAssetKeys(markdown, slug);
+  if (!keys.length) {
+    await env.BLOG_DB.prepare('DELETE FROM blog_assets WHERE slug = ?').bind(slug).run();
+    return;
+  }
+
+  const placeholders = keys.map(() => '?').join(', ');
+  await env.BLOG_DB.prepare(
+    `DELETE FROM blog_assets
+     WHERE slug = ?
+       AND key NOT IN (${placeholders})`,
+  ).bind(slug, ...keys).run();
 }
 
 export function assetBody(value) {

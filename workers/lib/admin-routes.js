@@ -11,7 +11,7 @@ import {
   putRuntimePost,
 } from './posts.js';
 import { getCommentSettings, setSetting, SETTINGS } from './settings.js';
-import { rewriteMarkdownImages, storeImages } from './assets.js';
+import { deleteUnreferencedImages, rewriteMarkdownImages, storeImages } from './assets.js';
 import { deleteComment, listAdminComments } from './comments.js';
 
 const MAX_MARKDOWN_BYTES = 512 * 1024;
@@ -83,12 +83,8 @@ const handlePostUpload = async (request, env) => {
     if (firstParsed.error) return json({ ok: false, message: firstParsed.error }, { status: 400 });
 
     const existing = await getAdminRuntimePost(env, slug);
-    if (existing && imageFiles.length) {
-      await env.BLOG_DB.prepare('DELETE FROM blog_assets WHERE slug = ?').bind(slug).run();
-    }
-
     const { markdownRewrites, assets } = await storeImages(env, slug, imageFiles);
-    markdown = rewriteMarkdownImages(markdown, markdownRewrites);
+    markdown = rewriteMarkdownImages(markdown, markdownRewrites, { slug, assets });
 
     const parsed = parseFrontmatter(markdown);
     if (parsed.error) return json({ ok: false, message: parsed.error }, { status: 400 });
@@ -109,6 +105,9 @@ const handlePostUpload = async (request, env) => {
       published: !parsed.data.draft,
       searchText: searchText(parsed.body),
     });
+    if (existing && imageFiles.length) {
+      await deleteUnreferencedImages(env, slug, markdown);
+    }
 
     return json({
       ok: true,
