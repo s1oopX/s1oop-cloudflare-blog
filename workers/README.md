@@ -27,7 +27,7 @@ Cloudflare deployment configuration lives in `wrangler.jsonc`.
 - `PATCH /api/admin/settings`: updates runtime settings such as the comment switch.
 - `GET /api/comments` and `GET /api/comments/status`: expose the current public comment switch and stored comments.
 - `POST /api/comments`: stores a public comment when comments are enabled. Each IP hash is limited to 2 comments.
-- `GET /api/posts`: returns runtime D1 posts for the browser overlay.
+- `GET /api/posts`: returns D1 posts for public archive, collection, search, and recommendation views.
 - `GET /api/posts/:slug`: returns one runtime D1 post.
 - `GET /api/assets/*`: serves uploaded D1 image assets with long-lived cache headers.
 
@@ -41,7 +41,7 @@ ADMIN_PASSWORD=...
 BLOG_DB      D1 database binding
 ```
 
-Runtime publishing does not write Markdown back to GitHub. GitHub remains the source repository for code and static content.
+Runtime publishing does not write Markdown back to GitHub. GitHub remains the source repository for code and page shells.
 
 Uploaded images are stored in `blog_assets` as small base64 payloads. Keep each image at or below 1 MB.
 The private admin page compresses JPEG, PNG, and WebP uploads in the browser before sending them to D1. GIF uploads are kept as-is.

@@ -3,6 +3,10 @@ const stages = [...document.querySelectorAll('.landing-stage')];
 const dots = [...document.querySelectorAll('[data-panel-target]')];
 const cue = document.querySelector('.landing-scroll-cue');
 const portrait = document.querySelector('.landing-portrait');
+const latestLink = document.querySelector('[data-landing-latest]');
+const latestDate = document.querySelector('[data-landing-latest-date]');
+const latestTitle = document.querySelector('[data-landing-latest-title]');
+const latestExcerpt = document.querySelector('[data-landing-latest-excerpt]');
 const panelCount = stages.length;
 let activeIndex = location.hash === '#enter-blog' ? 1 : 0;
 let isAnimating = false;
@@ -184,3 +188,22 @@ window.addEventListener('keydown', (event) => {
 });
 
 activatePanel(activeIndex, { instant: true });
+
+fetch('/api/posts?limit=1')
+  .then((response) => response.ok ? response.json() : null)
+  .then((data) => {
+    const post = Array.isArray(data?.posts) ? data.posts[0] : null;
+    if (!post || !latestLink) return;
+
+    const date = new Date(post.date);
+    latestLink.href = post.href || '/blog';
+    if (latestDate) {
+      latestDate.textContent = Number.isNaN(date.getTime())
+        ? '最近'
+        : `最近 / ${date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })}`;
+    }
+    if (latestTitle) latestTitle.textContent = post.title || '';
+    if (latestExcerpt) latestExcerpt.textContent = post.excerpt || '';
+    latestLink.hidden = false;
+  })
+  .catch(() => {});

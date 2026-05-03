@@ -9,9 +9,9 @@ import '../../styles/article-sidebar.css';
 <BaseLayout title="实时文章 | s1oop's Blog">
   <article class="ui-page reading-page" data-live-post-page>
     <PageHeader
-      eyebrow="runtime post"
-      title="实时文章"
-      description="这篇文章从 D1 读取，发布后无需重新构建站点。"
+      eyebrow="reading"
+      title="文章阅读"
+      description="正在整理文章内容。"
     >
       <Fragment slot="actions">
         <a href="/blog" class="ui-button">全部内容</a>
@@ -45,7 +45,7 @@ import '../../styles/article-sidebar.css';
             </div>
             <div class="ui-stat-row">
               <span class="ui-stat-label">类型</span>
-              <span class="ui-stat-value">D1</span>
+              <span class="ui-stat-value" data-live-post-type>-</span>
             </div>
             <div class="ui-stat-row">
               <span class="ui-stat-label">字数</span>

@@ -2,7 +2,7 @@ const postList = document.querySelector('[data-collection-post-list]');
 const pagination = document.querySelector('[data-collection-pagination]');
 const totalNode = document.querySelector('[data-collection-total]');
 const latestNode = document.querySelector('[data-collection-latest]');
-const staticPosts = JSON.parse(postList?.dataset.staticPosts || '[]');
+const initialPosts = JSON.parse(postList?.dataset.initialPosts || '[]');
 const collectionMeta = JSON.parse(postList?.dataset.collectionMeta || '{}');
 const otherCollectionMeta = JSON.parse(postList?.dataset.otherCollectionMeta || '[]');
 const pageSize = Number(postList?.dataset.pageSize || 10);
@@ -92,23 +92,28 @@ fetch('/api/posts?limit=100')
   .then((data) => {
     const runtimePosts = Array.isArray(data?.posts) ? data.posts.filter((post) => post?.runtime) : [];
     const runtimeMatches = runtimePosts.filter((post) => belongsToCollection(post, collectionMeta));
-    const existingHrefs = new Set(staticPosts.map((post) => post.href));
+    const existingHrefs = new Set(initialPosts.map((post) => post.href));
     const posts = runtimeMatches
       .filter((post) => post?.href && !existingHrefs.has(post.href))
-      .concat(staticPosts)
+      .concat(initialPosts)
       .sort((a, b) => normalizeTime(b.date) - normalizeTime(a.date));
 
     if (totalNode) totalNode.textContent = String(posts.length);
     if (latestNode) latestNode.textContent = posts[0] ? formatDate(posts[0].date) : '-';
 
     for (const other of otherCollectionMeta) {
-      const count = other.staticCount + runtimePosts.filter((post) => belongsToCollection(post, other)).length;
+      const count = (other.baseCount || 0) + runtimePosts.filter((post) => belongsToCollection(post, other)).length;
       const node = document.querySelector(`[data-other-collection-count="${other.slug}"]`);
       if (node) node.textContent = `${count} 篇`;
     }
 
-    if (!runtimeMatches.length || !postList) return;
+    if (!postList) return;
     postList.querySelectorAll('.post-card, [data-collection-empty]').forEach((node) => node.remove());
+    if (!runtimeMatches.length) {
+      postList.insertAdjacentHTML('afterbegin', '<div class="ui-panel p-5 text-sm text-zinc-400" data-collection-empty>D1 暂无文章。</div>');
+      renderPagination(1, 1);
+      return;
+    }
     const currentPage = Math.max(1, currentPageFromUrl());
     const totalPages = Math.max(1, Math.ceil(posts.length / pageSize));
     const boundedPage = Math.min(currentPage, totalPages);

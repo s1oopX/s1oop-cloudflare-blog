@@ -27,11 +27,11 @@ fetch('/api/posts?limit=100')
 
       const countNode = card.querySelector('[data-collection-count]');
       const listNode = card.querySelector('[data-collection-list]');
-      const staticTitles = Array.from(listNode?.querySelectorAll('span') || []).map((node) => node.textContent || '');
-      const titles = runtimeMatches.map((post) => post.title).concat(staticTitles).slice(0, 2);
-      const staticCount = Number.parseInt(countNode?.textContent || '0', 10) || 0;
+      const existingTitles = Array.from(listNode?.querySelectorAll('span') || []).map((node) => node.textContent || '');
+      const titles = runtimeMatches.map((post) => post.title).concat(existingTitles).slice(0, 2);
+      const baseCount = Number.parseInt(countNode?.textContent || '0', 10) || 0;
 
-      if (countNode) countNode.textContent = `${staticCount + runtimeMatches.length} 篇`;
+      if (countNode) countNode.textContent = `${baseCount + runtimeMatches.length} 篇`;
       if (listNode) listNode.innerHTML = titles.map((title) => `<span>${escapeHtml(title)}</span>`).join('');
     }
   })

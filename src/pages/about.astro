@@ -6,7 +6,7 @@ import '../styles/about.css';
 const profileRows = [
   { label: 'Owner', value: 's1oop' },
   { label: 'Runtime', value: 'Cloudflare' },
-  { label: 'Source', value: 'Markdown + D1' },
+  { label: 'Source', value: 'D1' },
 ];
 
 const focusRows = [
@@ -31,7 +31,7 @@ const focusRows = [
     label: 'Build',
     title: '轻量部署和维护',
     copy:
-      '源码保留在 GitHub，公开页面由 Astro 静态生成；需要即时发布的文章写入 Cloudflare D1，不再把运行时内容回写源码仓库。',
+      '源码保留在 GitHub，公开页面由 Astro 生成；文章统一写入 Cloudflare D1，不再维护一套静态文章源。',
     pill: 'Astro / Pages / D1',
   },
 ];
@@ -40,7 +40,7 @@ const workflowRows = [
   {
     label: 'Runtime post',
     title: '实时文章',
-    copy: '需要快速上传的 Markdown 进入 D1，前台会和已有归档合并排序、搜索和展示。',
+    copy: '上传的 Markdown 进入 D1，前台的归档、专栏、搜索和阅读页都从运行时接口读取。',
   },
   {
     label: 'Private entry',
@@ -71,7 +71,7 @@ const sideSignals = [
   {
     label: 'Frontend',
     value: 'Astro Static',
-    detail: '公开页面预渲染，首屏主要走静态分发。',
+    detail: '公开壳页面预渲染，文章内容由 D1 接口填充。',
   },
   {
     label: 'Deploy',
@@ -98,9 +98,9 @@ const systemFlow = [
 ];
 
 const systemNotes = [
-  '静态文章保留在源码仓库，适合长期维护和版本追踪。',
-  '临时或快速发布的内容进入 D1，避免每次都重新改源码。',
-  '公开阅读路径尽量静态化，只有需要即时变化的部分交给函数。',
+  '文章统一进入 D1，避免静态 Markdown 和运行时文章形成两套入口。',
+  'GitHub 只负责代码、样式和页面壳，不再承载公开文章源。',
+  '公开阅读路径保留静态壳，内容、搜索和推荐交给边缘函数。',
 ];
 ---
 
@@ -154,8 +154,8 @@ const systemNotes = [
               <p class="ui-eyebrow">publishing</p>
               <h3>再降低维护。</h3>
               <ul>
-                <li>源码文章走 GitHub</li>
-                <li>实时文章写入 D1</li>
+                <li>文章统一写入 D1</li>
+                <li>GitHub 只维护站点代码</li>
                 <li>评论和小图进入 D1</li>
               </ul>
             </div>

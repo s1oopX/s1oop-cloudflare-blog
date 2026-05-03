@@ -7,14 +7,14 @@ Live site: <https://s1oop.bbroot.com>
 ## Features
 
 - Astro static site generation.
-- Markdown posts through Astro Content Collections.
+- D1-backed Markdown posts served through `/blog/live?slug=...`.
 - Dark archive-style visual system.
-- Full archive, collection pages, search index, changelog, and article pages.
+- Full archive, collection pages, search, changelog, and one live article page.
 - Cloudflare Pages deployment from GitHub.
 - `/api/*` functions backed by `workers/api.js`.
 - Private `/s1oop/admin` publishing flow that stores new posts and small uploaded images in Cloudflare D1.
 - Private admin list, delete, overwrite warning, Markdown preview, image preflight checks, and comment switch.
-- GitHub remains the source repository and deployment trigger; new posts are not written back to GitHub.
+- GitHub remains the source repository and deployment trigger; public posts live in D1 and are not written back to GitHub.
 
 ## Tech Stack
 
@@ -147,30 +147,11 @@ Then bind it to the Pages project:
 BLOG_DB      -> s1oop-blog-content
 ```
 
-`POST /api/admin/posts` accepts a Markdown file plus optional image files. The Markdown is parsed into D1 and uploaded images are stored in `blog_assets` as small base64 payloads. Each image is limited to 1 MB, so this remains lightweight and avoids R2 billing setup. The private admin page can list and delete D1 posts, check whether an upload will overwrite an existing slug, and toggle comment availability through `site_settings`. The blog archive reads `/api/posts` in the browser and prepends these runtime posts without a rebuild.
-
-## Static Content
-
-Add posts under `content/posts/`:
-
-```md
----
-title: My Post
-date: 2026-04-29
-excerpt: Short summary.
-tags:
-  - Blog
-draft: false
----
-
-Post body.
-```
-
-Images for static posts can be placed under `public/images/posts/` and referenced from Markdown with absolute public paths.
+`POST /api/admin/posts` accepts a Markdown file plus optional image files. The Markdown is parsed into D1 and uploaded images are stored in `blog_assets` as small base64 payloads. Each image is limited to 1 MB, so this remains lightweight and avoids R2 billing setup. The private admin page can list and delete D1 posts, check whether an upload will overwrite an existing slug, and toggle comment availability through `site_settings`. The blog archive, collections, search, home entry, and article recommendations read `/api/posts` in the browser.
 
 ## Repository Notes
 
-- The public blog is static-first with a D1 runtime overlay for newly uploaded posts.
+- The public blog uses static shell pages with D1 as the only public article source.
 - Public comments are disabled by default.
 - The status panel is static by design; use Cloudflare Web Analytics for real analytics if needed.
 - The admin publishing API requires `ADMIN_PASSWORD` and `BLOG_DB` and should only be enabled for trusted deployments.

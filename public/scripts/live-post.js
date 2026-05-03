@@ -5,6 +5,7 @@ const updatedRow = document.querySelector('[data-live-post-updated-row]');
 const updatedNode = document.querySelector('[data-live-post-updated]');
 const wordsNode = document.querySelector('[data-live-post-words]');
 const minutesNode = document.querySelector('[data-live-post-minutes]');
+const typeNode = document.querySelector('[data-live-post-type]');
 const tagsNode = document.querySelector('[data-live-post-tags]');
 const relatedNode = document.querySelector('[data-live-related-posts]');
 const navNode = document.querySelector('[data-live-post-nav]');
@@ -153,18 +154,16 @@ if (!slug) {
   Promise.all([
     fetch(`/api/posts/${encodeURIComponent(slug)}`)
       .then((response) => response.ok ? response.json() : Promise.reject(new Error('not found'))),
-    fetch('/search-index.json')
-      .then((response) => response.ok ? response.json() : [])
-      .catch(() => []),
     fetch('/api/posts?limit=100')
       .then((response) => response.ok ? response.json() : { posts: [] })
       .catch(() => ({ posts: [] })),
   ])
-    .then(([data, staticPosts, listData]) => {
+    .then(([data, listData]) => {
       if (!data?.post) throw new Error('not found');
       renderPost(data.post);
+      if (typeNode) typeNode.textContent = 'D1';
       const runtimePosts = Array.isArray(listData?.posts) ? listData.posts : [];
-      const posts = mergePosts(Array.isArray(staticPosts) ? staticPosts : [], runtimePosts);
+      const posts = mergePosts(runtimePosts);
       renderRelatedPosts(data.post, posts);
       renderReadingNav(data.post, posts);
     })

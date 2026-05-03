@@ -4,7 +4,7 @@ const postCount = document.querySelector('[data-post-count]');
 const tagCount = document.querySelector('[data-tag-count]');
 const latestPost = document.querySelector('[data-latest-post]');
 const archivePathCountNodes = document.querySelectorAll('[data-archive-path-count]');
-const staticPosts = JSON.parse(postList?.dataset.staticPosts || '[]');
+const initialPosts = JSON.parse(postList?.dataset.initialPosts || '[]');
 const archivePaths = JSON.parse(postList?.dataset.archivePaths || '[]');
 const pageSize = Number(postList?.dataset.pageSize || 10);
 
@@ -87,7 +87,7 @@ const renderPagination = (currentPage, totalPages) => {
     return;
   }
 
-  const hrefForPage = (page) => page === 1 ? '/blog' : `/blog/page/${page}`;
+  const hrefForPage = (page) => page === 1 ? '/blog' : `/blog?page=${page}`;
   const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
   pagination.innerHTML = `
     <nav class="ui-pagination" aria-label="分页">
@@ -103,9 +103,8 @@ const renderPagination = (currentPage, totalPages) => {
 const renderCombinedPosts = (runtimePosts = []) => {
   if (!postList) return;
 
-  const existingHrefs = new Set(staticPosts.map((post) => post.href));
-  const uniqueRuntimePosts = runtimePosts.filter((post) => post?.href && !existingHrefs.has(post.href));
-  const posts = staticPosts
+  const uniqueRuntimePosts = runtimePosts.filter((post) => post?.runtime && post?.href);
+  const posts = initialPosts
     .concat(uniqueRuntimePosts)
     .sort((a, b) => normalizeTime(b.date) - normalizeTime(a.date));
   const archivePathCounts = archivePathsFor(uniqueRuntimePosts);
@@ -114,9 +113,12 @@ const renderCombinedPosts = (runtimePosts = []) => {
   const boundedPage = Math.min(currentPage, totalPages);
   const visiblePosts = posts.slice((boundedPage - 1) * pageSize, boundedPage * pageSize);
 
-  postList.querySelectorAll('.post-card').forEach((node) => node.remove());
+  postList.querySelectorAll('.post-card, [data-archive-empty]').forEach((node) => node.remove());
   const renderedPosts = visiblePosts.map((post) => renderPost(post)).join('');
-  postList.insertAdjacentHTML('afterbegin', renderedPosts);
+  postList.insertAdjacentHTML(
+    'afterbegin',
+    renderedPosts || '<div class="ui-panel p-5 text-sm text-zinc-400" data-archive-empty>D1 暂无文章。</div>',
+  );
   renderPagination(boundedPage, totalPages);
   updateArchivePathCounts(archivePathCounts);
 

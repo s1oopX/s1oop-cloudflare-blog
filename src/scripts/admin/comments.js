@@ -28,7 +28,7 @@ const renderComments = ({ commentList, commentCount }, comments) => {
         <p class="private-comment-body">${escapeHtml(comment.body)}</p>
       </div>
       <div class="private-post-actions">
-        <a href="${escapeHtml(comment.postHref || `/blog/${comment.postSlug}`)}" target="_blank" rel="noreferrer">文章</a>
+        <a href="${escapeHtml(comment.postHref || `/blog/live?slug=${encodeURIComponent(comment.postSlug)}`)}" target="_blank" rel="noreferrer">文章</a>
         <button type="button" data-delete-comment="${escapeHtml(comment.id)}">删除</button>
       </div>
     </article>

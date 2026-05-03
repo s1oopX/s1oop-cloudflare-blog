@@ -2,24 +2,6 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/PageHeader.astro';
 import SearchBar from '../components/SearchBar.astro';
-import { getCollection } from 'astro:content';
-import { collectTags, postExcerpt, visiblePosts } from '../lib/posts';
-
-const posts = visiblePosts(await getCollection('posts'));
-const tags = collectTags(posts);
-const matchesTopic = (post: typeof posts[number], tag: string) => (
-  [post.data.title, postExcerpt(post), post.body ?? '', post.data.tags.join(' ')]
-    .join(' ')
-    .toLowerCase()
-    .includes(tag.toLowerCase())
-);
-const tagStats = tags.map((tag) => ({
-  tag,
-  count: posts.filter((post) => matchesTopic(post, tag)).length,
-})).sort((a, b) => b.count - a.count || a.tag.localeCompare(b.tag));
-const visibleTagStats = tagStats.slice(0, 6);
-const maxTagCount = Math.max(1, ...tagStats.map((item) => item.count));
-const shareBucket = (count: number) => String(Math.max(10, Math.min(100, Math.ceil((count / maxTagCount) * 10) * 10)));
 ---
 
 <BaseLayout title="搜索 | s1oop's Blog">
@@ -37,7 +19,7 @@ const shareBucket = (count: number) => String(Math.max(10, Math.min(100, Math.ce
             <SearchBar />
             <div class="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4">
               <p id="search-status" class="search-status">输入关键词后显示结果。</p>
-              <span class="font-mono text-[0.68rem] uppercase tracking-[0.12em] text-zinc-500" data-search-summary>{posts.length} 篇文章 / 常用入口</span>
+              <span class="font-mono text-[0.68rem] uppercase tracking-[0.12em] text-zinc-500" data-search-summary>正在读取 D1 内容</span>
             </div>
           </div>
         </section>
@@ -51,19 +33,7 @@ const shareBucket = (count: number) => String(Math.max(10, Math.min(100, Math.ce
               <h2 id="search-topics-title" class="mt-2 text-2xl font-semibold text-white">搜索入口</h2>
             </div>
           </div>
-          <div class="tag-index-grid search-topic-grid" data-search-topic-grid>
-            {visibleTagStats.map(({ tag, count }) => (
-              <a
-                href={`/search?q=${encodeURIComponent(tag)}`}
-                class="tag-index-card ui-panel ui-panel-link no-underline"
-                data-share-bucket={shareBucket(count)}
-              >
-                <span class="tag-index-name">#{tag}</span>
-                <span class="tag-index-count">{count} 篇</span>
-                <span class="tag-index-meter" aria-hidden="true"></span>
-              </a>
-            ))}
-          </div>
+          <div class="tag-index-grid search-topic-grid" data-search-topic-grid></div>
         </section>
       </div>
 
@@ -75,11 +45,11 @@ const shareBucket = (count: number) => String(Math.max(10, Math.min(100, Math.ce
           <div class="ui-panel-body grid gap-4">
             <div class="ui-stat-row">
               <span class="ui-stat-label">文章</span>
-              <span class="ui-stat-value" data-search-post-count>{posts.length}</span>
+              <span class="ui-stat-value" data-search-post-count>0</span>
             </div>
             <div class="ui-stat-row">
               <span class="ui-stat-label">入口</span>
-              <span class="ui-stat-value" data-search-tag-count>{tags.length}</span>
+              <span class="ui-stat-value" data-search-tag-count>0</span>
             </div>
             <div class="ui-stat-row">
               <span class="ui-stat-label">状态</span>

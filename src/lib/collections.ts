@@ -1,6 +1,3 @@
-import type { BlogPost } from './posts';
-import { postSlug } from './posts';
-
 export const collections = [
   {
     slug: 'hot',
@@ -11,7 +8,6 @@ export const collections = [
       src: '/images/collections/hot-panel-20260503.jpg',
       alt: '深色笔记本电脑上显示现代化控制面板，代表近期重点内容入口',
     },
-    posts: ['noir-archive-design', 'hello-cloudflare'],
     runtimeTags: ['热点'],
   },
   {
@@ -23,7 +19,6 @@ export const collections = [
       src: '/images/collections/tech.jpg',
       alt: '带手写任务板和屏幕的现代工作桌面，代表方法与维护流程',
     },
-    posts: ['astro-cloudflare-workflow', 'noir-archive-design'],
     runtimeTags: ['方法'],
   },
   {
@@ -35,7 +30,6 @@ export const collections = [
       src: '/images/collections/learn-notes-20260503.jpg',
       alt: '平板上用手写笔记录清单，代表学习与复盘记录',
     },
-    posts: ['astro-cloudflare-workflow', 'private-blog-editing-checklist'],
     runtimeTags: ['学习'],
   },
 ];
@@ -44,11 +38,6 @@ export type BlogCollection = (typeof collections)[number];
 
 export function collectionHref(collection: BlogCollection) {
   return `/collections/${collection.slug}`;
-}
-
-export function postsForCollection(collection: BlogCollection, posts: BlogPost[]) {
-  const bySlug = new Map(posts.map((post) => [postSlug(post), post]));
-  return collection.posts.map((slug) => bySlug.get(slug)).filter(Boolean) as BlogPost[];
 }
 
 export function collectionBySlug(slug: string | undefined) {

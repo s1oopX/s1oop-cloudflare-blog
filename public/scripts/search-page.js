@@ -117,17 +117,12 @@ const renderSearch = () => {
   if (results) results.innerHTML = matched.map(renderResult).join('') || renderEmpty('没有结果', '没有找到匹配结果。可以换一个关键词，或从全部文章继续浏览。');
 };
 
-Promise.all([
-  fetch('/search-index.json').then((response) => response.json()),
-  fetch('/api/posts?limit=100&include=search')
-    .then((response) => response.ok ? response.json() : null)
-    .catch(() => null),
-])
-  .then(([data, runtime]) => {
+fetch('/api/posts?limit=100&include=search')
+  .then((response) => response.ok ? response.json() : null)
+  .then((runtime) => {
     const runtimePosts = Array.isArray(runtime?.posts) ? runtime.posts : [];
-    const existingHrefs = new Set(data.map((post) => post.href));
-    index = data
-      .concat(runtimePosts.filter((post) => !existingHrefs.has(post.href)))
+    index = runtimePosts
+      .filter((post) => post?.runtime && post?.href)
       .sort((a, b) => normalizeTime(b.date) - normalizeTime(a.date));
     renderTopicIndex();
     const query = new URLSearchParams(window.location.search).get('q')?.trim() ?? '';

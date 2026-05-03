@@ -1,35 +1,21 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ArchiveSidebar from '../../components/ArchiveSidebar.astro';
 import PageHeader from '../../components/PageHeader.astro';
 import Pagination from '../../components/Pagination.astro';
-import PostCard from '../../components/PostCard.astro';
-import { collectionHref, collections, postsForCollection } from '../../lib/collections';
-import { POSTS_PER_PAGE, collectTags, formatPostDate, pageCount, pageItems, postExcerpt, postHref, postImage, visiblePosts } from '../../lib/posts';
+import { collectionHref, collections } from '../../lib/collections';
+import { POSTS_PER_PAGE } from '../../lib/posts';
 
-const posts = visiblePosts(await getCollection('posts'));
-const tags = collectTags(posts);
-const latestPost = posts[0];
 const currentPage = 1;
-const totalPages = pageCount(posts, POSTS_PER_PAGE);
-const paginatedPosts = pageItems(posts, currentPage, POSTS_PER_PAGE);
+const totalPages = 1;
 const archivePaths = collections.map((collection) => ({
   slug: collection.slug,
   href: collectionHref(collection),
   title: collection.title,
-  count: postsForCollection(collection, posts).length,
+  count: 0,
   runtimeTags: collection.runtimeTags,
 }));
-const staticPostData = posts.map((post) => ({
-  title: post.data.title,
-  excerpt: postExcerpt(post),
-  href: postHref(post),
-  date: post.data.date.toISOString(),
-  tags: post.data.tags,
-  image: postImage(post),
-  runtime: false,
-}));
+const initialPostData: unknown[] = [];
 ---
 
 <BaseLayout title="全部内容 | s1oop's Blog">
@@ -45,28 +31,19 @@ const staticPostData = posts.map((post) => ({
         class="ui-stack ui-stagger archive-post-list"
         data-post-list
         data-page-size={POSTS_PER_PAGE}
-        data-static-posts={JSON.stringify(staticPostData)}
+        data-initial-posts={JSON.stringify(initialPostData)}
         data-archive-paths={JSON.stringify(archivePaths)}
       >
-        {paginatedPosts.map((post) => (
-          <PostCard
-            title={post.data.title}
-            excerpt={postExcerpt(post)}
-            href={postHref(post)}
-            date={formatPostDate(post.data.date)}
-            tags={post.data.tags}
-            image={postImage(post)}
-          />
-        ))}
+        <div class="ui-panel p-5 text-sm text-zinc-400" data-archive-empty>正在读取 D1 文章。</div>
         <div data-post-pagination>
-          <Pagination currentPage={currentPage} totalPages={totalPages} baseHref="/blog/page" firstHref="/blog" />
+          <Pagination currentPage={currentPage} totalPages={totalPages} baseHref="/blog" queryParam="page" />
         </div>
       </div>
 
       <ArchiveSidebar
-        postCount={posts.length}
-        tagCount={tags.length}
-        latestLabel={latestPost ? formatPostDate(latestPost.data.date) : '-'}
+        postCount={0}
+        tagCount={0}
+        latestLabel="-"
         paths={archivePaths}
       />
     </div>
