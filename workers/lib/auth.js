@@ -2,7 +2,12 @@ import { text } from './strings.js';
 
 const SESSION_COOKIE = 's1oop_admin_session';
 const SESSION_MAX_AGE = 60 * 60 * 6;
+const LOGIN_WINDOW_MS = 10 * 60 * 1000;
+const LOGIN_BLOCK_MS = 15 * 60 * 1000;
+const LOGIN_MAX_FAILURES = 5;
 const encoder = new TextEncoder();
+const loginAttempts = globalThis.__s1oopLoginAttempts ?? new Map();
+globalThis.__s1oopLoginAttempts = loginAttempts;
 
 const requireAdminPassword = (env) => {
   const password = text(env.ADMIN_PASSWORD);
@@ -26,6 +31,44 @@ const readCookie = (request, name) => {
     .map((part) => part.trim())
     .find((part) => part.startsWith(prefix))
     ?.slice(prefix.length) || '';
+};
+
+const clientKey = (request) => request.headers.get('cf-connecting-ip')
+  || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+  || 'local';
+
+const loginThrottle = (request) => {
+  const key = clientKey(request);
+  const now = Date.now();
+  const attempt = loginAttempts.get(key);
+
+  if (!attempt) return { ok: true, key, now };
+  if (attempt.blockedUntil && attempt.blockedUntil > now) {
+    return { ok: false, key, now, retryAfter: Math.ceil((attempt.blockedUntil - now) / 1000) };
+  }
+  if (attempt.firstFailureAt + LOGIN_WINDOW_MS <= now) {
+    loginAttempts.delete(key);
+    return { ok: true, key, now };
+  }
+
+  return { ok: true, key, now };
+};
+
+const recordLoginFailure = ({ key, now }) => {
+  const current = loginAttempts.get(key);
+  const attempt = current && current.firstFailureAt + LOGIN_WINDOW_MS > now
+    ? current
+    : { count: 0, firstFailureAt: now, blockedUntil: 0 };
+
+  attempt.count += 1;
+  if (attempt.count >= LOGIN_MAX_FAILURES) {
+    attempt.blockedUntil = now + LOGIN_BLOCK_MS;
+  }
+  loginAttempts.set(key, attempt);
+};
+
+const clearLoginFailure = (key) => {
+  loginAttempts.delete(key);
 };
 
 const sessionSignature = async (secret, expiresAt) => {
@@ -61,11 +104,23 @@ export async function verifyAdmin(request, env) {
     return { ok: true, session: true };
   }
 
+  const throttle = loginThrottle(request);
+  if (!throttle.ok) {
+    return {
+      ok: false,
+      status: 429,
+      message: 'Too many login attempts',
+      headers: { 'retry-after': String(throttle.retryAfter) },
+    };
+  }
+
   const password = await readRequestPassword(request);
   if (!timingSafeEqual(password, configured.password)) {
+    recordLoginFailure(throttle);
     return { ok: false, status: 401, message: 'Invalid password' };
   }
 
+  clearLoginFailure(throttle.key);
   return { ok: true };
 }
 

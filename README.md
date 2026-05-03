@@ -137,6 +137,8 @@ Apply the D1 schema:
 npx wrangler d1 execute s1oop-blog-content --file migrations/0001_runtime_posts.sql
 npx wrangler d1 execute s1oop-blog-content --file migrations/0002_blog_assets.sql
 npx wrangler d1 execute s1oop-blog-content --file migrations/0003_site_settings.sql
+npx wrangler d1 execute s1oop-blog-content --file migrations/0004_runtime_post_search_text.sql
+npx wrangler d1 execute s1oop-blog-content --file migrations/0005_blog_comments.sql
 ```
 
 Then bind it to the Pages project:

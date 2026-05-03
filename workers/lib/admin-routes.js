@@ -18,7 +18,10 @@ const MAX_MARKDOWN_BYTES = 512 * 1024;
 
 const requireAdmin = async (request, env) => {
   const auth = await verifyAdmin(request, env);
-  return auth.ok ? null : json({ ok: false, message: auth.message }, { status: auth.status });
+  return auth.ok ? null : json(
+    { ok: false, message: auth.message },
+    { status: auth.status, headers: auth.headers },
+  );
 };
 
 const requireD1 = (env) => (
