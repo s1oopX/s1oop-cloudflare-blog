@@ -43,19 +43,23 @@ const normalizeTime = (value) => {
   return Number.isFinite(time) ? time : 0;
 };
 
-const tagCountsFor = (posts = []) => {
-  const counts = new Map();
-  for (const post of posts) {
-    for (const tag of post.tags || []) {
-      counts.set(tag, (counts.get(tag) || 0) + 1);
-    }
-  }
-  return Array.from(counts, ([tag, count]) => ({ tag, count }))
+const matchesKeyword = (post, keyword) => {
+  const haystack = [post.title, post.excerpt, post.body, (post.tags || []).join(' ')].join(' ').toLowerCase();
+  return haystack.includes(keyword.toLowerCase());
+};
+
+const topicCountsFor = (posts = []) => {
+  const topics = Array.from(new Set(posts.flatMap((post) => post.tags || [])));
+  return topics
+    .map((tag) => ({
+      tag,
+      count: posts.filter((post) => matchesKeyword(post, tag)).length,
+    }))
     .sort((a, b) => a.tag.localeCompare(b.tag));
 };
 
 const renderTopicIndex = () => {
-  const tagStats = tagCountsFor(index);
+  const tagStats = topicCountsFor(index);
   const maxTagCount = Math.max(1, ...tagStats.map((item) => item.count));
 
   if (summary) summary.textContent = `${index.length} 篇文章 / ${tagStats.length} 个主题`;
@@ -105,10 +109,7 @@ const renderSearch = () => {
     return;
   }
 
-  const matched = index.filter((post) => {
-    const haystack = [post.title, post.excerpt, post.body, (post.tags || []).join(' ')].join(' ').toLowerCase();
-    return haystack.includes(keyword);
-  });
+  const matched = index.filter((post) => matchesKeyword(post, keyword));
 
   if (status) status.textContent = `找到 ${matched.length} 篇相关文章。`;
   if (sidebarState) sidebarState.textContent = `${matched.length} 条结果`;

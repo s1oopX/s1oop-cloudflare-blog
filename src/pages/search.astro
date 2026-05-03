@@ -3,13 +3,19 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHeader from '../components/PageHeader.astro';
 import SearchBar from '../components/SearchBar.astro';
 import { getCollection } from 'astro:content';
-import { collectTags, visiblePosts } from '../lib/posts';
+import { collectTags, postExcerpt, visiblePosts } from '../lib/posts';
 
 const posts = visiblePosts(await getCollection('posts'));
 const tags = collectTags(posts);
+const matchesTopic = (post: typeof posts[number], tag: string) => (
+  [post.data.title, postExcerpt(post), post.body ?? '', post.data.tags.join(' ')]
+    .join(' ')
+    .toLowerCase()
+    .includes(tag.toLowerCase())
+);
 const tagStats = tags.map((tag) => ({
   tag,
-  count: posts.filter((post) => post.data.tags.includes(tag)).length,
+  count: posts.filter((post) => matchesTopic(post, tag)).length,
 }));
 const maxTagCount = Math.max(1, ...tagStats.map((item) => item.count));
 const shareBucket = (count: number) => String(Math.max(10, Math.min(100, Math.ceil((count / maxTagCount) * 10) * 10)));
