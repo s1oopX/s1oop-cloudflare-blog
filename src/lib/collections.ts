@@ -8,7 +8,7 @@ export const collections = [
     eyebrow: 'recent focus',
     description: '当前阶段更值得先看的内容，包含视觉方向、博客定位和近期最能代表这里气质的文章。',
     image: {
-      src: '/images/collections/hot.jpg',
+      src: '/images/collections/hot-panel-20260503.jpg',
       alt: '深色笔记本电脑上显示现代化控制面板，代表近期重点内容入口',
     },
     posts: ['noir-archive-design', 'hello-cloudflare'],
@@ -32,7 +32,7 @@ export const collections = [
     eyebrow: 'learning notes',
     description: '写作、阅读、工具和方法相关记录，保留可复用的学习过程与经验。',
     image: {
-      src: '/images/collections/learn.jpg',
+      src: '/images/collections/learn-notes-20260503.jpg',
       alt: '平板上用手写笔记录清单，代表学习与复盘记录',
     },
     posts: ['astro-cloudflare-workflow', 'private-blog-editing-checklist'],
