@@ -6,6 +6,8 @@ const updatedNode = document.querySelector('[data-live-post-updated]');
 const wordsNode = document.querySelector('[data-live-post-words]');
 const minutesNode = document.querySelector('[data-live-post-minutes]');
 const tagsNode = document.querySelector('[data-live-post-tags]');
+const relatedNode = document.querySelector('[data-live-related-posts]');
+const navNode = document.querySelector('[data-live-post-nav]');
 
 const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
   '&': '&amp;',
@@ -47,6 +49,69 @@ const shouldShowUpdated = (post) => {
   return Number.isFinite(created) && Number.isFinite(updated) && updated - created > 60_000;
 };
 
+const relatedScore = (post, currentTags) => (
+  (post.tags || [])
+    .map((tag) => String(tag).toLowerCase())
+    .filter((tag) => currentTags.has(tag)).length
+);
+
+const renderRelatedPosts = (post, posts = []) => {
+  if (!relatedNode) return;
+
+  const currentTags = new Set((post.tags || []).map((tag) => String(tag).toLowerCase()));
+  const relatedPosts = posts
+    .filter((item) => item.slug && item.slug !== post.slug)
+    .map((item) => ({ post: item, score: relatedScore(item, currentTags) }))
+    .sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      return timestamp(b.post.date) - timestamp(a.post.date);
+    })
+    .slice(0, 3)
+    .map((item) => item.post);
+
+  relatedNode.innerHTML = relatedPosts.length > 0
+    ? relatedPosts.map((item) => `
+      <a href="${escapeHtml(item.href)}" class="article-related-item no-underline">
+        <span class="article-related-date">${formatDate(item.date)}</span>
+        <span class="article-related-title">${escapeHtml(item.title)}</span>
+      </a>
+    `).join('')
+    : '<p class="text-sm text-zinc-400">暂无其他文章。</p>';
+};
+
+const renderReadingNav = (post, posts = []) => {
+  if (!navNode) return;
+
+  const sortedPosts = posts
+    .filter((item) => item.slug)
+    .sort((a, b) => timestamp(b.date) - timestamp(a.date));
+  const currentIndex = sortedPosts.findIndex((item) => item.slug === post.slug);
+  const previousPost = currentIndex > 0 ? sortedPosts[currentIndex - 1] : null;
+  const nextPost = currentIndex >= 0 && currentIndex < sortedPosts.length - 1 ? sortedPosts[currentIndex + 1] : null;
+
+  if (!previousPost && !nextPost) {
+    navNode.hidden = true;
+    navNode.innerHTML = '';
+    return;
+  }
+
+  navNode.innerHTML = `
+    ${previousPost ? `
+      <a href="${escapeHtml(previousPost.href)}" class="reading-nav-link reading-nav-prev">
+        <span class="reading-nav-label">上一篇</span>
+        <span class="reading-nav-title">${escapeHtml(previousPost.title)}</span>
+      </a>
+    ` : ''}
+    ${nextPost ? `
+      <a href="${escapeHtml(nextPost.href)}" class="reading-nav-link reading-nav-next">
+        <span class="reading-nav-label">下一篇</span>
+        <span class="reading-nav-title">${escapeHtml(nextPost.title)}</span>
+      </a>
+    ` : ''}
+  `;
+  navNode.hidden = false;
+};
+
 const renderPost = (post) => {
   document.title = `${post.title} | s1oop's Blog`;
   page?.querySelector('.ui-page-head h1')?.replaceChildren(document.createTextNode(post.title));
@@ -74,13 +139,22 @@ const slug = new URLSearchParams(window.location.search).get('slug');
 if (!slug) {
   if (content) content.innerHTML = '<p>缺少文章标识。</p>';
 } else {
-  fetch(`/api/posts/${encodeURIComponent(slug)}`)
-    .then((response) => response.ok ? response.json() : Promise.reject(new Error('not found')))
-    .then((data) => {
+  Promise.all([
+    fetch(`/api/posts/${encodeURIComponent(slug)}`)
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error('not found'))),
+    fetch('/api/posts?limit=100')
+      .then((response) => response.ok ? response.json() : { posts: [] })
+      .catch(() => ({ posts: [] })),
+  ])
+    .then(([data, listData]) => {
       if (!data?.post) throw new Error('not found');
       renderPost(data.post);
+      const posts = Array.isArray(listData?.posts) ? listData.posts : [];
+      renderRelatedPosts(data.post, posts);
+      renderReadingNav(data.post, posts);
     })
     .catch(() => {
       if (content) content.innerHTML = '<p>没有找到这篇实时文章。</p>';
+      if (relatedNode) relatedNode.innerHTML = '<p class="text-sm text-zinc-400">暂无其他文章。</p>';
     });
 }

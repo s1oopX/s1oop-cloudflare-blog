@@ -24,6 +24,8 @@ import '../../styles/article-sidebar.css';
           <p>正在读取文章。</p>
         </div>
 
+        <nav class="reading-nav" aria-label="文章导航" data-live-post-nav hidden></nav>
+
         <Comments />
       </div>
 
@@ -57,6 +59,15 @@ import '../../styles/article-sidebar.css';
               <span class="ui-stat-label">标签</span>
               <div class="flex flex-wrap gap-2" data-live-post-tags></div>
             </div>
+          </div>
+        </section>
+
+        <section class="ui-panel">
+          <div class="ui-panel-header">
+            <h2 class="ui-panel-title">继续阅读</h2>
+          </div>
+          <div class="ui-panel-body article-related-list" data-live-related-posts>
+            <p class="text-sm text-zinc-400">正在整理相关内容。</p>
           </div>
         </section>
       </aside>
