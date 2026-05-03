@@ -6,6 +6,8 @@
   .landing-portrait,
   .landing-portrait > img,
   .landing-title,
+  .private-dashboard[data-auth='unlocked'] .private-status-card,
+  .private-dashboard[data-auth='unlocked'] .private-dashboard-panel,
   .reading-page .ui-page-head-copy,
   .reading-surface {
     animation: none;
@@ -19,6 +21,8 @@
 
   .ui-stagger > *,
   .landing-fixed,
+  .private-dashboard[data-auth='unlocked'] .private-status-card,
+  .private-dashboard[data-auth='unlocked'] .private-dashboard-panel,
   .reading-page .ui-page-head-copy,
   .reading-surface {
     opacity: 1;
