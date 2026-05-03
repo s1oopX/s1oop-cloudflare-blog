@@ -41,7 +41,15 @@
   }
 
   .site-brand-name {
-    @apply sr-only;
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: nowrap;
+    font-size: 1rem;
+    line-height: 1.25rem;
   }
 
   .site-nav-group {
