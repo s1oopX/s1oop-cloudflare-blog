@@ -19,7 +19,7 @@ export default {
       return new Response(null, {
         headers: {
           'access-control-allow-methods': 'GET,HEAD,POST,PATCH,DELETE,OPTIONS',
-          'access-control-allow-headers': 'authorization,content-type,x-admin-password',
+          'access-control-allow-headers': 'content-type',
           'cache-control': CACHE.noStore,
         },
       });
@@ -90,9 +90,10 @@ export default {
       if (cached) return maybeHead(request, cached);
 
       const object = await env.BLOG_DB.prepare(
-        `SELECT content_type, body, byte_length, updated_at
+        `SELECT blog_assets.content_type, blog_assets.body, blog_assets.byte_length, blog_assets.updated_at
          FROM blog_assets
-         WHERE key = ?`,
+         INNER JOIN blog_posts ON blog_posts.slug = blog_assets.slug
+         WHERE blog_assets.key = ? AND blog_posts.published = 1`,
       ).bind(key).first();
       if (!object) return json({ ok: false, message: 'Asset not found' }, { status: 404 });
 

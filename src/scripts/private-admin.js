@@ -1,4 +1,4 @@
-import { requestAdmin as requestAdminRequest, verifyPassword } from './admin/api.js';
+import { clearSession, requestAdmin as requestAdminRequest, verifySession } from './admin/api.js';
 import { imageProblems, prepareUploadForm, readImageDimensions, uploadedImageProblems } from './admin/images.js';
 import { firstMarkdownImage, parseFrontmatter } from './admin/markdown.js';
 import { bindPostListActions, loadPosts as loadRuntimePosts } from './admin/runtime-posts.js';
@@ -58,8 +58,9 @@ const setPublishLink = (href = '') => {
 
 const getPassword = () => sessionStorage.getItem(passwordKey);
 
-const lockAndExit = () => {
+const lockAndExit = async () => {
   sessionStorage.removeItem(passwordKey);
+  await clearSession();
   window.location.replace('/s1oop');
 };
 
@@ -158,7 +159,7 @@ const existingPassword = getPassword();
 if (!existingPassword) {
   window.location.replace('/s1oop');
 } else {
-  verifyPassword(existingPassword)
+  verifySession()
     .then(() => {
       if (dashboard) dashboard.dataset.auth = 'unlocked';
       setState(authState, '已解锁', 'success');
@@ -220,8 +221,7 @@ clearButton?.addEventListener('click', () => {
 
 uploadForm?.addEventListener('submit', async (event) => {
   event.preventDefault();
-  const password = getPassword();
-  if (!password) {
+  if (!getPassword()) {
     lockAndExit();
     return;
   }
@@ -268,7 +268,6 @@ uploadForm?.addEventListener('submit', async (event) => {
 
     const response = await fetch('/api/admin/posts', {
       method: 'POST',
-      headers: { 'x-admin-password': password },
       body: form,
     });
     const data = await response.json().catch(() => ({}));

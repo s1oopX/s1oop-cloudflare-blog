@@ -1,5 +1,5 @@
 import { json } from './http.js';
-import { verifyAdmin } from './auth.js';
+import { clearAdminSessionCookie, createAdminSessionCookie, verifyAdmin } from './auth.js';
 import { toSlug } from './strings.js';
 import { firstImage, markdownToHtml, parseFrontmatter, readingStats, searchText } from './markdown.js';
 import {
@@ -123,10 +123,17 @@ const handlePostUpload = async (request, env) => {
 };
 
 export const handleAdminRoute = async (request, env, url) => {
-  if (url.pathname === '/api/admin/check' && request.method === 'POST') {
+  if (url.pathname === '/api/admin/check' && ['GET', 'POST'].includes(request.method)) {
     const authResponse = await requireAdmin(request, env);
     if (authResponse) return authResponse;
-    return json({ ok: true, storage: { d1: Boolean(env.BLOG_DB), assets: 'd1' } });
+    return json(
+      { ok: true, storage: { d1: Boolean(env.BLOG_DB), assets: 'd1' } },
+      request.method === 'POST' ? { headers: { 'set-cookie': await createAdminSessionCookie(env) } } : {},
+    );
+  }
+
+  if (url.pathname === '/api/admin/logout' && request.method === 'POST') {
+    return json({ ok: true }, { headers: { 'set-cookie': clearAdminSessionCookie() } });
   }
 
   if (url.pathname === '/api/admin/settings' && ['GET', 'PATCH'].includes(request.method)) {

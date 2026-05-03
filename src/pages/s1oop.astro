@@ -58,6 +58,13 @@ import '../styles/private-access.css';
       node.dataset.tone = tone;
     };
 
+    const verifySession = async () => {
+      const response = await fetch('/api/admin/check');
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.ok) throw new Error(data.message || '密码验证失败');
+      return data;
+    };
+
     const verifyPassword = async (password) => {
       const response = await fetch('/api/admin/check', {
         method: 'POST',
@@ -69,14 +76,13 @@ import '../styles/private-access.css';
       return data;
     };
 
-    const enterAdmin = (password) => {
-      sessionStorage.setItem(passwordKey, password);
+    const enterAdmin = () => {
+      sessionStorage.setItem(passwordKey, '1');
       window.location.assign('/s1oop/admin');
     };
 
-    const existingPassword = sessionStorage.getItem(passwordKey);
-    if (existingPassword) {
-      verifyPassword(existingPassword)
+    if (sessionStorage.getItem(passwordKey)) {
+      verifySession()
         .then(() => {
           window.location.replace('/s1oop/admin');
         })
@@ -98,7 +104,7 @@ import '../styles/private-access.css';
       try {
         await verifyPassword(password);
         setState(loginState, '正在进入...', 'success');
-        enterAdmin(password);
+        enterAdmin();
       } catch (error) {
         setState(loginState, formatError(error.message), 'error');
       }

@@ -39,6 +39,12 @@ function fullPost(row) {
   };
 }
 
+function publicFullPost(row) {
+  const post = fullPost(row);
+  delete post.markdown;
+  return post;
+}
+
 export async function listRuntimePosts(env, limit = 50, options = {}) {
   if (!env.BLOG_DB) return [];
   const includeSearch = Boolean(options.includeSearch);
@@ -80,7 +86,7 @@ export async function getRuntimePost(env, slug) {
      FROM blog_posts
      WHERE slug = ? AND published = 1`,
   ).bind(slug).first();
-  return row ? fullPost(row) : null;
+  return row ? publicFullPost(row) : null;
 }
 
 export async function getAdminRuntimePost(env, slug) {
