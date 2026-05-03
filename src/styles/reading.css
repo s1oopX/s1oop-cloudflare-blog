@@ -11,7 +11,7 @@
   }
 
   .reading-page .ui-sidebar {
-    position: static;
+    @apply lg:sticky lg:top-24;
   }
 
   .reading-surface {
