@@ -3,6 +3,7 @@ const MIN_BODY_LENGTH = 5;
 const MAX_BODY_LENGTH = 30;
 const MAX_URL_LENGTH = 160;
 const MAX_COMMENTS_PER_IP = 2;
+const COMMENT_COOLDOWN_SECONDS = 60;
 const PUBLIC_COMMENT_LIMIT = 50;
 const ADMIN_COMMENT_LIMIT = 100;
 
@@ -160,6 +161,15 @@ export async function createComment(env, request) {
     ).bind(comment.ipHash).first();
     if (Number(existing?.count ?? 0) >= MAX_COMMENTS_PER_IP) {
       return { error: '同一网络最多留言 2 条', status: 429 };
+    }
+
+    const recent = await env.BLOG_DB.prepare(
+      `SELECT id FROM blog_comments
+       WHERE ip_hash = ? AND created_at >= datetime('now', ?)
+       LIMIT 1`,
+    ).bind(comment.ipHash, `-${COMMENT_COOLDOWN_SECONDS} seconds`).first();
+    if (recent) {
+      return { error: '留言太频繁，请稍后再试', status: 429 };
     }
 
     await env.BLOG_DB.prepare(

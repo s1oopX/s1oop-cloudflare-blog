@@ -59,6 +59,7 @@ const otherCollectionMeta = otherCollections.map((item) => ({
         class="ui-stack ui-stagger"
         data-collection-post-list
         data-page-size={POSTS_PER_PAGE}
+        data-current-page={currentPage}
         data-static-posts={JSON.stringify(staticPostData)}
         data-collection-meta={JSON.stringify(collectionMeta)}
         data-other-collection-meta={JSON.stringify(otherCollectionMeta)}

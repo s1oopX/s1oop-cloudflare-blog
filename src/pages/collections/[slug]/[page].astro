@@ -31,6 +31,24 @@ const totalPages = pageCount(collectionPosts, POSTS_PER_PAGE);
 const paginatedPosts = pageItems(collectionPosts, currentPage, POSTS_PER_PAGE);
 const otherCollections = collections.filter((item) => item.slug !== collection.slug);
 const latestCollectionPost = collectionPosts[0];
+const staticPostData = collectionPosts.map((post) => ({
+  title: post.data.title,
+  excerpt: postExcerpt(post),
+  href: postHref(post),
+  date: post.data.date.toISOString(),
+  tags: post.data.tags,
+  image: postImage(post),
+  runtime: false,
+}));
+const collectionMeta = {
+  slug: collection.slug,
+  runtimeTags: collection.runtimeTags,
+};
+const otherCollectionMeta = otherCollections.map((item) => ({
+  slug: item.slug,
+  runtimeTags: item.runtimeTags,
+  staticCount: postsForCollection(item, posts).length,
+}));
 ---
 
 <BaseLayout title={`${collection.title} · 第 ${currentPage} 页 | s1oop's Blog`}>
@@ -46,7 +64,15 @@ const latestCollectionPost = collectionPosts[0];
     </PageHeader>
 
     <div class="ui-grid ui-page-body">
-      <div class="ui-stack ui-stagger">
+      <div
+        class="ui-stack ui-stagger"
+        data-collection-post-list
+        data-page-size={POSTS_PER_PAGE}
+        data-current-page={currentPage}
+        data-static-posts={JSON.stringify(staticPostData)}
+        data-collection-meta={JSON.stringify(collectionMeta)}
+        data-other-collection-meta={JSON.stringify(otherCollectionMeta)}
+      >
         {paginatedPosts.map((post) => (
           <PostCard
             title={post.data.title}
@@ -58,9 +84,11 @@ const latestCollectionPost = collectionPosts[0];
           />
         ))}
         {collectionPosts.length === 0 && (
-          <div class="ui-panel p-5 text-sm text-zinc-400">该专栏暂无文章。</div>
+          <div class="ui-panel p-5 text-sm text-zinc-400" data-collection-empty>该专栏暂无文章。</div>
         )}
-        <Pagination currentPage={currentPage} totalPages={totalPages} baseHref={`/collections/${collection.slug}`} />
+        <div data-collection-pagination>
+          <Pagination currentPage={currentPage} totalPages={totalPages} baseHref={`/collections/${collection.slug}`} />
+        </div>
       </div>
 
       <aside class="ui-sidebar ui-stagger">
@@ -72,11 +100,11 @@ const latestCollectionPost = collectionPosts[0];
             <p class="text-sm leading-6 text-zinc-400">{collection.description}</p>
             <div class="ui-stat-row">
               <span class="ui-stat-label">文章</span>
-              <span class="ui-stat-value">{collectionPosts.length}</span>
+              <span class="ui-stat-value" data-collection-total>{collectionPosts.length}</span>
             </div>
             <div class="ui-stat-row">
               <span class="ui-stat-label">最新</span>
-              <span class="ui-stat-value">{latestCollectionPost ? formatPostDate(latestCollectionPost.data.date) : '-'}</span>
+              <span class="ui-stat-value" data-collection-latest>{latestCollectionPost ? formatPostDate(latestCollectionPost.data.date) : '-'}</span>
             </div>
           </div>
         </section>
@@ -88,7 +116,7 @@ const latestCollectionPost = collectionPosts[0];
           <div class="ui-panel-body sidebar-link-list">
             {otherCollections.map((item) => (
               <a href={`/collections/${item.slug}`} class="sidebar-link-item no-underline">
-                <span class="sidebar-link-kicker">{postsForCollection(item, posts).length} 篇</span>
+                <span class="sidebar-link-kicker" data-other-collection-count={item.slug}>{postsForCollection(item, posts).length} 篇</span>
                 <span class="sidebar-link-title">{item.title}</span>
               </a>
             ))}
@@ -100,4 +128,5 @@ const latestCollectionPost = collectionPosts[0];
       </aside>
     </div>
   </section>
+  <script type="module" src="/scripts/collection-page.js"></script>
 </BaseLayout>

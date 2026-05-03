@@ -8,6 +8,7 @@ export const formatError = (message) => {
   if (message?.includes('留言需要 5 到 30 个字')) return '留言需要 5 到 30 个字';
   if (message?.includes('Comment payload is too large')) return '留言内容过大';
   if (message?.includes('Invalid comment content type')) return '留言请求格式不正确';
+  if (message?.includes('留言太频繁，请稍后再试')) return '留言太频繁，请稍后再试';
   if (message?.includes('Each image must be 1 MB or smaller')) return '单张图片不能超过 1 MB';
   if (message?.includes('Only JPEG, PNG, WebP and GIF images are supported')) return '仅支持 JPEG / PNG / WebP / GIF';
   return message || '操作失败';

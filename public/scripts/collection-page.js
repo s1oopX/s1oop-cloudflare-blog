@@ -6,6 +6,7 @@ const staticPosts = JSON.parse(postList?.dataset.staticPosts || '[]');
 const collectionMeta = JSON.parse(postList?.dataset.collectionMeta || '{}');
 const otherCollectionMeta = JSON.parse(postList?.dataset.otherCollectionMeta || '[]');
 const pageSize = Number(postList?.dataset.pageSize || 10);
+const configuredPage = Number(postList?.dataset.currentPage || 0);
 
 const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
   '&': '&amp;',
@@ -56,6 +57,36 @@ const renderPost = (post) => `
   </article>
 `;
 
+const currentPageFromUrl = () => {
+  const queryPage = Number(new URLSearchParams(window.location.search).get('page') || 0);
+  if (Number.isFinite(queryPage) && queryPage > 0) return queryPage;
+  const pathPage = Number(window.location.pathname.match(/\/page\/(\d+)\/?$/)?.[1] || 0);
+  if (Number.isFinite(pathPage) && pathPage > 0) return pathPage;
+  return configuredPage || 1;
+};
+
+const renderPagination = (currentPage, totalPages) => {
+  if (!pagination) return;
+  if (totalPages <= 1) {
+    pagination.innerHTML = '';
+    return;
+  }
+
+  const baseHref = `/collections/${encodeURIComponent(collectionMeta.slug || '')}`;
+  const hrefForPage = (page) => page === 1 ? baseHref : `${baseHref}?page=${page}`;
+  const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
+  pagination.hidden = false;
+  pagination.innerHTML = `
+    <nav class="ui-pagination" aria-label="分页">
+      <a class="ui-page-step ${currentPage <= 1 ? 'is-disabled' : ''}" ${currentPage > 1 ? `href="${hrefForPage(currentPage - 1)}"` : 'aria-disabled="true"'}>上一页</a>
+      <div class="ui-page-numbers">
+        ${pages.map((page) => `<a class="ui-page-number ${page === currentPage ? 'is-active' : ''}" href="${hrefForPage(page)}" ${page === currentPage ? 'aria-current="page"' : ''}>${page}</a>`).join('')}
+      </div>
+      <a class="ui-page-step ${currentPage >= totalPages ? 'is-disabled' : ''}" ${currentPage < totalPages ? `href="${hrefForPage(currentPage + 1)}"` : 'aria-disabled="true"'}>下一页</a>
+    </nav>
+  `;
+};
+
 fetch('/api/posts?limit=100')
   .then((response) => response.ok ? response.json() : null)
   .then((data) => {
@@ -78,8 +109,11 @@ fetch('/api/posts?limit=100')
 
     if (!runtimeMatches.length || !postList) return;
     postList.querySelectorAll('.post-card, [data-collection-empty]').forEach((node) => node.remove());
-    const visiblePosts = posts.slice(0, pageSize);
+    const currentPage = Math.max(1, currentPageFromUrl());
+    const totalPages = Math.max(1, Math.ceil(posts.length / pageSize));
+    const boundedPage = Math.min(currentPage, totalPages);
+    const visiblePosts = posts.slice((boundedPage - 1) * pageSize, boundedPage * pageSize);
     postList.insertAdjacentHTML('afterbegin', visiblePosts.map(renderPost).join(''));
-    if (pagination) pagination.hidden = posts.length <= pageSize;
+    renderPagination(boundedPage, totalPages);
   })
   .catch(() => {});
