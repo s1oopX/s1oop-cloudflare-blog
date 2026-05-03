@@ -33,7 +33,7 @@ export const collections = [
     description: '写作、阅读、工具和方法相关记录，保留可复用的学习过程与经验。',
     image: {
       src: '/images/collections/learn.jpg',
-      alt: '夜间桌面上的平板、书本和数字时钟，代表学习与复盘记录',
+      alt: '平板上用手写笔记录清单，代表学习与复盘记录',
     },
     posts: ['astro-cloudflare-workflow', 'private-blog-editing-checklist'],
     runtimeTags: ['学习'],
