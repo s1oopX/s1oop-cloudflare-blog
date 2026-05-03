@@ -121,3 +121,98 @@
     @apply hover:text-white;
     color: var(--accent);
   }
+
+  .comments-panel {
+    background:
+      linear-gradient(180deg, rgb(255 255 255 / 0.025), transparent 16rem),
+      color-mix(in srgb, var(--card) 94%, transparent);
+  }
+
+  .comments-count {
+    @apply inline-flex h-7 min-w-7 items-center justify-center rounded-md border px-2 font-mono text-xs text-zinc-400;
+    border-color: rgb(255 255 255 / 0.09);
+    background: rgb(255 255 255 / 0.025);
+  }
+
+  .comments-list {
+    @apply grid gap-3;
+  }
+
+  .comment-item {
+    @apply rounded-md border p-4;
+    border-color: rgb(255 255 255 / 0.08);
+    background: rgb(255 255 255 / 0.025);
+  }
+
+  .comment-item header {
+    @apply mb-2 flex items-center justify-between gap-4 text-sm;
+  }
+
+  .comment-item strong,
+  .comment-item a {
+    @apply font-medium text-zinc-100 no-underline hover:text-white;
+  }
+
+  .comment-item time {
+    @apply shrink-0 font-mono text-[0.68rem] uppercase tracking-[0.14em] text-zinc-500;
+  }
+
+  .comment-item p {
+    @apply text-sm leading-7 text-zinc-400;
+  }
+
+  .comments-empty {
+    @apply rounded-md border border-dashed p-4 text-sm text-zinc-500;
+    border-color: rgb(255 255 255 / 0.08);
+  }
+
+  .comments-form {
+    @apply mt-5 grid gap-4 border-t border-white/10 pt-5;
+  }
+
+  .comments-form-grid {
+    @apply grid gap-3 sm:grid-cols-2;
+  }
+
+  .comments-form label {
+    @apply grid gap-2;
+  }
+
+  .comments-form label span {
+    @apply text-xs text-zinc-500;
+  }
+
+  .comments-form input,
+  .comments-form textarea {
+    @apply w-full rounded-md border px-3 py-2 text-sm text-zinc-100 outline-none transition;
+    border-color: rgb(255 255 255 / 0.1);
+    background: rgb(255 255 255 / 0.035);
+  }
+
+  .comments-form input:focus,
+  .comments-form textarea:focus {
+    border-color: rgb(var(--accent-rgb) / 0.36);
+    box-shadow: 0 0 0 3px rgb(var(--accent-rgb) / 0.08);
+  }
+
+  .comments-honeypot {
+    @apply hidden;
+  }
+
+  .comments-actions {
+    @apply flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between;
+  }
+
+  .comments-actions span {
+    @apply text-sm text-zinc-500;
+  }
+
+  .comments-actions span[data-tone='error'] {
+    @apply text-red-300;
+  }
+
+  .comments-actions button {
+    @apply inline-flex h-10 items-center justify-center rounded-md border px-4 text-sm font-medium text-zinc-100 transition hover:text-white disabled:cursor-not-allowed disabled:opacity-50;
+    border-color: rgb(var(--accent-rgb) / 0.18);
+    background: rgb(var(--accent-rgb) / 0.11);
+  }

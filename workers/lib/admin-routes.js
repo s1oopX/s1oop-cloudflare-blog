@@ -12,6 +12,7 @@ import {
 } from './posts.js';
 import { getCommentSettings, setSetting, SETTINGS } from './settings.js';
 import { rewriteMarkdownImages, storeImages } from './assets.js';
+import { deleteComment, listAdminComments } from './comments.js';
 
 const MAX_MARKDOWN_BYTES = 512 * 1024;
 
@@ -152,6 +153,29 @@ export const handleAdminRoute = async (request, env, url) => {
 
   if (url.pathname === '/api/admin/posts' && request.method === 'POST') {
     return handlePostUpload(request, env);
+  }
+
+  if (url.pathname === '/api/admin/comments' && request.method === 'GET') {
+    const authResponse = await requireAdmin(request, env);
+    if (authResponse) return authResponse;
+    const d1Response = requireD1(env);
+    if (d1Response) return d1Response;
+
+    const limit = Math.min(100, Math.max(1, Number(url.searchParams.get('limit') ?? 50)));
+    return json({ ok: true, source: 'd1', comments: await listAdminComments(env, limit) });
+  }
+
+  const adminCommentMatch = url.pathname.match(/^\/api\/admin\/comments\/([^/]+)$/);
+  if (adminCommentMatch && request.method === 'DELETE') {
+    const authResponse = await requireAdmin(request, env);
+    if (authResponse) return authResponse;
+    const d1Response = requireD1(env);
+    if (d1Response) return d1Response;
+
+    const id = decodeURIComponent(adminCommentMatch[1]);
+    const result = await deleteComment(env, id);
+    if (!result.deleted) return json({ ok: false, message: 'Comment not found' }, { status: 404 });
+    return json({ ok: true, id, deleted: true });
   }
 
   if (url.pathname === '/api/admin/assets/orphans' && ['GET', 'DELETE'].includes(request.method)) {

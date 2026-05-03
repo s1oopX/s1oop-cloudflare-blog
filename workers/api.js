@@ -3,6 +3,7 @@ import { handleAdminRoute } from './lib/admin-routes.js';
 import { getRuntimePost, listRuntimePosts } from './lib/posts.js';
 import { getCommentSettings } from './lib/settings.js';
 import { assetBody } from './lib/assets.js';
+import { createComment, listComments } from './lib/comments.js';
 
 const maybeHead = (request, response) => (
   request.method === 'HEAD'
@@ -28,14 +29,25 @@ export default {
     const adminResponse = await handleAdminRoute(request, env, url);
     if (adminResponse) return adminResponse;
 
-    if ((url.pathname === '/api/comments' || url.pathname === '/api/comments/status') && publicMethod === 'GET') {
+    if (url.pathname === '/api/comments/status' && publicMethod === 'GET') {
       const comments = await getCommentSettings(env);
       return maybeHead(request, json({
         ok: true,
         enabled: comments.enabled,
-        comments: [],
       }, {
         headers: { 'cache-control': CACHE.publicList },
+      }));
+    }
+
+    if (url.pathname === '/api/comments' && publicMethod === 'GET') {
+      const comments = await getCommentSettings(env);
+      const slug = url.searchParams.get('post') || url.searchParams.get('slug') || '';
+      return maybeHead(request, json({
+        ok: true,
+        enabled: comments.enabled,
+        comments: comments.enabled ? await listComments(env, slug) : [],
+      }, {
+        headers: { 'cache-control': CACHE.publicDetail },
       }));
     }
 
@@ -48,10 +60,9 @@ export default {
         );
       }
 
-      return json(
-        { ok: false, enabled: true, message: 'Comment storage is not configured' },
-        { status: 501 },
-      );
+      const result = await createComment(env, request);
+      if (result.error) return json({ ok: false, enabled: true, message: result.error }, { status: result.status });
+      return json({ ok: true, enabled: true, comment: result.comment });
     }
 
     if (url.pathname === '/api/posts' && publicMethod === 'GET') {

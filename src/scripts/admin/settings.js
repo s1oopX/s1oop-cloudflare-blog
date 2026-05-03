@@ -14,8 +14,9 @@ export const loadSettings = async (requestAdmin, nodes) => {
   }
 };
 
-export const bindCommentToggle = (requestAdmin, nodes) => {
+export const bindCommentToggle = (requestAdmin, nodes, callbacks = {}) => {
   const { commentState, commentToggle, commentToggleState } = nodes;
+  const { loadComments } = callbacks;
 
   commentToggle?.addEventListener('change', async () => {
     const enabled = Boolean(commentToggle.checked);
@@ -28,6 +29,7 @@ export const bindCommentToggle = (requestAdmin, nodes) => {
       });
       setState(commentState, enabled ? '已开放' : '已关闭', enabled ? 'success' : 'muted');
       setState(commentToggleState, enabled ? '评论区已开放' : '评论区已关闭', enabled ? 'success' : 'muted');
+      loadComments?.();
     } catch (error) {
       commentToggle.checked = !enabled;
       setState(commentState, '保存失败', 'error');

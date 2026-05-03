@@ -1,6 +1,7 @@
 import { clearSession, requestAdmin as requestAdminRequest, verifySession } from './admin/api.js';
 import { imageProblems, prepareUploadForm, readImageDimensions, uploadedImageProblems } from './admin/images.js';
 import { firstMarkdownImage, parseFrontmatter } from './admin/markdown.js';
+import { bindCommentActions, loadComments as loadRuntimeComments } from './admin/comments.js';
 import { bindPostListActions, loadPosts as loadRuntimePosts } from './admin/runtime-posts.js';
 import { bindCommentToggle, loadSettings as loadAdminSettings } from './admin/settings.js';
 import { formatError, readableSize, setState, toSlug } from './admin/utils.js';
@@ -11,6 +12,7 @@ const uploadState = document.querySelector('#post-upload-state');
 const lockButton = document.querySelector('#private-lock-button');
 const clearButton = document.querySelector('#post-clear-button');
 const refreshButton = document.querySelector('#runtime-posts-refresh');
+const commentsRefreshButton = document.querySelector('#runtime-comments-refresh');
 const orphanAssetsButton = document.querySelector('#orphan-assets-clean');
 const fileInput = document.querySelector('#post-file');
 const imageInput = document.querySelector('#post-images');
@@ -37,6 +39,8 @@ const previewTags = document.querySelector('#preview-tags');
 const previewImage = document.querySelector('#preview-image');
 const previewOverwrite = document.querySelector('#preview-overwrite');
 const postList = document.querySelector('#runtime-post-list');
+const commentList = document.querySelector('#runtime-comments-list');
+const commentCount = document.querySelector('#runtime-comments-count');
 
 let selectedMarkdown = '';
 let overwriteCheckId = 0;
@@ -153,6 +157,7 @@ const updateImageState = async () => {
 
 const requestAdmin = (path, options = {}) => requestAdminRequest(passwordKey, path, options);
 const loadPosts = () => loadRuntimePosts(requestAdmin, { postList, postCount });
+const loadComments = () => loadRuntimeComments(requestAdmin, { commentList, commentCount });
 const loadSettings = () => loadAdminSettings(requestAdmin, { commentState, commentToggle, commentToggleState });
 
 const existingPassword = getPassword();
@@ -165,6 +170,7 @@ if (!existingPassword) {
       setState(authState, '已解锁', 'success');
       loadSettings();
       loadPosts();
+      loadComments();
     })
     .catch(() => {
       lockAndExit();
@@ -298,8 +304,10 @@ bindPostListActions(
 );
 
 refreshButton?.addEventListener('click', loadPosts);
+commentsRefreshButton?.addEventListener('click', loadComments);
 
-bindCommentToggle(requestAdmin, { commentState, commentToggle, commentToggleState });
+bindCommentActions(requestAdmin, { commentList, uploadState }, { loadComments });
+bindCommentToggle(requestAdmin, { commentState, commentToggle, commentToggleState }, { loadComments });
 
 lockButton?.addEventListener('click', () => {
   lockAndExit();

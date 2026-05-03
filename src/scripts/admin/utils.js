@@ -3,6 +3,8 @@ export const formatError = (message) => {
   if (message === 'ADMIN_PASSWORD is not configured') return '访问密码未配置';
   if (message?.includes('D1 binding BLOG_DB is not configured')) return 'D1 文章库未绑定';
   if (message?.includes('D1 settings table is not configured')) return 'D1 设置表未迁移';
+  if (message?.includes('D1 comments table is not configured')) return 'D1 评论表未迁移';
+  if (message?.includes('Comment limit reached') || message?.includes('同一网络最多留言 2 条')) return '同一网络最多留言 2 条';
   if (message?.includes('Each image must be 1 MB or smaller')) return '单张图片不能超过 1 MB';
   if (message?.includes('Only JPEG, PNG, WebP and GIF images are supported')) return '仅支持 JPEG / PNG / WebP / GIF';
   return message || '操作失败';

@@ -133,6 +133,20 @@ import '../../styles/private-management.css';
             </div>
           </section>
 
+          <section class="private-dashboard-panel" aria-labelledby="runtime-comments-title">
+            <div class="private-panel-head">
+              <div>
+                <p class="private-admin-kicker">comments</p>
+                <h2 id="runtime-comments-title">留言管理</h2>
+              </div>
+              <span id="runtime-comments-count" class="private-panel-badge">-</span>
+              <button id="runtime-comments-refresh" class="private-admin-secondary private-panel-action" type="button">刷新</button>
+            </div>
+            <div id="runtime-comments-list" class="private-post-list" aria-live="polite">
+              <p class="private-list-empty">等待读取留言</p>
+            </div>
+          </section>
+
           <section class="private-dashboard-panel" aria-labelledby="checklist-title">
             <div class="private-panel-head">
               <div>
@@ -164,6 +178,7 @@ import '../../styles/private-management.css';
                 <strong>开放评论区</strong>
               </label>
               <p id="comments-toggle-state" class="private-panel-note">读取评论开关状态</p>
+              <p class="private-panel-note">同一 IP 最多提交 2 条留言。</p>
             </div>
           </section>
 

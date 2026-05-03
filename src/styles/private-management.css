@@ -22,6 +22,10 @@
     @apply mt-1 line-clamp-1 text-xs text-zinc-500;
   }
 
+  .private-comment-row p.private-comment-body {
+    @apply line-clamp-2 whitespace-pre-wrap;
+  }
+
   .private-post-actions {
     @apply flex shrink-0 flex-wrap items-center justify-end gap-2;
     max-width: 14rem;

@@ -1,14 +1,45 @@
-<section class="ui-panel mt-12 border-dashed comments-panel" data-comments-panel hidden>
+---
+interface Props {
+  slug?: string;
+}
+
+const { slug = '' } = Astro.props;
+---
+
+<section class="ui-panel mt-12 comments-panel" data-comments-panel data-comments-slug={slug} hidden>
   <div class="ui-panel-header">
     <h2 class="text-lg font-semibold text-white">留言</h2>
+    <span class="comments-count" data-comments-count>0</span>
   </div>
   <div class="ui-panel-body">
-    <p class="text-sm text-zinc-400" data-comments-copy>
-      评论入口已开放。
-    </p>
-    <div class="mt-4 rounded-md border border-white/10 bg-white/[0.035] px-4 py-3 text-sm text-zinc-300">
-      <span data-comments-state>正在读取评论状态</span>
+    <div class="comments-list" data-comments-list>
+      <p class="comments-empty">正在读取留言。</p>
     </div>
+
+    <form class="comments-form" data-comments-form>
+      <div class="comments-form-grid">
+        <label>
+          <span>称呼</span>
+          <input name="authorName" type="text" maxlength="32" autocomplete="name" required />
+        </label>
+        <label>
+          <span>链接</span>
+          <input name="authorUrl" type="url" maxlength="160" autocomplete="url" placeholder="可选" />
+        </label>
+      </div>
+      <label class="comments-body-field">
+        <span>内容</span>
+        <textarea name="body" maxlength="800" rows="4" required></textarea>
+      </label>
+      <label class="comments-honeypot" aria-hidden="true">
+        <span>Website</span>
+        <input name="website" type="text" tabindex="-1" autocomplete="off" />
+      </label>
+      <div class="comments-actions">
+        <span data-comments-state>正在读取评论状态</span>
+        <button type="submit">提交留言</button>
+      </div>
+    </form>
   </div>
 </section>
 
@@ -16,14 +47,73 @@
   (() => {
     const panel = document.querySelector('[data-comments-panel]');
     const state = document.querySelector('[data-comments-state]');
-    const copy = document.querySelector('[data-comments-copy]');
+    const count = document.querySelector('[data-comments-count]');
+    const list = document.querySelector('[data-comments-list]');
+    const form = document.querySelector('[data-comments-form]');
     if (!panel) return;
 
     const setText = (node, text) => {
       if (node) node.textContent = text;
     };
 
-    fetch('/api/comments/status')
+    const setStatus = (text, tone = 'muted') => {
+      setText(state, text);
+      if (state) state.dataset.tone = tone;
+    };
+
+    const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;',
+    }[character]));
+
+    const formatDate = (value) => {
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '';
+      return date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    };
+
+    const currentSlug = () => {
+      const explicit = panel.dataset.commentsSlug;
+      if (explicit) return explicit;
+      return new URLSearchParams(window.location.search).get('slug') || '';
+    };
+
+    const renderComments = (comments) => {
+      setText(count, String(comments.length));
+      if (!list) return;
+      if (!comments.length) {
+        list.innerHTML = '<p class="comments-empty">还没有留言。</p>';
+        return;
+      }
+
+      list.innerHTML = comments.map((comment) => {
+        const name = escapeHtml(comment.authorName || '访客');
+        const author = comment.authorUrl
+          ? `<a href="${escapeHtml(comment.authorUrl)}" target="_blank" rel="noreferrer">${name}</a>`
+          : `<strong>${name}</strong>`;
+        return `
+          <article class="comment-item">
+            <header>
+              ${author}
+              <time>${escapeHtml(formatDate(comment.createdAt))}</time>
+            </header>
+            <p>${escapeHtml(comment.body).replace(/\n/g, '<br />')}</p>
+          </article>
+        `;
+      }).join('');
+    };
+
+    const loadComments = () => {
+      const slug = currentSlug();
+      if (!slug) {
+        panel.remove();
+        return;
+      }
+
+      fetch(`/api/comments?post=${encodeURIComponent(slug)}`)
       .then((response) => response.ok ? response.json() : Promise.reject(new Error('status failed')))
       .then((data) => {
         if (!data?.enabled) {
@@ -32,11 +122,47 @@
         }
 
         panel.hidden = false;
-        setText(copy, '评论区当前开放。正式提交入口会在这里接入，关闭后前台不会显示这个模块。');
-        setText(state, '评论入口开放中');
+        renderComments(Array.isArray(data.comments) ? data.comments : []);
+        setStatus('评论区开放中');
       })
       .catch(() => {
         panel.remove();
       });
+    };
+
+    form?.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const submit = form.querySelector('button[type="submit"]');
+      const formData = new FormData(form);
+      const payload = {
+        postSlug: currentSlug(),
+        postHref: `${window.location.pathname}${window.location.search}`,
+        authorName: formData.get('authorName'),
+        authorUrl: formData.get('authorUrl'),
+        body: formData.get('body'),
+        website: formData.get('website'),
+      };
+
+      submit.disabled = true;
+      setStatus('正在提交...');
+      try {
+        const response = await fetch('/api/comments', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.ok) throw new Error(data.message || '提交失败');
+        form.reset();
+        setStatus('已提交', 'success');
+        loadComments();
+      } catch (error) {
+        setStatus(error.message || '提交失败', 'error');
+      } finally {
+        submit.disabled = false;
+      }
+    });
+
+    loadComments();
   })();
 </script>

@@ -21,9 +21,12 @@ Cloudflare deployment configuration lives in `wrangler.jsonc`.
 - `DELETE /api/admin/posts/:slug`: deletes a runtime post and its D1 image assets.
 - `GET /api/admin/assets/orphans`: counts D1 image assets that no longer belong to a post.
 - `DELETE /api/admin/assets/orphans`: deletes orphaned D1 image assets.
+- `GET /api/admin/comments`: lists stored comments for moderation.
+- `DELETE /api/admin/comments/:id`: deletes one stored comment.
 - `GET /api/admin/settings`: reads private runtime settings.
 - `PATCH /api/admin/settings`: updates runtime settings such as the comment switch.
-- `GET /api/comments` and `GET /api/comments/status`: expose the current public comment switch.
+- `GET /api/comments` and `GET /api/comments/status`: expose the current public comment switch and stored comments.
+- `POST /api/comments`: stores a public comment when comments are enabled. Each IP hash is limited to 2 comments.
 - `GET /api/posts`: returns runtime D1 posts for the browser overlay.
 - `GET /api/posts/:slug`: returns one runtime D1 post.
 - `GET /api/assets/*`: serves uploaded D1 image assets with long-lived cache headers.
@@ -52,4 +55,5 @@ npx wrangler d1 execute s1oop-blog-content --file migrations/0001_runtime_posts.
 npx wrangler d1 execute s1oop-blog-content --file migrations/0002_blog_assets.sql
 npx wrangler d1 execute s1oop-blog-content --file migrations/0003_site_settings.sql
 npx wrangler d1 execute s1oop-blog-content --file migrations/0004_runtime_post_search_text.sql
+npx wrangler d1 execute s1oop-blog-content --file migrations/0005_blog_comments.sql
 ```
