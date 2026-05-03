@@ -73,23 +73,3 @@
     overflow: hidden;
   }
 }
-
-@keyframes site-status-light-breathe {
-  from {
-    opacity: 0.4;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes site-status-light-glow {
-  from {
-    opacity: 0.4;
-  }
-
-  to {
-    opacity: 1;
-  }
-}

@@ -3,6 +3,7 @@ const pagination = document.querySelector('[data-post-pagination]');
 const postCount = document.querySelector('[data-post-count]');
 const tagCount = document.querySelector('[data-tag-count]');
 const latestPost = document.querySelector('[data-latest-post]');
+const archivePathCountNodes = document.querySelectorAll('[data-archive-path-count]');
 const staticPosts = JSON.parse(postList?.dataset.staticPosts || '[]');
 const archivePaths = JSON.parse(postList?.dataset.archivePaths || '[]');
 const pageSize = Number(postList?.dataset.pageSize || 10);
@@ -71,22 +72,13 @@ const archivePathsFor = (runtimePosts = []) => archivePaths.map((path) => ({
   count: path.count + runtimePosts.filter((post) => belongsToArchivePath(post, path)).length,
 }));
 
-const renderArchiveBreak = (paths = archivePaths) => `
-  <section class="archive-path-break ui-panel" aria-label="按专栏继续阅读" data-archive-path-break>
-    <div>
-      <p class="ui-eyebrow">reading paths</p>
-      <h2>换一条路线继续读</h2>
-    </div>
-    <div class="archive-path-links">
-      ${paths.map((path) => `
-        <a href="${escapeHtml(path.href)}">
-          <span>${escapeHtml(path.count)} 篇</span>
-          <strong>${escapeHtml(path.title)}</strong>
-        </a>
-      `).join('')}
-    </div>
-  </section>
-`;
+const updateArchivePathCounts = (paths = archivePaths) => {
+  const counts = new Map(paths.map((path) => [String(path.slug || path.href), path.count]));
+  archivePathCountNodes.forEach((node) => {
+    const key = node.dataset.archivePathCount;
+    if (counts.has(key)) node.textContent = `${counts.get(key)} 篇`;
+  });
+};
 
 const renderPagination = (currentPage, totalPages) => {
   if (!pagination) return;
@@ -95,7 +87,7 @@ const renderPagination = (currentPage, totalPages) => {
     return;
   }
 
-  const hrefForPage = (page) => page === 1 ? '/blog' : `/blog?page=${page}`;
+  const hrefForPage = (page) => page === 1 ? '/blog' : `/blog/page/${page}`;
   const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
   pagination.innerHTML = `
     <nav class="ui-pagination" aria-label="分页">
@@ -122,12 +114,11 @@ const renderCombinedPosts = (runtimePosts = []) => {
   const boundedPage = Math.min(currentPage, totalPages);
   const visiblePosts = posts.slice((boundedPage - 1) * pageSize, boundedPage * pageSize);
 
-  postList.querySelectorAll('.post-card, [data-archive-path-break]').forEach((node) => node.remove());
-  const renderedPosts = visiblePosts.map((post, index) => (
-    renderPost(post) + (index === 3 && visiblePosts.length > 4 ? renderArchiveBreak(archivePathCounts) : '')
-  )).join('');
+  postList.querySelectorAll('.post-card').forEach((node) => node.remove());
+  const renderedPosts = visiblePosts.map((post) => renderPost(post)).join('');
   postList.insertAdjacentHTML('afterbegin', renderedPosts);
   renderPagination(boundedPage, totalPages);
+  updateArchivePathCounts(archivePathCounts);
 
   if (postCount) postCount.textContent = String(posts.length);
   if (tagCount) tagCount.textContent = String(tagCountsFor(posts).size);
