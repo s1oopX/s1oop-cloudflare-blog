@@ -22,6 +22,18 @@ const posts = visiblePosts(await getCollection('posts'));
 const relatedPosts = relatedPostsFor(post, posts);
 const readingStats = postReadingStats(post);
 const currentSlug = postSlug(post);
+const currentPostData = {
+  title: post.data.title,
+  href: postHref(post),
+  date: post.data.date.toISOString(),
+  tags: post.data.tags,
+};
+const staticPostData = posts.map((item) => ({
+  title: item.data.title,
+  href: postHref(item),
+  date: item.data.date.toISOString(),
+  tags: item.data.tags,
+}));
 const currentTags = new Set(post.data.tags.map((tag) => tag.toLowerCase()));
 const collectionSequence = collections
   .map((collection) => postsForCollection(collection, posts))
@@ -47,7 +59,12 @@ const nextPost = collectionNeighbors.next ?? tagNeighbors.next ?? timeNeighbors.
 ---
 
 <BaseLayout title={`${post.data.title} | s1oop's Blog`}>
-  <article class="ui-page reading-page">
+  <article
+    class="ui-page reading-page"
+    data-reading-post-page
+    data-current-post={JSON.stringify(currentPostData)}
+    data-static-posts={JSON.stringify(staticPostData)}
+  >
     <PageHeader
       eyebrow={formatPostDate(post.data.date)}
       title={post.data.title}
@@ -64,22 +81,20 @@ const nextPost = collectionNeighbors.next ?? tagNeighbors.next ?? timeNeighbors.
           <Content />
         </div>
 
-        {(previousPost || nextPost) && (
-          <nav class="reading-nav" aria-label="文章导航">
-            {previousPost && (
-              <a href={postHref(previousPost)} class="reading-nav-link reading-nav-prev">
-                <span class="reading-nav-label">上一篇</span>
-                <span class="reading-nav-title">{previousPost.data.title}</span>
-              </a>
-            )}
-            {nextPost && (
-              <a href={postHref(nextPost)} class="reading-nav-link reading-nav-next">
-                <span class="reading-nav-label">下一篇</span>
-                <span class="reading-nav-title">{nextPost.data.title}</span>
-              </a>
-            )}
-          </nav>
-        )}
+        <nav class="reading-nav" aria-label="文章导航" data-reading-nav hidden={!(previousPost || nextPost)}>
+          {previousPost && (
+            <a href={postHref(previousPost)} class="reading-nav-link reading-nav-prev">
+              <span class="reading-nav-label">上一篇</span>
+              <span class="reading-nav-title">{previousPost.data.title}</span>
+            </a>
+          )}
+          {nextPost && (
+            <a href={postHref(nextPost)} class="reading-nav-link reading-nav-next">
+              <span class="reading-nav-label">下一篇</span>
+              <span class="reading-nav-title">{nextPost.data.title}</span>
+            </a>
+          )}
+        </nav>
 
         <Comments slug={postSlug(post)} />
       </div>
@@ -123,7 +138,7 @@ const nextPost = collectionNeighbors.next ?? tagNeighbors.next ?? timeNeighbors.
           <div class="ui-panel-header">
             <h2 class="ui-panel-title">继续阅读</h2>
           </div>
-          <div class="ui-panel-body article-related-list">
+          <div class="ui-panel-body article-related-list" data-reading-related-posts>
             {relatedPosts.map((item) => (
               <a href={postHref(item)} class="article-related-item no-underline">
                 <span class="article-related-date">{formatPostDate(item.data.date)}</span>
@@ -138,4 +153,6 @@ const nextPost = collectionNeighbors.next ?? tagNeighbors.next ?? timeNeighbors.
       </aside>
     </div>
   </article>
+
+  <script type="module" src="/scripts/reading-post.js"></script>
 </BaseLayout>

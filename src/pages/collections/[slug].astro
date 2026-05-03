@@ -78,7 +78,7 @@ const otherCollectionMeta = otherCollections.map((item) => ({
           <div class="ui-panel p-5 text-sm text-zinc-400" data-collection-empty>该专栏暂无文章。</div>
         )}
         <div data-collection-pagination>
-          <Pagination currentPage={currentPage} totalPages={totalPages} baseHref={`/collections/${collection.slug}`} />
+          <Pagination currentPage={currentPage} totalPages={totalPages} baseHref={`/collections/${collection.slug}`} queryParam="page" />
         </div>
       </div>
 

@@ -49,6 +49,17 @@ const shouldShowUpdated = (post) => {
   return Number.isFinite(created) && Number.isFinite(updated) && updated - created > 60_000;
 };
 
+const postKey = (post) => post?.href || post?.slug || '';
+
+const mergePosts = (...groups) => {
+  const byKey = new Map();
+  for (const post of groups.flat()) {
+    const key = postKey(post);
+    if (key && !byKey.has(key)) byKey.set(key, post);
+  }
+  return Array.from(byKey.values());
+};
+
 const relatedScore = (post, currentTags) => (
   (post.tags || [])
     .map((tag) => String(tag).toLowerCase())
@@ -60,7 +71,7 @@ const renderRelatedPosts = (post, posts = []) => {
 
   const currentTags = new Set((post.tags || []).map((tag) => String(tag).toLowerCase()));
   const relatedPosts = posts
-    .filter((item) => item.slug && item.slug !== post.slug)
+    .filter((item) => postKey(item) && postKey(item) !== postKey(post))
     .map((item) => ({ post: item, score: relatedScore(item, currentTags) }))
     .sort((a, b) => {
       if (b.score !== a.score) return b.score - a.score;
@@ -83,9 +94,9 @@ const renderReadingNav = (post, posts = []) => {
   if (!navNode) return;
 
   const sortedPosts = posts
-    .filter((item) => item.slug)
+    .filter((item) => postKey(item))
     .sort((a, b) => timestamp(b.date) - timestamp(a.date));
-  const currentIndex = sortedPosts.findIndex((item) => item.slug === post.slug);
+  const currentIndex = sortedPosts.findIndex((item) => postKey(item) === postKey(post));
   const previousPost = currentIndex > 0 ? sortedPosts[currentIndex - 1] : null;
   const nextPost = currentIndex >= 0 && currentIndex < sortedPosts.length - 1 ? sortedPosts[currentIndex + 1] : null;
 
@@ -142,14 +153,18 @@ if (!slug) {
   Promise.all([
     fetch(`/api/posts/${encodeURIComponent(slug)}`)
       .then((response) => response.ok ? response.json() : Promise.reject(new Error('not found'))),
+    fetch('/search-index.json')
+      .then((response) => response.ok ? response.json() : [])
+      .catch(() => []),
     fetch('/api/posts?limit=100')
       .then((response) => response.ok ? response.json() : { posts: [] })
       .catch(() => ({ posts: [] })),
   ])
-    .then(([data, listData]) => {
+    .then(([data, staticPosts, listData]) => {
       if (!data?.post) throw new Error('not found');
       renderPost(data.post);
-      const posts = Array.isArray(listData?.posts) ? listData.posts : [];
+      const runtimePosts = Array.isArray(listData?.posts) ? listData.posts : [];
+      const posts = mergePosts(Array.isArray(staticPosts) ? staticPosts : [], runtimePosts);
       renderRelatedPosts(data.post, posts);
       renderReadingNav(data.post, posts);
     })

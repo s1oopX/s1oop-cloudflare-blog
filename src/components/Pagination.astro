@@ -4,11 +4,16 @@ interface Props {
   totalPages: number;
   baseHref: string;
   firstHref?: string;
+  queryParam?: string;
 }
 
-const { currentPage, totalPages, baseHref, firstHref } = Astro.props;
+const { currentPage, totalPages, baseHref, firstHref, queryParam } = Astro.props;
 
-const hrefForPage = (page: number) => (page === 1 ? firstHref ?? baseHref : `${baseHref}/${page}`);
+const hrefForPage = (page: number) => {
+  if (page === 1) return firstHref ?? baseHref;
+  if (queryParam) return `${baseHref}?${queryParam}=${page}`;
+  return `${baseHref}/${page}`;
+};
 const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
 ---
 

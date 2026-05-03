@@ -62,7 +62,7 @@ const renderTopicIndex = () => {
   const tagStats = topicCountsFor(index);
   const maxTagCount = Math.max(1, ...tagStats.map((item) => item.count));
 
-  if (summary) summary.textContent = `${index.length} 篇文章 / ${tagStats.length} 个主题`;
+  if (summary) summary.textContent = `${index.length} 篇文章 / ${tagStats.length} 个入口`;
   if (postCount) postCount.textContent = String(index.length);
   if (tagCount) tagCount.textContent = String(tagStats.length);
   if (!topicGrid) return;
