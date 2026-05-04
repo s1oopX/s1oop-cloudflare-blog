@@ -12,8 +12,8 @@
   }
 
   .post-card-media {
-    @apply relative grid overflow-hidden border;
-    grid-template-rows: minmax(0, 1fr) auto;
+    @apply relative grid self-start overflow-hidden border;
+    grid-template-rows: auto auto;
     border-color: rgb(var(--accent-rgb) / 0.12);
     border-radius: 0.45rem;
     background:
@@ -23,7 +23,7 @@
 
   .post-card-media img,
   .post-card-media > span {
-    @apply block h-full w-full transition;
+    @apply block w-full transition;
     aspect-ratio: 16 / 9;
     filter: grayscale(0.08) sepia(0.08) saturate(0.7) contrast(1.08) brightness(0.75);
   }
