@@ -117,35 +117,61 @@
     @apply overflow-hidden;
   }
 
-  .site-status-head {
-    @apply flex items-center justify-between gap-3;
-  }
-
-  .site-status-head > span {
-    @apply shrink-0 rounded-full border px-2.5 py-1 font-mono text-[0.62rem] uppercase tracking-[0.14em] text-zinc-500;
-    border-color: rgb(var(--accent-rgb) / 0.16);
-    background: rgb(255 255 255 / 0.025);
-  }
-
   .site-status-body {
-    @apply flex items-center justify-between gap-4;
+    @apply grid gap-4 p-5;
   }
 
-  .site-status-kicker {
-    @apply font-mono text-[0.68rem] uppercase tracking-[0.14em] text-zinc-500;
+  .site-status-main {
+    @apply grid grid-cols-[2.25rem_minmax(0,1fr)] items-start gap-4;
   }
 
-  .site-status-state {
-    @apply inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-zinc-100;
+  .site-status-main > div {
+    @apply min-w-0;
   }
 
   .site-status-dot {
-    @apply h-2.5 w-2.5 rounded-full;
+    @apply mt-1 grid h-9 w-9 place-items-center rounded-full;
     background: #74d990;
     box-shadow:
-      0 0 0 2px rgb(116 217 144 / 0.12),
-      0 0 16px rgb(116 217 144 / 0.38);
+      inset 0 0 0 1px rgb(255 255 255 / 0.22),
+      0 0 0 4px rgb(116 217 144 / 0.08),
+      0 0 22px rgb(116 217 144 / 0.32);
     animation: site-status-breathe 1.9s ease-in-out infinite;
+  }
+
+  .site-status-dot::after {
+    content: '';
+    @apply h-2.5 w-2.5 rounded-full bg-white/90;
+    box-shadow: 0 0 10px rgb(255 255 255 / 0.5);
+  }
+
+  .site-status-main h2 {
+    @apply mt-2 text-xl font-semibold leading-tight text-white;
+    font-family: var(--font-display);
+    letter-spacing: 0;
+  }
+
+  .site-status-main p:not(.ui-eyebrow) {
+    @apply mt-2 text-sm leading-6 text-zinc-400;
+  }
+
+  .site-status-meta {
+    @apply grid grid-cols-2 gap-px overflow-hidden border border-white/10;
+    border-radius: calc(var(--radius) - 0.35rem);
+    background: rgb(255 255 255 / 0.04);
+  }
+
+  .site-status-meta div {
+    @apply min-w-0 px-3 py-3;
+    background: color-mix(in srgb, var(--card) 90%, transparent);
+  }
+
+  .site-status-meta dt {
+    @apply font-mono text-[0.62rem] uppercase tracking-[0.13em] text-zinc-500;
+  }
+
+  .site-status-meta dd {
+    @apply mt-1 truncate text-sm font-medium text-zinc-200;
   }
 
   .sidebar-link-list {
