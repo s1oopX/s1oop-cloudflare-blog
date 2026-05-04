@@ -24,9 +24,10 @@ const collectionMeta = collections.map((collection) => ({
     >
       {collections.map((collection) => {
         const image = collection.image;
+        const titleId = `collection-${collection.slug}-title`;
 
         return (
-          <a href={collectionHref(collection)} class="collection-card ui-panel ui-panel-link no-underline" data-collection-card={collection.slug}>
+          <a href={collectionHref(collection)} class="collection-card ui-panel ui-panel-link no-underline" data-collection-card={collection.slug} aria-labelledby={titleId}>
             {image && (
               <div class="collection-card-image">
                 <img src={image.src} alt={image.alt} loading="lazy" decoding="async" />
@@ -37,7 +38,7 @@ const collectionMeta = collections.map((collection) => ({
               <div class="mt-3 flex flex-wrap gap-2">
                 <span class="ui-badge" data-collection-count>0 篇</span>
               </div>
-              <h2>{collection.title}</h2>
+              <h2 id={titleId}>{collection.title}</h2>
               <p>{collection.description}</p>
               <div class="collection-card-list" data-collection-list></div>
             </div>

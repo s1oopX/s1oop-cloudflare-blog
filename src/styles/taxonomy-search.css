@@ -34,11 +34,12 @@
     @apply overflow-hidden border;
     border-color: rgb(var(--accent-rgb) / 0.12);
     border-radius: 0.45rem;
+    aspect-ratio: 16 / 9;
     background: var(--card-2);
   }
 
   .collection-card-image img {
-    @apply h-40 w-full object-cover transition;
+    @apply h-full w-full object-cover transition;
     filter: grayscale(0.08) sepia(0.08) saturate(0.7) contrast(1.08) brightness(0.75);
   }
 
@@ -68,7 +69,7 @@
   }
 
   .tag-index-meter {
-    @apply h-px w-full overflow-hidden bg-white/10;
+    @apply h-0.5 w-full overflow-hidden bg-white/10;
   }
 
   .tag-index-meter::before {
