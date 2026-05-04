@@ -7,12 +7,12 @@
   }
 
   .post-card-link {
-    @apply grid gap-4 no-underline sm:grid-cols-[10rem_minmax(0,1fr)];
+    @apply grid gap-4 no-underline sm:grid-cols-[12.5rem_minmax(0,1fr)];
     padding: 0.9rem;
   }
 
   .post-card-media {
-    @apply relative grid self-start overflow-hidden border;
+    @apply relative grid self-center overflow-hidden border;
     grid-template-rows: auto auto;
     border-color: rgb(var(--accent-rgb) / 0.12);
     border-radius: 0.45rem;
@@ -50,7 +50,7 @@
   }
 
   .post-card-media time {
-    @apply relative z-10 px-3 py-2 font-mono text-xs uppercase tracking-[0.12em];
+    @apply relative z-10 px-3 py-1.5 font-mono text-xs uppercase tracking-[0.12em];
     color: var(--accent);
     background: rgb(6 13 11 / 0.78);
     border-top: 1px solid rgb(var(--accent-rgb) / 0.1);
