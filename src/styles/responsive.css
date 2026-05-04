@@ -57,7 +57,8 @@
   }
 
   .site-nav-group {
-    @apply order-2 w-full flex-none justify-start text-xs;
+    @apply order-2 flex-none justify-start text-xs;
+    width: auto;
     max-width: none;
   }
 
