@@ -13,30 +13,33 @@ const contactRows = [
 
 const profileRows = [
   { label: 'Owner', value: 's1oop' },
-  { label: 'Runtime', value: 'Cloudflare' },
-  { label: 'Source', value: 'D1' },
+  { label: 'Type', value: 'Personal archive' },
+  { label: 'Public source', value: 'D1 live posts' },
 ];
 
 const principles = [
   {
-    title: '先保证阅读',
-    copy: '页面保持安静，正文和入口优先，减少不会长期使用的装饰。',
+    label: 'Reading',
+    title: '优先阅读',
+    copy: '正文、目录和入口比装饰更重要。页面应当保持安静，让内容自己留下判断。',
   },
   {
-    title: '再降低维护',
-    copy: '公开文章统一进入 D1，GitHub 只维护站点代码、样式和页面结构。',
+    label: 'Publishing',
+    title: '降低维护',
+    copy: '公开文章统一进入 D1，代码只负责页面壳、样式和后台工具，避免两套内容源。',
   },
   {
-    title: '最后方便回找',
-    copy: '专栏、搜索和更新记录都服务于后续回看，不额外制造内容入口。',
+    label: 'Archive',
+    title: '方便回找',
+    copy: '专栏负责连续主题，搜索负责片段回看，更新记录说明站点变化。',
   },
 ];
 
 const projectRows = [
   { label: 'Shell', value: 'Astro' },
-  { label: 'Code', value: 'GitHub' },
-  { label: 'Runtime', value: 'Pages' },
-  { label: 'Data', value: 'D1' },
+  { label: 'Repository', value: 'GitHub' },
+  { label: 'Runtime', value: 'Cloudflare Pages' },
+  { label: 'Content', value: 'Cloudflare D1' },
 ];
 ---
 
@@ -46,26 +49,33 @@ const projectRows = [
 >
   <section class="ui-page archive-page about-page">
     <PageHeader
-      eyebrow="about"
+      eyebrow="public profile"
       title="关于"
-      description="这里保存写作、阅读、设计判断和轻量技术实践。"
-    />
+      description="这里保存写作、阅读、设计判断和轻量技术实践。它是一个长期维护的个人档案入口。"
+    >
+      <a class="ui-button" href={githubUrl} target="_blank" rel="noreferrer" slot="actions">GitHub</a>
+      <a class="ui-button" href={`mailto:${gmailAddress}`} slot="actions">Gmail</a>
+    </PageHeader>
 
     <div class="ui-grid ui-page-body">
       <main class="ui-stack ui-stagger">
-        <section class="ui-panel about-summary" aria-labelledby="about-summary-title">
-          <div class="ui-panel-header">
-            <p class="ui-eyebrow">personal archive</p>
-            <h2 id="about-summary-title">长期回看的个人档案。</h2>
+        <section class="ui-panel about-record" aria-labelledby="about-record-title">
+          <div class="about-record-head">
+            <div>
+              <p class="ui-eyebrow">s1oop's Blog</p>
+              <h2 id="about-record-title">长期回看的个人档案。</h2>
+            </div>
+            <span>D1 live source</span>
           </div>
-          <div class="ui-panel-body">
+          <div class="about-record-body">
             <p>
-              这个博客不按热度排序，也不追逐频繁刷新。它更像一个可以反复打开的个人档案：
-              文章、标签、专栏和搜索都只服务一件事，让写过的内容在之后还能被找到、读懂和继续修正。
+              这个博客不按热度排序，也不追逐频繁刷新。它把文章、标签、专栏和搜索组织成稳定入口，
+              让写过的内容在之后还能被找到、读懂和继续修正。
             </p>
-            <div class="about-principle-list" aria-label="维护原则">
+            <div class="about-principle-list" aria-label="站点维护原则">
               {principles.map((item) => (
                 <article>
+                  <p class="ui-eyebrow">{item.label}</p>
                   <h3>{item.title}</h3>
                   <p>{item.copy}</p>
                 </article>
@@ -76,25 +86,23 @@ const projectRows = [
       </main>
 
       <aside class="ui-sidebar ui-stagger" aria-label="博客说明">
-        <section class="ui-panel about-profile">
-          <div class="ui-panel-body">
-            <div class="about-profile-head">
-              <img src="/images/avatar.jpg" alt="" width="128" height="128" loading="eager" decoding="async" />
-              <div>
-                <p class="ui-eyebrow">s1oop</p>
-                <h2>个人博客</h2>
-                <p>写作、阅读和实践记录。</p>
-              </div>
+        <section class="ui-panel about-profile" aria-label="个人博客">
+          <div class="about-profile-head">
+            <img src="/images/avatar.jpg" alt="" width="128" height="128" loading="eager" decoding="async" />
+            <div>
+              <p class="ui-eyebrow">s1oop</p>
+              <h2>个人博客</h2>
+              <p>写作、阅读和实践记录。</p>
             </div>
-            <dl class="about-meta-list">
-              {profileRows.map((item) => (
-                <div>
-                  <dt>{item.label}</dt>
-                  <dd>{item.value}</dd>
-                </div>
-              ))}
-            </dl>
           </div>
+          <dl class="about-meta-list">
+            {profileRows.map((item) => (
+              <div>
+                <dt>{item.label}</dt>
+                <dd>{item.value}</dd>
+              </div>
+            ))}
+          </dl>
         </section>
 
         <section class="ui-panel">
@@ -115,6 +123,7 @@ const projectRows = [
           <div class="ui-panel-header">
             <h2 class="ui-panel-title">项目指纹</h2>
           </div>
+          <p class="about-fingerprint-copy">公开页面保持克制，实时文章和运行时元数据统一从 D1 读取。</p>
           <div class="ui-panel-body grid gap-4">
             {projectRows.map((item) => (
               <div class="ui-stat-row">
