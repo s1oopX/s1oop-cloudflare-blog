@@ -337,3 +337,22 @@
     transform: translateY(0);
   }
 }
+
+@keyframes site-status-breathe {
+  0%,
+  100% {
+    opacity: 0.58;
+    transform: scale(0.92);
+    box-shadow:
+      0 0 0 2px rgb(116 217 144 / 0.1),
+      0 0 10px rgb(116 217 144 / 0.28);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow:
+      0 0 0 3px rgb(116 217 144 / 0.16),
+      0 0 20px rgb(116 217 144 / 0.52);
+  }
+}

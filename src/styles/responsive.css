@@ -1,5 +1,6 @@
 @media (prefers-reduced-motion: reduce) {
   .ui-stagger > *,
+  .site-status-dot,
   .landing-track,
   .landing-fixed,
   .landing-scroll-cue span,

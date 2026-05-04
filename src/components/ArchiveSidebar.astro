@@ -1,22 +1,28 @@
 ---
-interface ArchivePath {
-  slug: string;
-  href: string;
-  title: string;
-  count: number;
-}
-
 interface Props {
   postCount: number;
   tagCount: number;
   latestLabel: string;
-  paths: ArchivePath[];
 }
 
-const { postCount, tagCount, latestLabel, paths } = Astro.props;
+const { postCount, tagCount, latestLabel } = Astro.props;
 ---
 
 <aside class="ui-sidebar ui-stagger">
+  <section class="ui-panel site-status-panel" aria-label="站点状态">
+    <div class="ui-panel-header site-status-head">
+      <h2 class="ui-panel-title">站点状态</h2>
+      <span>实时情况</span>
+    </div>
+    <div class="ui-panel-body site-status-body">
+      <span class="site-status-kicker">archive node</span>
+      <span class="site-status-state">
+        <span class="site-status-dot" aria-hidden="true"></span>
+        <span>运行正常</span>
+      </span>
+    </div>
+  </section>
+
   <section class="ui-panel">
     <div class="ui-panel-header">
       <h2 class="ui-panel-title">阅读概览</h2>
@@ -37,19 +43,4 @@ const { postCount, tagCount, latestLabel, paths } = Astro.props;
     </div>
   </section>
 
-  <section class="ui-panel" aria-label="内容路线">
-    <div class="ui-panel-header">
-      <h2 class="ui-panel-title">内容路线</h2>
-    </div>
-    <div class="ui-panel-body">
-      <div class="sidebar-link-list">
-        {paths.map((path) => (
-          <a href={path.href} class="sidebar-link-item no-underline">
-            <span class="sidebar-link-kicker" data-archive-path-count={path.slug}>{path.count} 篇</span>
-            <span class="sidebar-link-title">{path.title}</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
 </aside>
