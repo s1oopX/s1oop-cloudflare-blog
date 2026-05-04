@@ -338,23 +338,19 @@
   }
 }
 
-@keyframes site-status-breathe {
+@keyframes site-status-light-breathe {
   0%,
   100% {
-    opacity: 0.58;
-    transform: scale(0.92);
+    opacity: 0.36;
     box-shadow:
-      inset 0 0 0 1px rgb(255 255 255 / 0.18),
-      0 0 0 3px rgb(116 217 144 / 0.07),
-      0 0 14px rgb(116 217 144 / 0.24);
+      0 0 0 1px rgb(116 217 144 / 0.08),
+      0 0 5px rgb(116 217 144 / 0.18);
   }
 
   50% {
     opacity: 1;
-    transform: scale(1);
     box-shadow:
-      inset 0 0 0 1px rgb(255 255 255 / 0.28),
-      0 0 0 5px rgb(116 217 144 / 0.12),
-      0 0 28px rgb(116 217 144 / 0.5);
+      0 0 0 1px rgb(116 217 144 / 0.16),
+      0 0 9px rgb(116 217 144 / 0.4);
   }
 }

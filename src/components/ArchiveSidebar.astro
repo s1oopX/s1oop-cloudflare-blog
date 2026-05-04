@@ -1,4 +1,6 @@
 ---
+import SiteStatusPanel from './SiteStatusPanel.astro';
+
 interface Props {
   postCount: number;
   tagCount: number;
@@ -9,28 +11,7 @@ const { postCount, tagCount, latestLabel } = Astro.props;
 ---
 
 <aside class="ui-sidebar ui-stagger">
-  <section class="ui-panel site-status-panel" aria-label="站点状态">
-    <div class="site-status-body">
-      <div class="site-status-main">
-        <span class="site-status-dot" aria-hidden="true"></span>
-        <div>
-          <p class="ui-eyebrow">site status</p>
-          <h2>运行正常</h2>
-          <p>公开归档和 D1 内容读取保持在线。</p>
-        </div>
-      </div>
-      <dl class="site-status-meta">
-        <div>
-          <dt>Node</dt>
-          <dd>Archive</dd>
-        </div>
-        <div>
-          <dt>Mode</dt>
-          <dd>Live</dd>
-        </div>
-      </dl>
-    </div>
-  </section>
+  <SiteStatusPanel />
 
   <section class="ui-panel">
     <div class="ui-panel-header">

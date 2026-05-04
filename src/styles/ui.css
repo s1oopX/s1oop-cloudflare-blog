@@ -118,60 +118,54 @@
   }
 
   .site-status-body {
-    @apply grid gap-4 p-5;
+    @apply grid gap-3.5 px-5 py-4;
+  }
+
+  .site-status-head {
+    @apply flex items-center justify-between gap-4;
+  }
+
+  .site-status-label {
+    @apply min-w-0 truncate font-mono text-[0.68rem] uppercase leading-none tracking-[0.14em] text-zinc-500;
+  }
+
+  .site-status-chip {
+    @apply shrink-0 rounded-full border px-2 py-1 font-mono text-[0.62rem] uppercase leading-none tracking-[0.12em] text-zinc-500;
+    border-color: rgb(var(--accent-rgb) / 0.16);
+    background: rgb(255 255 255 / 0.025);
   }
 
   .site-status-main {
-    @apply grid grid-cols-[2.25rem_minmax(0,1fr)] items-start gap-4;
+    @apply rounded-md border px-3 py-3;
+    border-color: rgb(255 255 255 / 0.09);
+    background:
+      linear-gradient(90deg, rgb(116 217 144 / 0.07), transparent 52%),
+      rgb(255 255 255 / 0.018);
   }
 
-  .site-status-main > div {
-    @apply min-w-0;
-  }
-
-  .site-status-dot {
-    @apply mt-1 grid h-9 w-9 place-items-center rounded-full;
-    background: #74d990;
-    box-shadow:
-      inset 0 0 0 1px rgb(255 255 255 / 0.22),
-      0 0 0 4px rgb(116 217 144 / 0.08),
-      0 0 22px rgb(116 217 144 / 0.32);
-    animation: site-status-breathe 1.9s ease-in-out infinite;
-  }
-
-  .site-status-dot::after {
-    content: '';
-    @apply h-2.5 w-2.5 rounded-full bg-white/90;
-    box-shadow: 0 0 10px rgb(255 255 255 / 0.5);
-  }
-
-  .site-status-main h2 {
-    @apply mt-2 text-xl font-semibold leading-tight text-white;
-    font-family: var(--font-display);
-    letter-spacing: 0;
-  }
-
-  .site-status-main p:not(.ui-eyebrow) {
-    @apply mt-2 text-sm leading-6 text-zinc-400;
+  .site-status-value {
+    @apply inline-flex items-center gap-1.5 text-sm font-semibold leading-none text-zinc-100;
   }
 
   .site-status-meta {
-    @apply grid grid-cols-2 gap-px overflow-hidden border border-white/10;
-    border-radius: calc(var(--radius) - 0.35rem);
-    background: rgb(255 255 255 / 0.04);
+    @apply flex items-center justify-between gap-4 font-mono text-[0.62rem] uppercase leading-none tracking-[0.14em] text-zinc-600;
   }
 
-  .site-status-meta div {
-    @apply min-w-0 px-3 py-3;
-    background: color-mix(in srgb, var(--card) 90%, transparent);
+  .site-status-light {
+    position: relative;
+    width: 0.42rem;
+    height: 0.42rem;
+    flex: 0 0 0.42rem;
+    border-radius: 9999px;
+    background: #74d990;
+    box-shadow: 0 0 0 1px rgb(116 217 144 / 0.1), 0 0 6px rgb(116 217 144 / 0.24);
+    contain: layout paint;
+    animation: site-status-light-breathe 1.7s ease-in-out infinite alternate;
   }
 
-  .site-status-meta dt {
-    @apply font-mono text-[0.62rem] uppercase tracking-[0.13em] text-zinc-500;
-  }
-
-  .site-status-meta dd {
-    @apply mt-1 truncate text-sm font-medium text-zinc-200;
+  .site-status-light::before,
+  .site-status-light::after {
+    content: none;
   }
 
   .sidebar-link-list {
