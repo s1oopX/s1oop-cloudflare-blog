@@ -6,323 +6,123 @@ import '../styles/about.css';
 const githubUrl = 'https://github.com/s1oopX';
 const gmailAddress = 's1oopp1337@gmail.com';
 
+const contactRows = [
+  { label: 'GitHub', value: 's1oopX', href: githubUrl },
+  { label: 'Gmail', value: gmailAddress, href: `mailto:${gmailAddress}` },
+];
+
 const profileRows = [
   { label: 'Owner', value: 's1oop' },
   { label: 'Runtime', value: 'Cloudflare' },
   { label: 'Source', value: 'D1' },
 ];
 
-const contactRows = [
-  {
-    label: 'GitHub',
-    value: 's1oopX',
-    href: githubUrl,
-  },
-  {
-    label: 'Gmail',
-    value: gmailAddress || '待补充',
-    href: gmailAddress ? `mailto:${gmailAddress}` : '',
-  },
-];
-
-const focusRows = [
-  {
-    index: '01',
-    label: 'Design',
-    title: '界面和阅读体验',
-    copy:
-      '记录暗色阅读、排版密度、导航层级和长期阅读舒适度。这里更关心一个页面为什么这样安排，而不是只展示最终样式。',
-    pill: 'interface / typography / reading',
-  },
-  {
-    index: '02',
-    label: 'Writing',
-    title: '写作和整理方法',
-    copy:
-      '把文章当成可回看的档案，而不是短暂的信息流。标题、摘要、标签和归档都为再次阅读服务。',
-    pill: 'notes / archive / review',
-  },
-  {
-    index: '03',
-    label: 'Build',
-    title: '轻量部署和维护',
-    copy:
-      '源码保留在 GitHub，公开页面由 Astro 生成；文章统一写入 Cloudflare D1，不再维护一套静态文章源。',
-    pill: 'Astro / Pages / D1',
-  },
-];
-
-const workflowRows = [
-  {
-    label: 'Runtime post',
-    title: '实时文章',
-    copy: '上传的 Markdown 进入 D1，前台的归档、专栏、搜索和阅读页都从运行时接口读取。',
-  },
-  {
-    label: 'Private entry',
-    title: '私人入口',
-    copy: '受保护的管理页面用于上传 Markdown、小图、评论开关和运行时文章维护。',
-  },
-];
-
 const principles = [
   {
-    label: 'Quiet',
-    title: '界面安静',
-    copy: '视觉服务阅读，不用过度装饰抢走文章本身的注意力。',
+    title: '先保证阅读',
+    copy: '页面保持安静，正文和入口优先，减少不会长期使用的装饰。',
   },
   {
-    label: 'Durable',
-    title: '内容耐放',
-    copy: '文章尽量保留判断、过程和背景，让它过一段时间仍然能被理解。',
+    title: '再降低维护',
+    copy: '公开文章统一进入 D1，GitHub 只维护站点代码、样式和页面结构。',
   },
   {
-    label: 'Light',
-    title: '维护轻便',
-    copy: '优先使用 Cloudflare 免费能力和少量代码完成发布、搜索、评论和统计。',
+    title: '最后方便回找',
+    copy: '专栏、搜索和更新记录都服务于后续回看，不额外制造内容入口。',
   },
 ];
 
-const sideSignals = [
-  {
-    label: 'Site',
-    value: 'Personal archive',
-    detail: '面向长期回看和稳定检索，不按信息流方式组织内容。',
-  },
-  {
-    label: 'Repository',
-    value: 'GitHub',
-    detail: '源码、页面结构和样式在 GitHub 维护，公开内容不再放入静态文章源。',
-  },
-  {
-    label: 'Runtime',
-    value: 'Cloudflare',
-    detail: '公开页面、边缘函数和数据入口由 Cloudflare Pages 体系承载。',
-  },
-  {
-    label: 'Content',
-    value: 'D1',
-    detail: '文章、小图和运行时元数据统一进入 D1，前台只读取同一套内容源。',
-  },
-];
-
-const systemFlow = [
+const projectRows = [
   { label: 'Shell', value: 'Astro' },
   { label: 'Code', value: 'GitHub' },
   { label: 'Runtime', value: 'Pages' },
   { label: 'Data', value: 'D1' },
 ];
-
-const systemNotes = [
-  '公开文章只保留 D1 live 入口，避免出现两套内容来源。',
-  'GitHub 负责站点代码和样式演进，保持发布链路清楚。',
-  '搜索、专栏、阅读页和推荐都围绕同一套运行时内容组织。',
-];
 ---
 
 <BaseLayout
   title="关于 | s1oop's Blog"
-  description="关于 s1oop's Blog：一个整理设计、写作、阅读和轻量部署实践的个人博客。"
+  description="关于 s1oop's Blog：一个面向长期阅读和轻量维护的个人博客。"
 >
   <section class="ui-page archive-page about-page">
     <PageHeader
-      eyebrow="about archive"
+      eyebrow="about"
       title="关于"
-      description="这里存放设计、写作、阅读和轻量部署实践。它不是信息流，更像一个可以反复打开的个人档案。"
+      description="这里保存写作、阅读、设计判断和轻量技术实践。"
     />
 
     <div class="ui-grid ui-page-body">
-      <div class="about-main">
-        <section class="about-manifest ui-panel">
-          <div class="about-manifest-kicker">
-            <p class="ui-eyebrow">personal archive / quiet reading</p>
-            <span>built for rereading</span>
+      <main class="ui-stack ui-stagger">
+        <section class="ui-panel about-summary" aria-labelledby="about-summary-title">
+          <div class="ui-panel-header">
+            <p class="ui-eyebrow">personal archive</p>
+            <h2 id="about-summary-title">长期回看的个人档案。</h2>
           </div>
-          <div class="about-brief-grid">
-            <div class="about-brief-copy">
-              <p class="ui-eyebrow">position</p>
-              <h2>长期回看的私人档案。</h2>
-              <p>这里不按热度排序，也不追逐频繁刷新。文章、标签、专栏和搜索只服务一件事：让写过的内容在之后还能被找到、读懂和继续修改。</p>
-            </div>
-            <div class="about-brief-scope">
-              <p class="ui-eyebrow">scope</p>
-              <div class="about-stack-strip" aria-label="内容范围">
-                <span>设计判断</span>
-                <span>阅读体验</span>
-                <span>写作整理</span>
-                <span>技术实践</span>
-                <span>Cloudflare</span>
-                <span>Astro</span>
-              </div>
-            </div>
-          </div>
-          <div class="about-manifest-body">
-            <div class="about-manifest-note">
-              <p class="ui-eyebrow">reading</p>
-              <h3>先保证阅读。</h3>
-              <ul>
-                <li>正文比装饰更重要</li>
-                <li>暗色界面保持低噪音</li>
-                <li>导航只保留常用入口</li>
-              </ul>
-            </div>
-            <div class="about-manifest-note">
-              <p class="ui-eyebrow">publishing</p>
-              <h3>再降低维护。</h3>
-              <ul>
-                <li>文章统一写入 D1</li>
-                <li>GitHub 只维护站点代码</li>
-                <li>评论和小图进入 D1</li>
-              </ul>
-            </div>
-            <div class="about-manifest-note">
-              <p class="ui-eyebrow">archive</p>
-              <h3>最后方便回找。</h3>
-              <ul>
-                <li>专栏保留连续主题</li>
-                <li>搜索负责片段回看</li>
-                <li>更新记录说明变化</li>
-              </ul>
-            </div>
-          </div>
-        </section>
-
-        <section class="about-architecture ui-panel">
-          <div class="about-panel-head">
-            <p class="ui-eyebrow">content focus</p>
-            <h2>这个博客关注什么</h2>
-          </div>
-          <div class="about-dossier-grid">
-            {focusRows.map((item) => (
-              <article class="about-dossier-card">
-                <div class="about-dossier-topline">
-                  <span class="about-row-index" aria-hidden="true">{item.index}</span>
-                  <span class="about-row-pill" aria-label={`${item.label}: ${item.pill}`}>{item.pill}</span>
-                </div>
-                <div class="about-row-copy">
-                  <p class="ui-eyebrow">{item.label}</p>
+          <div class="ui-panel-body">
+            <p>
+              这个博客不按热度排序，也不追逐频繁刷新。它更像一个可以反复打开的个人档案：
+              文章、标签、专栏和搜索都只服务一件事，让写过的内容在之后还能被找到、读懂和继续修正。
+            </p>
+            <div class="about-principle-list" aria-label="维护原则">
+              {principles.map((item) => (
+                <article>
                   <h3>{item.title}</h3>
                   <p>{item.copy}</p>
-                </div>
-              </article>
-            ))}
+                </article>
+              ))}
+            </div>
           </div>
         </section>
-
-        <section class="about-architecture ui-panel">
-          <div class="about-panel-head">
-            <p class="ui-eyebrow">publishing workflow</p>
-            <h2>当前发布方式</h2>
-          </div>
-          <div class="about-workflow-list">
-            {workflowRows.map((item) => (
-              <article>
-                <p class="ui-eyebrow">{item.label}</p>
-                <h3>{item.title}</h3>
-                <p>{item.copy}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section class="about-principles ui-panel">
-          <div class="about-panel-head">
-            <p class="ui-eyebrow">editorial position</p>
-            <h2>写作和维护原则</h2>
-          </div>
-          <div class="about-principle-list">
-            {principles.map((item) => (
-              <article>
-                <p class="ui-eyebrow">{item.label}</p>
-                <h3>{item.title}</h3>
-                <p>{item.copy}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-      </div>
+      </main>
 
       <aside class="ui-sidebar ui-stagger" aria-label="博客说明">
-        <section class="about-profile ui-panel">
-          <div class="about-profile-head">
-            <img src="/images/avatar.jpg" alt="" width="128" height="128" loading="eager" decoding="async" />
-            <div>
-              <p class="ui-eyebrow">s1oop</p>
-              <h2>个人博客</h2>
-              <p>写作、阅读、设计判断和技术取舍的长期存放处。</p>
-            </div>
-          </div>
-          <dl class="about-profile-meta">
-            {profileRows.map((item) => (
+        <section class="ui-panel about-profile">
+          <div class="ui-panel-body">
+            <div class="about-profile-head">
+              <img src="/images/avatar.jpg" alt="" width="128" height="128" loading="eager" decoding="async" />
               <div>
-                <dt>{item.label}</dt>
-                <dd>{item.value}</dd>
+                <p class="ui-eyebrow">s1oop</p>
+                <h2>个人博客</h2>
+                <p>写作、阅读和实践记录。</p>
               </div>
-            ))}
-          </dl>
+            </div>
+            <dl class="about-meta-list">
+              {profileRows.map((item) => (
+                <div>
+                  <dt>{item.label}</dt>
+                  <dd>{item.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
         </section>
 
-        <section class="about-signal-panel ui-panel">
-          <div class="about-signal-head">
-            <div>
-              <p class="ui-eyebrow">contact</p>
-              <h2 class="about-side-title">正式联系</h2>
-            </div>
-            <span>public</span>
+        <section class="ui-panel">
+          <div class="ui-panel-header">
+            <h2 class="ui-panel-title">正式联系</h2>
           </div>
-          <div class="about-contact-list">
+          <div class="ui-panel-body about-link-list">
             {contactRows.map((item) => (
-              <div>
+              <a href={item.href} target={item.href.startsWith('mailto:') ? undefined : '_blank'} rel={item.href.startsWith('mailto:') ? undefined : 'noreferrer'}>
                 <span>{item.label}</span>
-                {item.href ? (
-                  <a
-                    href={item.href}
-                    target={item.href.startsWith('mailto:') ? undefined : '_blank'}
-                    rel={item.href.startsWith('mailto:') ? undefined : 'noreferrer'}
-                  >
-                    {item.value}
-                  </a>
-                ) : (
-                  <strong>{item.value}</strong>
-                )}
-              </div>
+                <strong>{item.value}</strong>
+              </a>
             ))}
           </div>
         </section>
 
-        <section class="about-signal-panel ui-panel">
-          <div class="about-signal-head">
-            <div>
-              <p class="ui-eyebrow">project</p>
-              <h2 class="about-side-title">项目指纹</h2>
-            </div>
-            <span>public stack</span>
+        <section class="ui-panel">
+          <div class="ui-panel-header">
+            <h2 class="ui-panel-title">项目指纹</h2>
           </div>
-          <p class="about-signal-summary">
-            这个站点的重点不是展示完整后台，而是把个人内容、公开页面和轻量维护流程放在一条清楚的发布线上。
-          </p>
-          <div class="about-system-flow" aria-label="站点运行链路">
-            {systemFlow.map((item) => (
-              <div>
-                <span>{item.label}</span>
-                <strong>{item.value}</strong>
+          <div class="ui-panel-body grid gap-4">
+            {projectRows.map((item) => (
+              <div class="ui-stat-row">
+                <span class="ui-stat-label">{item.label}</span>
+                <span class="ui-stat-value">{item.value}</span>
               </div>
             ))}
           </div>
-          <div class="about-signal-list">
-            {sideSignals.map((item) => (
-              <div>
-                <span>{item.label}</span>
-                <strong>{item.value}</strong>
-                <p>{item.detail}</p>
-              </div>
-            ))}
-          </div>
-          <ul class="about-system-note" aria-label="技术取舍">
-            {systemNotes.map((item) => (
-              <li>{item}</li>
-            ))}
-          </ul>
         </section>
       </aside>
     </div>
