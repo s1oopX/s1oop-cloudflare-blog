@@ -12,7 +12,7 @@
     --card-2: #1b2823;
     --foreground: #d0d4d1;
     --muted: #8a9490;
-    --muted-2: #65716c;
+    --muted-2: #7d8985;
     --border: rgb(224 236 226 / 0.11);
     --border-strong: rgb(203 224 209 / 0.24);
     --accent: #cfe2d4;
@@ -23,7 +23,7 @@
     --glow-rgb: 91 135 114;
     --shadow-rgb: 14 35 28;
     --font-display: "Cormorant Garamond", "Iowan Old Style", Georgia, "Times New Roman", ui-serif, serif;
-    --font-body: "Newsreader", Georgia, "Times New Roman", "Noto Serif SC", "Source Han Serif SC", "Songti SC", SimSun, serif;
+    --font-body: "Newsreader", "Noto Serif SC", "Source Han Serif SC", "Songti SC", SimSun, Georgia, "Times New Roman", serif;
     --radius: 0.75rem;
     --motion-fast: 160ms;
     --motion-page: 420ms;

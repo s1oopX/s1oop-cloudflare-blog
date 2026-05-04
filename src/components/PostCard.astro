@@ -15,6 +15,9 @@ const { title, excerpt, href, date, tags = [], image = null } = Astro.props;
 const displayDate = date instanceof Date
   ? new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(date)
   : date;
+const dateTime = date instanceof Date
+  ? date.toISOString().slice(0, 10)
+  : date;
 const visibleTags = tags.slice(0, 2);
 const extraTagCount = Math.max(0, tags.length - visibleTags.length);
 ---
@@ -26,7 +29,7 @@ const extraTagCount = Math.max(0, tags.length - visibleTags.length);
         <img src={image.src} alt={image.alt} loading="lazy" decoding="async" />
       )}
       {!image && <span aria-hidden="true"></span>}
-      <time>{displayDate}</time>
+      <time datetime={dateTime}>{displayDate}</time>
     </div>
     <div class="post-card-main">
       <div class="post-card-meta">

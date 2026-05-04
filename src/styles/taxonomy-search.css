@@ -39,7 +39,7 @@
 
   .collection-card-image img {
     @apply h-40 w-full object-cover transition;
-    filter: grayscale(0.16) sepia(0.1) saturate(0.58) contrast(1.08) brightness(0.68);
+    filter: grayscale(0.08) sepia(0.08) saturate(0.7) contrast(1.08) brightness(0.75);
   }
 
   .collection-card:hover .collection-card-image img {
