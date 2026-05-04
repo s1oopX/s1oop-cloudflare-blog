@@ -7,8 +7,8 @@ const githubUrl = 'https://github.com/s1oopX';
 const gmailAddress = 's1oopp1337@gmail.com';
 
 const contactRows = [
-  { label: 'GitHub', value: 's1oopX', href: githubUrl },
-  { label: 'Gmail', value: gmailAddress, href: `mailto:${gmailAddress}` },
+  { label: 'GitHub', value: 's1oopX', href: githubUrl, icon: 'github' },
+  { label: 'Gmail', value: gmailAddress, href: `mailto:${gmailAddress}`, icon: 'mail' },
 ];
 
 const profileRows = [
@@ -36,10 +36,26 @@ const principles = [
 ];
 
 const projectRows = [
-  { label: 'Shell', value: 'Astro' },
-  { label: 'Repository', value: 'GitHub' },
-  { label: 'Runtime', value: 'Cloudflare Pages' },
-  { label: 'Content', value: 'Cloudflare D1' },
+  {
+    label: 'Shell',
+    value: 'Astro',
+    copy: '公开页面保持轻量壳层，负责导航、排版和阅读结构。',
+  },
+  {
+    label: 'Repository',
+    value: 'GitHub',
+    copy: '代码、样式和页面组件集中维护，内容源不再拆成静态与运行时两套。',
+  },
+  {
+    label: 'Runtime',
+    value: 'Cloudflare Pages',
+    copy: '前台页面和边缘函数部署在同一条发布链路上。',
+  },
+  {
+    label: 'Content',
+    value: 'Cloudflare D1',
+    copy: '实时文章、小图和运行时元数据统一读取自 D1。',
+  },
 ];
 ---
 
@@ -83,6 +99,30 @@ const projectRows = [
             </div>
           </div>
         </section>
+
+        <section class="ui-panel about-project" aria-labelledby="about-project-title">
+          <div class="ui-panel-header">
+            <p class="ui-eyebrow">project structure</p>
+            <h2 id="about-project-title">项目介绍</h2>
+          </div>
+          <div class="about-project-body">
+            <p>
+              这个站点不是完整后台系统，也不是纯静态文章仓库。它更接近一个公开阅读壳：
+              页面负责呈现和导航，实时内容交给 Cloudflare 的边缘能力和 D1 数据源。
+            </p>
+            <div class="about-project-grid" aria-label="项目指纹">
+              {projectRows.map((item) => (
+                <article>
+                  <div>
+                    <span>{item.label}</span>
+                    <strong>{item.value}</strong>
+                  </div>
+                  <p>{item.copy}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
       </main>
 
       <aside class="ui-sidebar ui-stagger" aria-label="博客说明">
@@ -112,24 +152,23 @@ const projectRows = [
           <div class="ui-panel-body about-link-list">
             {contactRows.map((item) => (
               <a href={item.href} target={item.href.startsWith('mailto:') ? undefined : '_blank'} rel={item.href.startsWith('mailto:') ? undefined : 'noreferrer'}>
-                <span>{item.label}</span>
-                <strong>{item.value}</strong>
+                <span class="about-link-icon" aria-hidden="true">
+                  {item.icon === 'github' ? (
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M12 2.6a9.4 9.4 0 0 0-3 18.3c.48.08.65-.2.65-.46v-1.6c-2.65.58-3.2-1.13-3.2-1.13-.43-1.08-1.05-1.37-1.05-1.37-.86-.58.07-.57.07-.57.95.07 1.45.98 1.45.98.84 1.44 2.2 1.02 2.74.78.08-.6.33-1.02.6-1.25-2.12-.24-4.34-1.06-4.34-4.7 0-1.04.37-1.89.98-2.55-.1-.24-.43-1.22.09-2.52 0 0 .8-.26 2.6.97a8.9 8.9 0 0 1 4.74 0c1.8-1.23 2.6-.97 2.6-.97.52 1.3.19 2.28.1 2.52.6.66.97 1.51.97 2.55 0 3.65-2.23 4.46-4.35 4.7.34.3.64.88.64 1.77v2.62c0 .26.17.55.66.46A9.4 9.4 0 0 0 12 2.6Z" />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path d="M4.75 6.75h14.5v10.5H4.75V6.75Z" />
+                      <path d="m5.25 7.25 6.75 5.5 6.75-5.5" />
+                    </svg>
+                  )}
+                </span>
+                <span class="about-link-copy">
+                  <span>{item.label}</span>
+                  <strong>{item.value}</strong>
+                </span>
               </a>
-            ))}
-          </div>
-        </section>
-
-        <section class="ui-panel">
-          <div class="ui-panel-header">
-            <h2 class="ui-panel-title">项目指纹</h2>
-          </div>
-          <p class="about-fingerprint-copy">公开页面保持克制，实时文章和运行时元数据统一从 D1 读取。</p>
-          <div class="ui-panel-body grid gap-4">
-            {projectRows.map((item) => (
-              <div class="ui-stat-row">
-                <span class="ui-stat-label">{item.label}</span>
-                <span class="ui-stat-value">{item.value}</span>
-              </div>
             ))}
           </div>
         </section>
