@@ -11,6 +11,9 @@ export const formatError = (message) => {
   if (message?.includes('留言太频繁，请稍后再试')) return '留言太频繁，请稍后再试';
   if (message?.includes('Each image must be 1 MB or smaller')) return '单张图片不能超过 1 MB';
   if (message?.includes('Only JPEG, PNG, WebP and GIF images are supported')) return '仅支持 JPEG / PNG / WebP / GIF';
+  if (message?.includes('AI_STUDIO_API_KEY is not configured')) return 'AI Studio 密钥未配置';
+  if (message?.includes('AI Studio request failed')) return 'AI Studio 请求失败';
+  if (message?.includes('AI image download failed')) return 'AI 图片下载失败';
   return message || '操作失败';
 };
 

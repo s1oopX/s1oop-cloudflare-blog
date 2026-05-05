@@ -1,4 +1,7 @@
 ADMIN_PASSWORD=change-me
+AI_STUDIO_API_KEY=your-ai-studio-api-key
+AI_STUDIO_TEXT_MODEL=ernie-3.5-8k
+AI_STUDIO_IMAGE_MODEL=ERNIE-Image-Turbo
 
 # Runtime publishing uses Cloudflare bindings, not local secrets:
 # - BLOG_DB D1 database binding for posts and small images

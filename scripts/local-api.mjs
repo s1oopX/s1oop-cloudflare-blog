@@ -23,6 +23,9 @@ const parseDevVars = async () => {
 const devVars = await parseDevVars();
 const env = {
   ADMIN_PASSWORD: devVars.ADMIN_PASSWORD ?? process.env.ADMIN_PASSWORD ?? '',
+  AI_STUDIO_API_KEY: devVars.AI_STUDIO_API_KEY ?? process.env.AI_STUDIO_API_KEY ?? '',
+  AI_STUDIO_TEXT_MODEL: devVars.AI_STUDIO_TEXT_MODEL ?? process.env.AI_STUDIO_TEXT_MODEL ?? '',
+  AI_STUDIO_IMAGE_MODEL: devVars.AI_STUDIO_IMAGE_MODEL ?? process.env.AI_STUDIO_IMAGE_MODEL ?? '',
 };
 
 const toHeaders = (source) => {

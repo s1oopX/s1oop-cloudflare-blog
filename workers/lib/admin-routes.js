@@ -13,6 +13,7 @@ import {
 import { getCommentSettings, setSetting, SETTINGS } from './settings.js';
 import { deleteUnreferencedImages, rewriteMarkdownImages, storeImages } from './assets.js';
 import { deleteComment, listAdminComments } from './comments.js';
+import { createBlogAssist, createBlogImages } from './ai.js';
 
 const MAX_MARKDOWN_BYTES = 512 * 1024;
 
@@ -130,6 +131,26 @@ const handlePostUpload = async (request, env) => {
   }
 };
 
+const readJsonBody = async (request) => request.json().catch(() => ({}));
+
+const handleAiAssist = async (request, env) => {
+  const authResponse = await requireAdmin(request, env);
+  if (authResponse) return authResponse;
+
+  const result = await createBlogAssist(env, await readJsonBody(request));
+  if (result.error) return json({ ok: false, message: result.error.message }, { status: result.error.status });
+  return json({ ok: true, assist: result.assist });
+};
+
+const handleAiImages = async (request, env) => {
+  const authResponse = await requireAdmin(request, env);
+  if (authResponse) return authResponse;
+
+  const result = await createBlogImages(env, await readJsonBody(request));
+  if (result.error) return json({ ok: false, message: result.error.message }, { status: result.error.status });
+  return json({ ok: true, images: result.images });
+};
+
 export const handleAdminRoute = async (request, env, url) => {
   if (url.pathname === '/api/admin/check' && ['GET', 'POST'].includes(request.method)) {
     const authResponse = await requireAdmin(request, env);
@@ -160,6 +181,14 @@ export const handleAdminRoute = async (request, env, url) => {
 
   if (url.pathname === '/api/admin/posts' && request.method === 'POST') {
     return handlePostUpload(request, env);
+  }
+
+  if (url.pathname === '/api/admin/ai/assist' && request.method === 'POST') {
+    return handleAiAssist(request, env);
+  }
+
+  if (url.pathname === '/api/admin/ai/images' && request.method === 'POST') {
+    return handleAiImages(request, env);
   }
 
   if (url.pathname === '/api/admin/comments' && request.method === 'GET') {
