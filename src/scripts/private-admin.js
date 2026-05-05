@@ -4,6 +4,7 @@ import { firstMarkdownImage, parseFrontmatter } from './admin/markdown.js';
 import { bindCommentActions, loadComments as loadRuntimeComments } from './admin/comments.js';
 import { bindPostListActions, loadPosts as loadRuntimePosts } from './admin/runtime-posts.js';
 import { bindCommentToggle, loadSettings as loadAdminSettings } from './admin/settings.js';
+import { bindAiTools } from './admin/ai.js';
 import { formatDate, formatError, readableSize, setState, toSlug } from './admin/utils.js';
 
 const passwordKey = 's1oop-admin-password';
@@ -50,6 +51,11 @@ const templateImageAlt = document.querySelector('#template-image-alt');
 const templateBody = document.querySelector('#template-body');
 const templateBuildButton = document.querySelector('#template-build-button');
 const templateState = document.querySelector('#template-state');
+const aiSummaryButton = document.querySelector('#ai-summary-button');
+const aiImageButton = document.querySelector('#ai-image-button');
+const aiImagePrompt = document.querySelector('#ai-image-prompt');
+const aiImageResults = document.querySelector('#ai-image-results');
+const aiState = document.querySelector('#ai-state');
 
 let selectedMarkdown = '';
 let overwriteCheckId = 0;
@@ -419,6 +425,9 @@ clearButton?.addEventListener('click', () => {
   updateImageState();
   setPublishLink();
   setState(uploadState, '支持 .md / .mdx，单张图片不超过 1 MB', 'muted');
+  if (aiImagePrompt) aiImagePrompt.value = '';
+  if (aiImageResults) aiImageResults.innerHTML = '';
+  setState(aiState, 'AI 会读取当前模板或已选 Markdown，不会接触后台密钥。', 'muted');
 });
 
 templateBuildButton?.addEventListener('click', () => {
@@ -515,6 +524,29 @@ bindPostListActions(
   requestAdmin,
   { postList, uploadState, orphanAssetsButton },
   { editPost: loadPostForEdit, loadPosts, checkOverwrite },
+);
+
+bindAiTools(
+  requestAdmin,
+  {
+    summaryButton: aiSummaryButton,
+    imageButton: aiImageButton,
+    promptInput: aiImagePrompt,
+    resultList: aiImageResults,
+    aiState,
+    templateTitle,
+    templateExcerpt,
+    templateBody,
+    templateImageAlt,
+    imageInput,
+  },
+  {
+    selectedMarkdown: () => selectedMarkdown,
+    setMarkdownFile,
+    currentSlug,
+    buildTemplateMarkdown,
+    updateImageState,
+  },
 );
 
 refreshButton?.addEventListener('click', loadPosts);

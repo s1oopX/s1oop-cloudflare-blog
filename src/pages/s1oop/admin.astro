@@ -95,6 +95,27 @@ import '../../styles/private-management.css';
                   <input id="template-image-alt" class="private-admin-input" type="text" autocomplete="off" placeholder="选择配图后会插入为正文第一张图" />
                 </label>
 
+                <div class="private-ai-box" aria-label="AI 辅助">
+                  <div class="private-ai-head">
+                    <div>
+                      <p class="private-admin-kicker">ai assist</p>
+                      <h4>内容总结与配图</h4>
+                    </div>
+                    <div class="private-ai-actions">
+                      <button id="ai-summary-button" class="private-admin-secondary private-inline-action" type="button">生成导读</button>
+                      <button id="ai-image-button" class="private-admin-secondary private-inline-action" type="button">生成配图</button>
+                    </div>
+                  </div>
+
+                  <label class="private-template-wide">
+                    <span>图片提示词</span>
+                    <textarea id="ai-image-prompt" class="private-admin-input" rows="3" maxlength="900" placeholder="可先生成，也可以自己调整后再生成配图。"></textarea>
+                  </label>
+
+                  <div id="ai-image-results" class="private-ai-results" aria-live="polite"></div>
+                  <p id="ai-state" class="private-admin-state private-admin-state-inline" aria-live="polite">AI 会读取当前模板或已选 Markdown，不会接触后台密钥。</p>
+                </div>
+
                 <label class="private-template-wide">
                   <span>正文</span>
                   <textarea id="template-body" class="private-admin-input private-template-body" rows="14" placeholder="开头说明这篇文章解决什么问题。\n\n## 第一节\n\n写具体判断。\n\n## 保持克制\n\n收束到一个可以长期回看的结论。"></textarea>
