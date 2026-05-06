@@ -70,11 +70,16 @@
 
   .post-content p {
     @apply max-w-3xl;
+    text-indent: 2em;
   }
 
   .post-content p,
   .post-content li {
     @apply text-zinc-300;
+  }
+
+  .post-content p:has(img) {
+    text-indent: 0;
   }
 
   .post-content ul,
