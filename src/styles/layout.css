@@ -192,13 +192,12 @@
   }
 
   .site-brand-avatar {
-    @apply relative grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-md border;
-    border-color: var(--border);
+    @apply relative grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-full border border-zinc-200 shadow-sm;
     background: var(--card-2);
   }
 
   .site-brand-avatar img {
-    @apply h-full w-full rounded-md object-cover;
+    @apply h-full w-full rounded-full object-cover;
   }
 
   .site-brand-name {
