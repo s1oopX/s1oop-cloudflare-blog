@@ -34,7 +34,7 @@
   .private-post-actions a,
   .private-post-actions button {
     @apply inline-flex h-8 items-center rounded-md border px-2.5 text-xs text-zinc-300 no-underline transition hover:text-white;
-    border-color: rgb(var(--accent-rgb) / 0.14);
+    border-color: var(--border);
     background: rgb(255 255 255 / 0.025);
   }
 
@@ -66,7 +66,7 @@
 
   .private-toggle span {
     @apply relative h-6 w-11 rounded-full border transition;
-    border-color: rgb(var(--accent-rgb) / 0.16);
+    border-color: var(--border);
     background: rgb(255 255 255 / 0.04);
   }
 
@@ -77,14 +77,14 @@
   }
 
   .private-toggle input:checked + span {
-    border-color: rgb(var(--accent-rgb) / 0.42);
-    background: rgb(var(--accent-rgb) / 0.18);
+    border-color: var(--border-strong);
+    background: rgb(255 255 255 / 0.15);
   }
 
   .private-toggle input:checked + span::after {
     transform: translateX(1.25rem);
-    background: var(--accent);
-    box-shadow: 0 0 18px rgb(var(--accent-rgb) / 0.24);
+    background: #ffffff;
+    box-shadow: 0 0 10px rgb(255 255 255 / 0.5);
   }
 
   .private-toggle strong {
@@ -96,7 +96,7 @@
   }
 
   .private-panel-note[data-tone='success'] {
-    color: var(--accent);
+    color: #ffffff;
   }
 
   .private-panel-note[data-tone='error'] {

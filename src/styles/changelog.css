@@ -7,15 +7,12 @@
     content: '';
     @apply pointer-events-none absolute bottom-6 top-6 w-px;
     left: clamp(0.7rem, 2vw, 1.35rem);
-    background:
-      linear-gradient(
-        0deg,
-        rgb(var(--accent-rgb) / 0.42),
-        rgb(var(--accent-rgb) / 0.2) 38%,
-        rgb(var(--warm-rgb) / 0.18) 72%,
-        transparent
-      );
-    box-shadow: 0 0 20px rgb(var(--accent-rgb) / 0.08);
+    background: linear-gradient(
+      0deg,
+      rgb(255 255 255 / 0.4),
+      rgb(255 255 255 / 0.15) 50%,
+      transparent
+    );
   }
 
   .changelog-list::after {
@@ -25,9 +22,8 @@
     left: calc(clamp(0.7rem, 2vw, 1.35rem) - 0.32rem);
     width: 0.68rem;
     height: 0.68rem;
-    border-color: rgb(var(--accent-rgb) / 0.32);
+    border-color: var(--border-strong);
     background: var(--background);
-    box-shadow: 0 0 18px rgb(var(--accent-rgb) / 0.14);
   }
 
   .changelog-shell {
@@ -45,7 +41,7 @@
   }
 
   .changelog-overview p:not(.ui-eyebrow) {
-    @apply mt-3 max-w-2xl text-sm leading-7 text-zinc-300;
+    @apply mt-3 max-w-2xl text-sm leading-7 text-zinc-400;
   }
 
   .changelog-overview dl {
@@ -54,7 +50,7 @@
 
   .changelog-overview dl > div {
     @apply border-l pl-3;
-    border-color: rgb(var(--accent-rgb) / 0.18);
+    border-color: var(--border);
   }
 
   .changelog-overview dt {
@@ -62,7 +58,7 @@
   }
 
   .changelog-overview dd {
-    @apply mt-1 text-sm font-medium text-zinc-100;
+    @apply mt-1 text-sm font-medium text-white;
   }
 
   .changelog-entry {
@@ -79,7 +75,7 @@
   .changelog-branch::before {
     content: '';
     @apply absolute left-0 top-1/2 h-px w-full;
-    background: linear-gradient(90deg, rgb(var(--accent-rgb) / 0.38), rgb(var(--accent-rgb) / 0.08), transparent);
+    background: linear-gradient(90deg, rgb(255 255 255 / 0.35), rgb(255 255 255 / 0.08), transparent);
     transform: translateY(-50%) rotate(-8deg);
     transform-origin: left center;
   }
@@ -91,16 +87,13 @@
     width: 0.68rem;
     height: 0.68rem;
     transform: translateY(-50%);
-    border-color: rgb(var(--accent-rgb) / 0.36);
+    border-color: var(--border-strong);
     background: var(--card);
-    box-shadow: 0 0 16px rgb(var(--accent-rgb) / 0.12);
   }
 
   .changelog-entry:first-child .changelog-branch::after {
-    background: var(--accent);
-    box-shadow:
-      0 0 0 4px rgb(var(--accent-rgb) / 0.05),
-      0 0 22px rgb(var(--accent-rgb) / 0.26);
+    background: #ffffff;
+    box-shadow: 0 0 10px rgb(255 255 255 / 0.5);
   }
 
   .changelog-entry-index {
@@ -113,8 +106,7 @@
   }
 
   .changelog-entry time {
-    @apply font-mono text-xs uppercase tracking-[0.14em];
-    color: var(--accent-muted);
+    @apply font-mono text-xs uppercase tracking-[0.14em] text-zinc-500;
   }
 
   .changelog-entry h2 {
@@ -124,17 +116,16 @@
   }
 
   .changelog-entry-main > p:not(.ui-eyebrow) {
-    @apply mt-3 max-w-3xl text-sm leading-7 text-zinc-300;
+    @apply mt-3 max-w-3xl text-sm leading-7 text-zinc-400;
   }
 
   .changelog-entry-context {
     @apply mt-4 grid gap-2 border-l pl-4 text-sm leading-6 text-zinc-400;
-    border-color: rgb(var(--accent-rgb) / 0.18);
+    border-color: var(--border);
   }
 
   .changelog-entry-context span:first-child {
-    @apply font-mono text-[0.68rem] uppercase tracking-[0.12em];
-    color: var(--accent-muted);
+    @apply font-mono text-[0.68rem] uppercase tracking-[0.12em] text-zinc-500;
   }
 
   .changelog-entry ul {
@@ -143,7 +134,7 @@
 
   .changelog-entry li {
     @apply rounded-full border px-3 py-1 font-mono text-[0.7rem] uppercase tracking-[0.1em] text-zinc-400;
-    border-color: rgb(var(--accent-rgb) / 0.14);
+    border-color: var(--border);
     background: rgb(255 255 255 / 0.025);
   }
 
@@ -152,8 +143,7 @@
   }
 
   .changelog-entry-link {
-    @apply mt-5 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.12em] no-underline transition;
-    color: var(--accent);
+    @apply mt-5 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.12em] text-zinc-300 no-underline transition hover:text-white;
   }
 
   .changelog-entry-link:hover {

@@ -23,7 +23,7 @@
   }
 
   .collection-card p:not(.ui-eyebrow) {
-    @apply mt-3 text-sm leading-7 text-zinc-300;
+    @apply mt-3 text-sm leading-7 text-zinc-400;
   }
 
   .collection-card {
@@ -32,19 +32,20 @@
 
   .collection-card-image {
     @apply overflow-hidden border;
-    border-color: rgb(var(--accent-rgb) / 0.12);
-    border-radius: 0.45rem;
+    border-color: var(--border);
+    border-radius: var(--radius);
     aspect-ratio: 16 / 9;
     background: var(--card-2);
   }
 
   .collection-card-image img {
     @apply h-full w-full object-cover transition;
-    filter: grayscale(0.08) sepia(0.08) saturate(0.7) contrast(1.08) brightness(0.75);
+    filter: grayscale(100%) contrast(1.1) brightness(0.85);
   }
 
   .collection-card:hover .collection-card-image img {
-    transform: scale(1.018);
+    filter: grayscale(70%) contrast(1.15) brightness(0.95);
+    transform: scale(1.02);
   }
 
   .collection-card-list {
@@ -65,7 +66,7 @@
   }
 
   .tag-index-count {
-    @apply font-mono text-xs uppercase tracking-[0.14em] text-zinc-400;
+    @apply font-mono text-xs uppercase tracking-[0.14em] text-zinc-500;
   }
 
   .tag-index-meter {
@@ -76,8 +77,8 @@
     content: '';
     @apply block h-full;
     width: 100%;
-    background: linear-gradient(90deg, var(--accent), rgb(var(--warm-rgb) / 0.78));
-    box-shadow: 0 0 18px rgb(var(--accent-rgb) / 0.2);
+    background: linear-gradient(90deg, #ffffff, #71717a);
+    box-shadow: 0 0 10px rgb(255 255 255 / 0.3);
   }
 
   .tag-index-card[data-share-bucket="10"] .tag-index-meter::before { width: 10%; }
@@ -97,26 +98,24 @@
 
   .search-page .ui-search {
     @apply h-14 rounded-md;
-    border-color: rgb(var(--accent-rgb) / 0.18);
+    border-color: var(--border);
     background:
-      linear-gradient(90deg, rgb(var(--accent-rgb) / 0.032), transparent 42%),
-      linear-gradient(180deg, rgb(255 255 255 / 0.018), transparent 62%),
-      color-mix(in srgb, var(--background) 88%, transparent);
+      linear-gradient(180deg, rgb(255 255 255 / 0.02), transparent 60%),
+      color-mix(in srgb, var(--background) 90%, transparent);
     box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.028),
-      0 12px 38px rgb(var(--shadow-rgb) / 0.14);
+      inset 0 1px 0 rgb(255 255 255 / 0.03),
+      0 12px 38px rgb(0 0 0 / 0.4);
   }
 
   .search-page .ui-search:focus-within {
-    border-color: rgb(var(--accent-rgb) / 0.32);
+    border-color: var(--border-strong);
     background:
-      linear-gradient(90deg, rgb(var(--accent-rgb) / 0.048), transparent 42%),
-      linear-gradient(180deg, rgb(255 255 255 / 0.024), transparent 62%),
+      linear-gradient(180deg, rgb(255 255 255 / 0.03), transparent 60%),
       color-mix(in srgb, var(--background) 86%, transparent);
     box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.035),
-      0 0 0 1px rgb(var(--accent-rgb) / 0.1),
-      0 16px 42px rgb(var(--shadow-rgb) / 0.16);
+      inset 0 1px 0 rgb(255 255 255 / 0.05),
+      0 0 0 1px rgb(255 255 255 / 0.08),
+      0 16px 42px rgb(0 0 0 / 0.5);
   }
 
   .search-topic-panel .ui-panel-header {
@@ -130,4 +129,3 @@
   .search-results {
     min-height: 0;
   }
-

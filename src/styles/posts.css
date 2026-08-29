@@ -1,5 +1,5 @@
   .post-card {
-    border-radius: 0.55rem;
+    border-radius: var(--radius);
   }
 
   .archive-post-list {
@@ -8,24 +8,22 @@
 
   .post-card-link {
     @apply grid gap-4 no-underline sm:grid-cols-[12.5rem_minmax(0,1fr)];
-    padding: 0.9rem;
+    padding: 1rem;
   }
 
   .post-card-media {
     @apply relative grid self-center overflow-hidden border;
     grid-template-rows: auto auto;
-    border-color: rgb(var(--accent-rgb) / 0.12);
-    border-radius: 0.45rem;
-    background:
-      linear-gradient(135deg, rgb(var(--accent-rgb) / 0.05), transparent),
-      var(--card-2);
+    border-color: var(--border);
+    border-radius: calc(var(--radius) - 2px);
+    background: var(--card-2);
   }
 
   .post-card-media img,
   .post-card-media > span {
     @apply block w-full transition;
     aspect-ratio: 16 / 9;
-    filter: grayscale(0.08) sepia(0.08) saturate(0.7) contrast(1.08) brightness(0.75);
+    filter: grayscale(100%) contrast(1.05) brightness(0.85);
   }
 
   .post-card-media img {
@@ -35,8 +33,8 @@
   .post-card-media > span {
     @apply object-cover;
     background:
-      linear-gradient(135deg, rgb(var(--accent-rgb) / 0.09), transparent 58%),
-      repeating-linear-gradient(135deg, rgb(var(--accent-rgb) / 0.06) 0 1px, transparent 1px 0.75rem);
+      linear-gradient(135deg, rgb(255 255 255 / 0.04), transparent 60%),
+      repeating-linear-gradient(135deg, rgb(255 255 255 / 0.02) 0 1px, transparent 1px 0.75rem);
   }
 
   .post-card-media::after {
@@ -44,20 +42,19 @@
     @apply pointer-events-none absolute inset-x-0 top-0;
     aspect-ratio: 16 / 9;
     background:
-      linear-gradient(180deg, rgb(9 17 14 / 0.08), rgb(9 17 14 / 0.18) 62%, rgb(0 0 0 / 0.3)),
-      linear-gradient(135deg, rgb(var(--accent-rgb) / 0.1), transparent 46%),
-      radial-gradient(circle at 20% 0%, rgb(var(--accent-rgb) / 0.1), transparent 9rem);
+      linear-gradient(180deg, transparent 40%, rgb(0 0 0 / 0.6)),
+      radial-gradient(circle at 20% 0%, rgb(255 255 255 / 0.05), transparent 9rem);
   }
 
   .post-card-media time {
     @apply relative z-10 px-3 py-1.5 font-mono text-xs uppercase tracking-[0.12em];
-    color: var(--accent);
-    background: rgb(6 13 11 / 0.78);
-    border-top: 1px solid rgb(var(--accent-rgb) / 0.1);
+    color: var(--muted);
+    background: rgb(12 12 15 / 0.95);
+    border-top: 1px solid var(--border);
   }
 
   .ui-panel-link:hover .post-card-media img {
-    filter: grayscale(0.04) sepia(0.06) saturate(0.82) contrast(1.08) brightness(0.8);
+    filter: grayscale(60%) contrast(1.1) brightness(0.95);
   }
 
   .post-card-main {
@@ -69,14 +66,14 @@
   }
 
   .post-card-title {
-    @apply mt-3 text-xl font-semibold text-white sm:text-2xl;
+    @apply mt-2.5 text-xl font-semibold text-white sm:text-2xl;
     font-family: var(--font-display);
     letter-spacing: 0;
     overflow-wrap: anywhere;
   }
 
   .post-card-excerpt {
-    @apply mt-2 max-w-2xl text-sm leading-7 text-zinc-300;
+    @apply mt-2 max-w-2xl text-sm leading-7 text-zinc-400;
     display: -webkit-box;
     overflow: hidden;
     min-height: 3.5rem;
@@ -86,8 +83,11 @@
   }
 
   .post-card-action {
-    @apply mt-4 inline-flex items-center gap-3 text-sm font-medium;
-    color: var(--accent);
+    @apply mt-4 inline-flex items-center gap-2 text-sm font-medium text-zinc-300;
+  }
+
+  .ui-panel-link:hover .post-card-action {
+    color: #ffffff;
   }
 
   .post-card-action span:last-child {
@@ -102,13 +102,10 @@
   .reading-page::before {
     content: '';
     @apply pointer-events-none absolute inset-x-5 top-0 -z-10 h-56;
-    background:
-      radial-gradient(circle at 12% 26%, rgb(var(--warm-rgb) / 0.018), transparent 18rem),
-      radial-gradient(circle at 86% 12%, rgb(var(--accent-rgb) / 0.024), transparent 20rem);
+    background: radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.03), transparent 20rem);
     filter: blur(1px);
   }
 
   .reading-page::before {
     display: none;
   }
-

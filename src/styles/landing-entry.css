@@ -9,27 +9,27 @@
     @apply relative flex flex-col items-center justify-center gap-6 rounded-lg border px-10 text-center;
     width: min(25rem, calc(100vw - 3rem));
     min-height: 15rem;
-    border-color: rgb(var(--accent-rgb) / 0.15);
+    border-color: var(--border-strong);
     background:
       linear-gradient(180deg, rgb(255 255 255 / 0.035), transparent 45%),
-      color-mix(in srgb, var(--card) 90%, transparent);
+      color-mix(in srgb, var(--card) 94%, transparent);
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 0.06),
-      0 28px 90px rgb(var(--shadow-rgb) / 0.62);
+      0 28px 90px rgb(0 0 0 / 0.7);
   }
 
   .landing-entry-panel::before {
     content: '';
     @apply pointer-events-none absolute top-0 h-px;
     inset-inline: 1.75rem;
-    background: linear-gradient(90deg, transparent, rgb(var(--accent-rgb) / 0.6), transparent);
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.5), transparent);
   }
 
   .landing-entry-panel::after {
     content: '';
     @apply pointer-events-none absolute left-1/2 top-0 h-px w-0 -translate-x-1/2;
-    background: var(--accent);
-    box-shadow: 0 0 24px rgb(var(--accent-rgb) / 0.3);
+    background: #ffffff;
+    box-shadow: 0 0 16px rgb(255 255 255 / 0.6);
   }
 
   .landing-scroll[data-panel='1'] .landing-entry-panel::after {
@@ -37,34 +37,31 @@
   }
 
   .landing-kicker {
-    @apply mt-0 font-mono text-xs uppercase tracking-[0.22em];
-    color: var(--accent-muted);
+    @apply mt-0 font-mono text-xs uppercase tracking-[0.22em] text-zinc-400;
   }
 
   .landing-enter {
-    @apply mt-0 inline-flex h-14 min-w-40 items-center justify-center rounded-md border px-8 text-base font-medium text-zinc-950 no-underline shadow-2xl transition hover:-translate-y-0.5 hover:bg-white;
-    border-color: var(--border-strong);
-    background: var(--accent);
-    box-shadow: 0 22px 70px rgb(var(--shadow-rgb) / 0.5);
+    @apply mt-0 inline-flex h-14 min-w-40 items-center justify-center rounded-md border px-8 text-base font-semibold text-zinc-950 no-underline shadow-2xl transition hover:-translate-y-0.5 hover:bg-zinc-200;
+    border-color: rgb(255 255 255 / 0.9);
+    background: #ffffff;
+    box-shadow: 0 16px 40px rgb(0 0 0 / 0.6);
   }
 
   .landing-latest {
-    @apply grid max-w-full gap-1 no-underline transition hover:text-zinc-200;
+    @apply grid max-w-full gap-1 no-underline transition hover:text-white;
     color: var(--muted);
   }
 
   .landing-latest span {
-    @apply font-mono text-[0.62rem] uppercase tracking-[0.14em];
-    color: var(--muted-2);
+    @apply font-mono text-[0.62rem] uppercase tracking-[0.14em] text-zinc-500;
   }
 
   .landing-latest strong {
-    @apply truncate text-sm font-medium leading-5 text-zinc-300;
+    @apply truncate text-sm font-medium leading-5 text-zinc-200;
   }
 
   .landing-latest em {
-    @apply line-clamp-2 max-w-72 text-xs not-italic leading-5;
-    color: var(--muted-2);
+    @apply line-clamp-2 max-w-72 text-xs not-italic leading-5 text-zinc-500;
   }
 
   .landing-pagination {
@@ -73,15 +70,15 @@
 
   .landing-pagination button {
     @apply h-2.5 w-2.5 rounded-full border bg-transparent transition;
-    border-color: rgb(var(--accent-rgb) / 0.35);
+    border-color: var(--border-strong);
   }
 
   .landing-pagination button.is-active {
     @apply h-7;
-    background: var(--accent);
-    box-shadow: 0 0 18px rgb(var(--accent-rgb) / 0.28);
+    background: #ffffff;
+    border-color: #ffffff;
+    box-shadow: 0 0 12px rgb(255 255 255 / 0.4);
   }
-
 
 @keyframes scroll-cue {
   0%,
@@ -93,12 +90,6 @@
   50% {
     transform: translateY(0.85rem);
     opacity: 1;
-  }
-}
-
-@keyframes avatar-border-run {
-  to {
-    transform: rotate(360deg);
   }
 }
 

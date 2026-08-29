@@ -5,16 +5,16 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        ink: '#18181b',
-        paper: '#fafaf7',
-        line: '#e7e5df',
+        ink: '#09090b',
+        paper: '#ffffff',
+        line: '#27272a',
       },
       fontFamily: {
-        sans: ['ui-sans-serif', 'system-ui', 'sans-serif'],
-        mono: ['ui-monospace', 'SFMono-Regular', 'monospace'],
+        sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       boxShadow: {
-        soft: '0 18px 50px rgb(24 24 27 / 0.08)',
+        soft: '0 18px 50px rgb(0 0 0 / 0.45)',
       },
     },
   },

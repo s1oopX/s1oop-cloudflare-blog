@@ -5,29 +5,30 @@
 @layer base {
   :root {
     color-scheme: dark;
-    --background: #17211d;
-    --background-2: #1d2a25;
-    --background-3: #25372f;
-    --card: #121a17;
-    --card-2: #1b2823;
-    --foreground: #d0d4d1;
-    --muted: #8a9490;
-    --muted-2: #7d8985;
-    --border: rgb(224 236 226 / 0.11);
-    --border-strong: rgb(203 224 209 / 0.24);
-    --accent: #cfe2d4;
-    --accent-rgb: 207 226 212;
-    --accent-muted: #8aa394;
-    --warm: #d7b98e;
-    --warm-rgb: 215 185 142;
-    --glow-rgb: 91 135 114;
-    --shadow-rgb: 14 35 28;
+    --background: #09090b;
+    --background-2: #111114;
+    --background-3: #18181b;
+    --card: #121215;
+    --card-2: #18181b;
+    --foreground: #d4d4d8;
+    --foreground-bright: #ffffff;
+    --muted: #71717a;
+    --muted-2: #52525b;
+    --border: rgb(255 255 255 / 0.08);
+    --border-strong: rgb(255 255 255 / 0.18);
+    --accent: #f4f4f5;
+    --accent-rgb: 244 244 245;
+    --accent-muted: #a1a1aa;
+    --warm: #e4e4e7;
+    --warm-rgb: 228 228 231;
+    --glow-rgb: 255 255 255;
+    --shadow-rgb: 0 0 0;
     --font-display: "Cormorant Garamond", "Iowan Old Style", Georgia, "Times New Roman", ui-serif, serif;
     --font-body: "Newsreader", "Noto Serif SC", "Source Han Serif SC", "Songti SC", SimSun, Georgia, "Times New Roman", serif;
-    --radius: 0.75rem;
-    --motion-fast: 160ms;
-    --motion-page: 420ms;
-    --motion-landing: 720ms;
+    --radius: 0.5rem;
+    --motion-fast: 150ms;
+    --motion-page: 350ms;
+    --motion-landing: 600ms;
   }
 
   html {
@@ -41,20 +42,19 @@
   body {
     @apply min-h-screen selection:bg-white selection:text-zinc-950;
     font-family: var(--font-body);
-    background:
-      linear-gradient(rgb(var(--accent-rgb) / 0.032) 1px, transparent 1px),
-      linear-gradient(90deg, rgb(var(--accent-rgb) / 0.024) 1px, transparent 1px),
-      radial-gradient(circle at 18% 0%, rgb(var(--glow-rgb) / 0.075), transparent 30rem),
-      radial-gradient(circle at 82% 18%, rgb(var(--accent-rgb) / 0.035), transparent 26rem),
-      linear-gradient(180deg, var(--background-2) 0%, var(--background) 46%, #101a16 100%);
-    background-size: 44px 44px, 44px 44px, auto, auto, auto;
+    background-color: var(--background);
+    background-image:
+      linear-gradient(to bottom, rgb(255 255 255 / 0.02) 1px, transparent 1px),
+      linear-gradient(to right, rgb(255 255 255 / 0.015) 1px, transparent 1px),
+      radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.035), transparent 28rem),
+      linear-gradient(180deg, var(--background-2) 0%, var(--background) 50%, #050507 100%);
+    background-size: 40px 40px, 40px 40px, auto, auto;
   }
 
   body:has(.reading-page) {
-    background:
-      radial-gradient(circle at 18% 0%, rgb(var(--glow-rgb) / 0.055), transparent 28rem),
-      radial-gradient(circle at 82% 18%, rgb(var(--accent-rgb) / 0.026), transparent 24rem),
-      linear-gradient(180deg, var(--background-2) 0%, var(--background) 46%, #101a16 100%);
+    background-image:
+      radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.025), transparent 26rem),
+      linear-gradient(180deg, var(--background-2) 0%, var(--background) 50%, #050507 100%);
   }
 
   a {
@@ -64,7 +64,7 @@
   h1,
   h2,
   h3 {
-    @apply tracking-tight;
+    @apply tracking-tight text-white;
   }
 
   html:has(.landing-scroll),
