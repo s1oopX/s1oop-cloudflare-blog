@@ -10,11 +10,11 @@ import { collections, collectionHref } from '../lib/collections';
 >
   <div class="page-shell py-8 sm:py-12">
     <!-- Hero Masthead Section -->
-    <header class="border-b border-zinc-200 pb-10 sm:pb-14">
+    <header class="border-b border-zinc-200 pb-10 sm:pb-12">
       <div class="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:gap-8">
         <div class="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border border-zinc-300 bg-zinc-100 shadow-sm sm:h-24 sm:w-24">
           <img
-            src="/images/avatar.jpg"
+            src="/images/avatar.jpg?v=2026082902"
             alt="s1oop avatar"
             class="h-full w-full object-cover"
             width="96"
@@ -35,18 +35,17 @@ import { collections, collectionHref } from '../lib/collections';
           <p class="mt-3 max-w-2xl text-base leading-relaxed text-zinc-600 sm:text-lg">
             收集设计、写作、工程实现与日常思考。不追赶热度，只保留值得长期回看的判断与经验整理。
           </p>
-          <div class="mt-5 flex flex-wrap gap-2.5">
-            <a href="/blog" class="ui-button ui-button-primary">
-              全部文章
+          <div class="mt-4 flex flex-wrap items-center gap-4 text-xs font-mono text-zinc-400">
+            <span class="inline-flex items-center gap-1.5 text-zinc-600">
+              <span class="h-1.5 w-1.5 rounded-full bg-zinc-950"></span> 持续整理中
+            </span>
+            <span>&middot;</span>
+            <a href="/blog" class="text-zinc-600 hover:text-black no-underline transition font-semibold">
+              全部归档 &rarr;
             </a>
-            <a href="/collections" class="ui-button">
-              精选专栏
-            </a>
-            <a href="/about" class="ui-button">
-              关于我
-            </a>
-            <a href="/search" class="ui-button">
-              搜索
+            <span>&middot;</span>
+            <a href="/collections" class="text-zinc-600 hover:text-black no-underline transition font-semibold">
+              精选专栏 &rarr;
             </a>
           </div>
         </div>
@@ -54,13 +53,13 @@ import { collections, collectionHref } from '../lib/collections';
     </header>
 
     <!-- Curated Collections Section -->
-    <section class="mt-10 sm:mt-14">
+    <section class="mt-10 sm:mt-12">
       <div class="flex items-baseline justify-between border-b border-zinc-200 pb-3">
         <h2 class="font-mono text-xs uppercase tracking-[0.2em] text-zinc-400 font-semibold">
           精选专栏 / Collections
         </h2>
         <a href="/collections" class="font-mono text-xs text-zinc-500 hover:text-black no-underline">
-          查看专栏全部 -&gt;
+          查看全部专栏 &rarr;
         </a>
       </div>
       <div class="mt-6 grid gap-4 sm:grid-cols-3">
@@ -84,13 +83,13 @@ import { collections, collectionHref } from '../lib/collections';
     </section>
 
     <!-- Recent Writings Stream -->
-    <section class="mt-12 sm:mt-16">
+    <section class="mt-12 sm:mt-14">
       <div class="flex items-baseline justify-between border-b border-zinc-200 pb-3">
         <h2 class="font-mono text-xs uppercase tracking-[0.2em] text-zinc-400 font-semibold">
           近期思考 / Recent Stream
         </h2>
         <a href="/blog" class="font-mono text-xs text-zinc-500 hover:text-black no-underline">
-          完整博客归档 -&gt;
+          完整文章归档 &rarr;
         </a>
       </div>
 
@@ -126,7 +125,7 @@ import { collections, collectionHref } from '../lib/collections';
 
       <div class="mt-8 text-center sm:text-left">
         <a href="/blog" class="ui-button ui-button-primary px-6 py-2.5 text-sm">
-          查看全部文章归档 -&gt;
+          查看全部文章归档 &rarr;
         </a>
       </div>
     </section>

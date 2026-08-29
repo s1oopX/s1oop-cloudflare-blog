@@ -44,17 +44,14 @@
     font-family: var(--font-body);
     background-color: var(--background);
     background-image:
-      linear-gradient(to bottom, rgb(0 0 0 / 0.02) 1px, transparent 1px),
-      linear-gradient(to right, rgb(0 0 0 / 0.02) 1px, transparent 1px),
-      radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.8), transparent 30rem),
-      linear-gradient(180deg, #ffffff 0%, var(--background) 40%, #eaeaea 100%);
-    background-size: 40px 40px, 40px 40px, auto, auto;
+      radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.9), transparent 32rem),
+      linear-gradient(180deg, #ffffff 0%, var(--background) 45%, #eaeaea 100%);
   }
 
   body:has(.reading-page) {
     background-image:
-      radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.8), transparent 26rem),
-      linear-gradient(180deg, #ffffff 0%, var(--background) 40%, #eaeaea 100%);
+      radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.9), transparent 28rem),
+      linear-gradient(180deg, #ffffff 0%, var(--background) 45%, #eaeaea 100%);
   }
 
   a {
