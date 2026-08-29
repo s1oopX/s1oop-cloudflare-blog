@@ -135,7 +135,6 @@
     border-color: var(--border);
     border-radius: var(--radius);
     background: #f4f4f5;
-    filter: grayscale(100%) contrast(1.05);
   }
 
   .about-profile p:not(.ui-eyebrow) {

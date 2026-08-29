@@ -198,8 +198,7 @@
   }
 
   .site-brand-avatar img {
-    @apply h-full w-full rounded-md object-cover grayscale;
-    filter: grayscale(100%) contrast(1.05);
+    @apply h-full w-full rounded-md object-cover;
   }
 
   .site-brand-name {
