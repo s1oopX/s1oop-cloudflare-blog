@@ -7,14 +7,14 @@ module.exports = {
       colors: {
         ink: '#09090b',
         paper: '#ffffff',
-        line: '#27272a',
+        line: '#e4e4e7',
       },
       fontFamily: {
         sans: ['ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
         mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       boxShadow: {
-        soft: '0 18px 50px rgb(0 0 0 / 0.45)',
+        soft: '0 18px 50px rgb(0 0 0 / 0.06)',
       },
     },
   },

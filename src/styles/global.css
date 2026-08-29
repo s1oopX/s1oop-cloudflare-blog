@@ -4,24 +4,24 @@
 
 @layer base {
   :root {
-    color-scheme: dark;
-    --background: #09090b;
-    --background-2: #111114;
-    --background-3: #18181b;
-    --card: #121215;
-    --card-2: #18181b;
-    --foreground: #d4d4d8;
-    --foreground-bright: #ffffff;
+    color-scheme: light;
+    --background: #f4f4f5;
+    --background-2: #eaeaea;
+    --background-3: #e4e4e7;
+    --card: #ffffff;
+    --card-2: #fafafa;
+    --foreground: #27272a;
+    --foreground-bright: #09090b;
     --muted: #71717a;
-    --muted-2: #52525b;
-    --border: rgb(255 255 255 / 0.08);
-    --border-strong: rgb(255 255 255 / 0.18);
-    --accent: #f4f4f5;
-    --accent-rgb: 244 244 245;
-    --accent-muted: #a1a1aa;
-    --warm: #e4e4e7;
-    --warm-rgb: 228 228 231;
-    --glow-rgb: 255 255 255;
+    --muted-2: #a1a1aa;
+    --border: rgb(0 0 0 / 0.08);
+    --border-strong: rgb(0 0 0 / 0.16);
+    --accent: #18181b;
+    --accent-rgb: 24 24 27;
+    --accent-muted: #52525b;
+    --warm: #3f3f46;
+    --warm-rgb: 63 63 70;
+    --glow-rgb: 0 0 0;
     --shadow-rgb: 0 0 0;
     --font-display: "Cormorant Garamond", "Iowan Old Style", Georgia, "Times New Roman", ui-serif, serif;
     --font-body: "Newsreader", "Noto Serif SC", "Source Han Serif SC", "Songti SC", SimSun, Georgia, "Times New Roman", serif;
@@ -40,21 +40,21 @@
   }
 
   body {
-    @apply min-h-screen selection:bg-white selection:text-zinc-950;
+    @apply min-h-screen selection:bg-zinc-900 selection:text-white;
     font-family: var(--font-body);
     background-color: var(--background);
     background-image:
-      linear-gradient(to bottom, rgb(255 255 255 / 0.02) 1px, transparent 1px),
-      linear-gradient(to right, rgb(255 255 255 / 0.015) 1px, transparent 1px),
-      radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.035), transparent 28rem),
-      linear-gradient(180deg, var(--background-2) 0%, var(--background) 50%, #050507 100%);
+      linear-gradient(to bottom, rgb(0 0 0 / 0.02) 1px, transparent 1px),
+      linear-gradient(to right, rgb(0 0 0 / 0.02) 1px, transparent 1px),
+      radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.8), transparent 30rem),
+      linear-gradient(180deg, #ffffff 0%, var(--background) 40%, #eaeaea 100%);
     background-size: 40px 40px, 40px 40px, auto, auto;
   }
 
   body:has(.reading-page) {
     background-image:
-      radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.025), transparent 26rem),
-      linear-gradient(180deg, var(--background-2) 0%, var(--background) 50%, #050507 100%);
+      radial-gradient(circle at 50% 0%, rgb(255 255 255 / 0.8), transparent 26rem),
+      linear-gradient(180deg, #ffffff 0%, var(--background) 40%, #eaeaea 100%);
   }
 
   a {
@@ -64,7 +64,7 @@
   h1,
   h2,
   h3 {
-    @apply tracking-tight text-white;
+    @apply tracking-tight text-zinc-950;
   }
 
   html:has(.landing-scroll),

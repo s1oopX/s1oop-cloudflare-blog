@@ -3,7 +3,7 @@
   }
 
   .post-content {
-    @apply space-y-6 text-base leading-8 text-zinc-300;
+    @apply space-y-6 text-base leading-8 text-zinc-800;
   }
 
   .reading-page .ui-grid {
@@ -19,9 +19,10 @@
     animation: head-enter 400ms ease-out 200ms forwards;
     padding-block: clamp(1.75rem, 4vw, 3rem);
     padding-inline: clamp(1.25rem, 4vw, 3rem);
-    background:
-      linear-gradient(180deg, rgb(255 255 255 / 0.02), transparent 12rem),
-      color-mix(in srgb, var(--card) 95%, transparent);
+    background: #ffffff;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 4px rgb(0 0 0 / 0.02);
   }
 
   .reading-page .ui-page-head-copy {
@@ -34,16 +35,13 @@
     @apply relative m-0 mb-8 max-w-none overflow-hidden border p-0;
     border-color: var(--border);
     border-radius: var(--radius);
-    background: var(--card-2);
-    box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.04),
-      0 18px 48px rgb(0 0 0 / 0.4);
+    background: #f4f4f5;
   }
 
   .post-content > p:first-child:has(img)::after {
     content: '';
     @apply pointer-events-none absolute inset-0;
-    background: linear-gradient(180deg, transparent 60%, rgb(0 0 0 / 0.4));
+    background: linear-gradient(180deg, transparent 70%, rgb(0 0 0 / 0.15));
   }
 
   .post-content > p:first-child img {
@@ -52,21 +50,21 @@
   }
 
   .post-content h2 {
-    @apply pt-6 text-2xl font-semibold text-white;
+    @apply pt-6 text-2xl font-semibold text-zinc-950;
     font-family: var(--font-display);
     letter-spacing: 0;
     scroll-margin-top: 4.25rem;
   }
 
   .post-content h3 {
-    @apply pt-3 text-xl font-semibold text-white;
+    @apply pt-3 text-xl font-semibold text-zinc-950;
     font-family: var(--font-display);
     letter-spacing: 0;
     scroll-margin-top: 4.25rem;
   }
 
   .post-content p {
-    @apply max-w-3xl text-zinc-300;
+    @apply max-w-3xl text-zinc-800;
     text-indent: 2em;
   }
 
@@ -92,27 +90,26 @@
   }
 
   .post-content blockquote {
-    @apply max-w-3xl border-l-2 py-1 pl-4 text-zinc-400;
-    border-color: rgb(255 255 255 / 0.3);
-    background: linear-gradient(90deg, rgb(255 255 255 / 0.03), transparent);
+    @apply max-w-3xl border-l-2 py-1.5 pl-4 text-zinc-600;
+    border-color: #09090b;
+    background: linear-gradient(90deg, rgb(0 0 0 / 0.03), transparent);
   }
 
   .post-content hr {
-    @apply my-8 max-w-3xl border-0 border-t border-white/10;
+    @apply my-8 max-w-3xl border-0 border-t border-zinc-200;
   }
 
   .post-content strong {
-    @apply font-semibold text-white;
+    @apply font-semibold text-zinc-950;
   }
 
   .post-content pre {
-    @apply max-w-3xl overflow-x-auto rounded-lg border border-white/10 p-4 text-sm leading-7;
-    background: #111114;
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
+    @apply max-w-3xl overflow-x-auto rounded-lg border border-zinc-200 p-4 text-sm leading-7 text-zinc-900;
+    background: #f4f4f5;
   }
 
   .post-content code {
-    @apply rounded-md border border-white/10 bg-white/[0.05] px-1.5 py-0.5 font-mono text-sm text-zinc-200;
+    @apply rounded-md border border-zinc-200 bg-zinc-100 px-1.5 py-0.5 font-mono text-sm text-zinc-900;
   }
 
   .post-content pre code {
@@ -120,28 +117,23 @@
   }
 
   .post-content a {
-    @apply text-white underline underline-offset-4 decoration-white/40 transition hover:decoration-white;
+    @apply text-zinc-950 underline underline-offset-4 decoration-zinc-400 transition hover:decoration-black font-medium;
   }
 
   .reading-nav {
-    @apply relative grid overflow-hidden rounded-lg border sm:grid-cols-2;
+    @apply relative grid overflow-hidden rounded-lg border sm:grid-cols-2 shadow-sm;
     border-color: var(--border);
-    background:
-      linear-gradient(180deg, rgb(255 255 255 / 0.02), transparent 60%),
-      color-mix(in srgb, var(--card) 95%, transparent);
-    box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.03),
-      0 18px 48px rgb(0 0 0 / 0.35);
+    background: #ffffff;
   }
 
   .reading-nav::before {
     content: '';
     @apply pointer-events-none absolute inset-x-5 top-0 h-px;
-    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.3), transparent);
+    background: linear-gradient(90deg, transparent, rgb(0 0 0 / 0.15), transparent);
   }
 
   .reading-nav-link {
-    @apply relative grid min-h-28 content-center gap-2 px-5 py-4 no-underline transition hover:text-white sm:px-6;
+    @apply relative grid min-h-28 content-center gap-2 px-5 py-4 no-underline transition hover:text-black sm:px-6;
   }
 
   .reading-nav-link + .reading-nav-link {
@@ -150,8 +142,7 @@
   }
 
   .reading-nav-link:hover {
-    background: rgb(255 255 255 / 0.03);
-    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
+    background: #f4f4f5;
   }
 
   .reading-nav-link:only-child {
@@ -176,12 +167,12 @@
   .reading-nav-next .reading-nav-label { @apply justify-end; }
 
   .reading-nav-title {
-    @apply text-base font-semibold leading-6 text-zinc-200;
+    @apply text-base font-semibold leading-6 text-zinc-800;
     font-family: var(--font-display);
   }
 
   .reading-nav-link:hover .reading-nav-title {
-    color: #ffffff;
+    color: #000000;
   }
 
 @keyframes head-enter {
@@ -192,15 +183,14 @@
 }
 
   .comments-panel {
-    background:
-      linear-gradient(180deg, rgb(255 255 255 / 0.02), transparent 16rem),
-      color-mix(in srgb, var(--card) 95%, transparent);
+    background: #ffffff;
+    border: 1px solid var(--border);
   }
 
   .comments-count {
-    @apply inline-flex h-7 min-w-7 items-center justify-center rounded-md border px-2 font-mono text-xs text-zinc-400;
+    @apply inline-flex h-7 min-w-7 items-center justify-center rounded-md border px-2 font-mono text-xs text-zinc-600;
     border-color: var(--border);
-    background: rgb(255 255 255 / 0.03);
+    background: #f4f4f5;
   }
 
   .comments-list {
@@ -210,7 +200,7 @@
   .comment-item {
     @apply rounded-md border p-4;
     border-color: var(--border);
-    background: rgb(255 255 255 / 0.02);
+    background: #fafafa;
   }
 
   .comment-item header {
@@ -219,15 +209,15 @@
 
   .comment-item strong,
   .comment-item a {
-    @apply font-medium text-zinc-200 no-underline hover:text-white;
+    @apply font-medium text-zinc-900 no-underline hover:text-black;
   }
 
   .comment-item time {
-    @apply shrink-0 font-mono text-[0.68rem] uppercase tracking-[0.14em] text-zinc-500;
+    @apply shrink-0 font-mono text-[0.68rem] uppercase tracking-[0.14em] text-zinc-400;
   }
 
   .comment-item p {
-    @apply text-sm leading-7 text-zinc-400;
+    @apply text-sm leading-7 text-zinc-700;
   }
 
   .comments-empty {
@@ -236,7 +226,7 @@
   }
 
   .comments-form {
-    @apply mt-5 grid gap-4 border-t border-white/10 pt-5;
+    @apply mt-5 grid gap-4 border-t border-zinc-200 pt-5;
   }
 
   .comments-form-grid {
@@ -248,20 +238,20 @@
   }
 
   .comments-form label span {
-    @apply text-xs text-zinc-400;
+    @apply text-xs text-zinc-500 font-medium;
   }
 
   .comments-form input,
   .comments-form textarea {
-    @apply w-full rounded-md border px-3 py-2 text-sm text-zinc-100 outline-none transition;
+    @apply w-full rounded-md border px-3 py-2 text-sm text-zinc-900 outline-none transition;
     border-color: var(--border);
-    background: rgb(255 255 255 / 0.025);
+    background: #ffffff;
   }
 
   .comments-form input:focus,
   .comments-form textarea:focus {
     border-color: var(--border-strong);
-    box-shadow: 0 0 0 2px rgb(255 255 255 / 0.06);
+    box-shadow: 0 0 0 2px rgb(0 0 0 / 0.06);
   }
 
   .comments-honeypot {
@@ -277,11 +267,11 @@
   }
 
   .comments-actions span[data-tone='error'] {
-    @apply text-red-300;
+    @apply text-red-600;
   }
 
   .comments-actions button {
-    @apply inline-flex h-10 items-center justify-center rounded-md border px-5 text-sm font-semibold text-zinc-950 transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50;
-    border-color: rgb(255 255 255 / 0.8);
-    background: #ffffff;
+    @apply inline-flex h-10 items-center justify-center rounded-md border px-5 text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-50 shadow-sm;
+    border-color: #09090b;
+    background: #09090b;
   }

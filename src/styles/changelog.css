@@ -9,8 +9,8 @@
     left: clamp(0.7rem, 2vw, 1.35rem);
     background: linear-gradient(
       0deg,
-      rgb(255 255 255 / 0.4),
-      rgb(255 255 255 / 0.15) 50%,
+      rgb(0 0 0 / 0.25),
+      rgb(0 0 0 / 0.1) 50%,
       transparent
     );
   }
@@ -22,7 +22,7 @@
     left: calc(clamp(0.7rem, 2vw, 1.35rem) - 0.32rem);
     width: 0.68rem;
     height: 0.68rem;
-    border-color: var(--border-strong);
+    border-color: #09090b;
     background: var(--background);
   }
 
@@ -32,16 +32,17 @@
 
   .changelog-overview {
     @apply grid gap-5 p-5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:p-6;
+    background: #ffffff;
   }
 
   .changelog-overview h2 {
-    @apply mt-2 text-2xl font-semibold text-white;
+    @apply mt-2 text-2xl font-semibold text-zinc-950;
     font-family: var(--font-display);
     letter-spacing: 0;
   }
 
   .changelog-overview p:not(.ui-eyebrow) {
-    @apply mt-3 max-w-2xl text-sm leading-7 text-zinc-400;
+    @apply mt-3 max-w-2xl text-sm leading-7 text-zinc-600;
   }
 
   .changelog-overview dl {
@@ -54,15 +55,16 @@
   }
 
   .changelog-overview dt {
-    @apply font-mono text-[0.66rem] uppercase tracking-[0.14em] text-zinc-500;
+    @apply font-mono text-[0.66rem] uppercase tracking-[0.14em] text-zinc-400;
   }
 
   .changelog-overview dd {
-    @apply mt-1 text-sm font-medium text-white;
+    @apply mt-1 text-sm font-semibold text-zinc-950;
   }
 
   .changelog-entry {
     @apply relative grid gap-5 p-5 sm:grid-cols-[8rem_minmax(0,1fr)] sm:p-6;
+    background: #ffffff;
   }
 
   .changelog-branch {
@@ -75,7 +77,7 @@
   .changelog-branch::before {
     content: '';
     @apply absolute left-0 top-1/2 h-px w-full;
-    background: linear-gradient(90deg, rgb(255 255 255 / 0.35), rgb(255 255 255 / 0.08), transparent);
+    background: linear-gradient(90deg, rgb(0 0 0 / 0.25), rgb(0 0 0 / 0.05), transparent);
     transform: translateY(-50%) rotate(-8deg);
     transform-origin: left center;
   }
@@ -92,16 +94,16 @@
   }
 
   .changelog-entry:first-child .changelog-branch::after {
-    background: #ffffff;
-    box-shadow: 0 0 10px rgb(255 255 255 / 0.5);
+    background: #09090b;
+    border-color: #09090b;
   }
 
   .changelog-entry-index {
-    @apply flex items-center justify-between gap-4 border-b border-white/10 pb-4 sm:block sm:border-b-0 sm:pb-0;
+    @apply flex items-center justify-between gap-4 border-b border-zinc-100 pb-4 sm:block sm:border-b-0 sm:pb-0;
   }
 
   .changelog-entry-index span {
-    @apply block text-3xl font-semibold leading-none text-white/20;
+    @apply block text-3xl font-semibold leading-none text-zinc-300;
     font-family: var(--font-display);
   }
 
@@ -110,32 +112,32 @@
   }
 
   .changelog-entry h2 {
-    @apply mt-2 text-2xl font-semibold text-white;
+    @apply mt-2 text-2xl font-semibold text-zinc-950;
     font-family: var(--font-display);
     letter-spacing: 0;
   }
 
   .changelog-entry-main > p:not(.ui-eyebrow) {
-    @apply mt-3 max-w-3xl text-sm leading-7 text-zinc-400;
+    @apply mt-3 max-w-3xl text-sm leading-7 text-zinc-600;
   }
 
   .changelog-entry-context {
-    @apply mt-4 grid gap-2 border-l pl-4 text-sm leading-6 text-zinc-400;
+    @apply mt-4 grid gap-2 border-l pl-4 text-sm leading-6 text-zinc-600;
     border-color: var(--border);
   }
 
   .changelog-entry-context span:first-child {
-    @apply font-mono text-[0.68rem] uppercase tracking-[0.12em] text-zinc-500;
+    @apply font-mono text-[0.68rem] uppercase tracking-[0.12em] text-zinc-400;
   }
 
   .changelog-entry ul {
-    @apply mt-5 flex flex-wrap gap-2 text-sm leading-6 text-zinc-300;
+    @apply mt-5 flex flex-wrap gap-2 text-sm leading-6 text-zinc-700;
   }
 
   .changelog-entry li {
-    @apply rounded-full border px-3 py-1 font-mono text-[0.7rem] uppercase tracking-[0.1em] text-zinc-400;
+    @apply rounded-full border px-3 py-1 font-mono text-[0.7rem] uppercase tracking-[0.1em] text-zinc-600;
     border-color: var(--border);
-    background: rgb(255 255 255 / 0.025);
+    background: #f4f4f5;
   }
 
   .changelog-entry li::before {
@@ -143,11 +145,11 @@
   }
 
   .changelog-entry-link {
-    @apply mt-5 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.12em] text-zinc-300 no-underline transition hover:text-white;
+    @apply mt-5 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.12em] text-zinc-900 no-underline transition hover:text-black font-semibold;
   }
 
   .changelog-entry-link:hover {
-    color: white;
+    color: black;
   }
 
   @media (max-width: 640px) {

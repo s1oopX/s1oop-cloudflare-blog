@@ -7,15 +7,15 @@
   }
 
   .private-post-row {
-    @apply flex items-start justify-between gap-4 border-b border-white/10 py-4 first:pt-0 last:border-b-0 last:pb-0;
+    @apply flex items-start justify-between gap-4 border-b border-zinc-100 py-4 first:pt-0 last:border-b-0 last:pb-0;
   }
 
   .private-post-row span {
-    @apply font-mono text-[0.68rem] uppercase tracking-[0.14em] text-zinc-500;
+    @apply font-mono text-[0.68rem] uppercase tracking-[0.14em] text-zinc-400;
   }
 
   .private-post-row h3 {
-    @apply mt-1 line-clamp-1 text-base font-semibold text-zinc-100;
+    @apply mt-1 line-clamp-1 text-base font-semibold text-zinc-900;
   }
 
   .private-post-row p {
@@ -23,7 +23,7 @@
   }
 
   .private-comment-row p.private-comment-body {
-    @apply line-clamp-2 whitespace-pre-wrap;
+    @apply line-clamp-2 whitespace-pre-wrap text-zinc-700;
   }
 
   .private-post-actions {
@@ -33,17 +33,17 @@
 
   .private-post-actions a,
   .private-post-actions button {
-    @apply inline-flex h-8 items-center rounded-md border px-2.5 text-xs text-zinc-300 no-underline transition hover:text-white;
+    @apply inline-flex h-8 items-center rounded-md border px-2.5 text-xs text-zinc-700 no-underline transition hover:text-black hover:bg-zinc-100 shadow-sm;
     border-color: var(--border);
-    background: rgb(255 255 255 / 0.025);
+    background: #ffffff;
   }
 
   .private-post-actions button {
-    @apply text-zinc-300;
+    @apply text-zinc-700;
   }
 
   .private-post-actions button[data-delete-post] {
-    @apply text-red-200;
+    @apply text-red-600 hover:bg-red-50;
   }
 
   .private-post-actions button:disabled {
@@ -56,8 +56,8 @@
 
   .private-toggle {
     @apply flex cursor-pointer items-center gap-3 rounded-md border p-3;
-    border-color: rgb(255 255 255 / 0.08);
-    background: rgb(255 255 255 / 0.02);
+    border-color: var(--border);
+    background: #fafafa;
   }
 
   .private-toggle input {
@@ -67,28 +67,27 @@
   .private-toggle span {
     @apply relative h-6 w-11 rounded-full border transition;
     border-color: var(--border);
-    background: rgb(255 255 255 / 0.04);
+    background: #e4e4e7;
   }
 
   .private-toggle span::after {
     content: '';
     @apply absolute left-1 top-1 h-4 w-4 rounded-full transition;
-    background: rgb(161 161 170 / 0.72);
+    background: #71717a;
   }
 
   .private-toggle input:checked + span {
-    border-color: var(--border-strong);
-    background: rgb(255 255 255 / 0.15);
+    border-color: #09090b;
+    background: #09090b;
   }
 
   .private-toggle input:checked + span::after {
     transform: translateX(1.25rem);
     background: #ffffff;
-    box-shadow: 0 0 10px rgb(255 255 255 / 0.5);
   }
 
   .private-toggle strong {
-    @apply text-sm font-medium text-zinc-200;
+    @apply text-sm font-medium text-zinc-800;
   }
 
   .private-panel-note {
@@ -96,19 +95,20 @@
   }
 
   .private-panel-note[data-tone='success'] {
-    color: #ffffff;
+    color: #09090b;
+    font-weight: 600;
   }
 
   .private-panel-note[data-tone='error'] {
-    @apply text-red-300;
+    @apply text-red-600;
   }
 
   .private-checklist {
-    @apply grid gap-0 p-5 text-sm leading-6 text-zinc-300;
+    @apply grid gap-0 p-5 text-sm leading-6 text-zinc-700;
   }
 
   .private-checklist li {
-    @apply flex items-center justify-between gap-4 border-b border-white/10 py-3 first:pt-0 last:border-b-0 last:pb-0;
+    @apply flex items-center justify-between gap-4 border-b border-zinc-100 py-3 first:pt-0 last:border-b-0 last:pb-0;
   }
 
   .private-checklist span {
@@ -116,7 +116,7 @@
   }
 
   .private-checklist strong {
-    @apply text-right text-sm font-medium text-zinc-300;
+    @apply text-right text-sm font-medium text-zinc-900;
   }
 
   .private-feature-list {
@@ -124,7 +124,7 @@
   }
 
   .private-feature-list div {
-    @apply grid gap-2 border-b border-white/10 py-4 first:pt-0 last:border-b-0 last:pb-0;
+    @apply grid gap-2 border-b border-zinc-100 py-4 first:pt-0 last:border-b-0 last:pb-0;
   }
 
   .private-feature-list span {
@@ -132,12 +132,12 @@
   }
 
   .private-feature-list strong {
-    @apply text-lg font-semibold text-zinc-100;
+    @apply text-lg font-semibold text-zinc-950;
     font-family: var(--font-display);
   }
 
   .private-feature-list p {
-    @apply max-w-2xl text-sm leading-6 text-zinc-500;
+    @apply max-w-2xl text-sm leading-6 text-zinc-600;
   }
 
   .private-operation-list {
@@ -145,7 +145,7 @@
   }
 
   .private-operation-list div {
-    @apply flex items-center justify-between gap-4 border-b border-white/10 py-3 first:pt-0 last:border-b-0 last:pb-0;
+    @apply flex items-center justify-between gap-4 border-b border-zinc-100 py-3 first:pt-0 last:border-b-0 last:pb-0;
   }
 
   .private-operation-list span {
@@ -153,7 +153,7 @@
   }
 
   .private-operation-list strong {
-    @apply text-right text-sm font-medium text-zinc-300;
+    @apply text-right text-sm font-medium text-zinc-800;
   }
 
   .private-inline-action {
