@@ -23,8 +23,8 @@
     --warm-rgb: 63 63 70;
     --glow-rgb: 0 0 0;
     --shadow-rgb: 0 0 0;
-    --font-display: "Cormorant Garamond", "Iowan Old Style", Georgia, "Times New Roman", ui-serif, serif;
-    --font-body: "Newsreader", "Noto Serif SC", "Source Han Serif SC", "Songti SC", SimSun, Georgia, "Times New Roman", serif;
+    --font-display: "Cormorant Garamond", -apple-system, BlinkMacSystemFont, "Songti SC", "Source Han Serif SC", "Noto Serif SC", SimSun, Georgia, "Times New Roman", serif;
+    --font-body: "Newsreader", "Noto Serif SC", "Source Han Serif SC", "Songti SC", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", SimSun, Georgia, "Times New Roman", serif;
     --radius: 0.5rem;
     --motion-fast: 150ms;
     --motion-page: 350ms;

@@ -28,7 +28,7 @@ import { collections, collectionHref } from '../lib/collections';
             <h1 class="text-3xl font-bold tracking-tight text-zinc-950 sm:text-4xl" style="font-family: var(--font-display);">
               s1oop's Blog
             </h1>
-            <span class="rounded-full border border-zinc-200 bg-white px-2.5 py-0.5 font-mono text-[0.7rem] uppercase tracking-widest text-zinc-500 shadow-xs">
+            <span class="rounded-full border border-zinc-200 bg-white px-2.5 py-0.5 font-mono text-[0.7rem] uppercase tracking-widest text-zinc-500 shadow-sm">
               quiet archive
             </span>
           </div>
@@ -67,7 +67,7 @@ import { collections, collectionHref } from '../lib/collections';
         {collections.map((col) => (
           <a
             href={collectionHref(col)}
-            class="group block rounded-lg border border-zinc-200 bg-white p-5 no-underline shadow-xs transition hover:-translate-y-0.5 hover:border-zinc-400 hover:shadow-md"
+            class="group block rounded-lg border border-zinc-200 bg-white p-5 no-underline shadow-sm transition hover:-translate-y-0.5 hover:border-zinc-400 hover:shadow-md"
           >
             <span class="font-mono text-[0.68rem] uppercase tracking-widest text-zinc-400">
               {col.eyebrow}
@@ -94,8 +94,34 @@ import { collections, collectionHref } from '../lib/collections';
         </a>
       </div>
 
-      <div class="mt-4" data-home-feed>
-        <div class="py-12 text-center text-sm text-zinc-400">正在读取最新文章...</div>
+      <div class="mt-2" data-home-feed>
+        <!-- Zero-CLS Skeleton placeholder -->
+        <div class="skeleton-stream" aria-hidden="true">
+          <div class="skeleton-item">
+            <div class="flex justify-between">
+              <div class="skeleton-line h-3 w-20"></div>
+              <div class="skeleton-line h-4 w-12"></div>
+            </div>
+            <div class="skeleton-line mt-3 h-6 w-3/4"></div>
+            <div class="skeleton-line mt-2 h-4 w-full"></div>
+          </div>
+          <div class="skeleton-item">
+            <div class="flex justify-between">
+              <div class="skeleton-line h-3 w-20"></div>
+              <div class="skeleton-line h-4 w-12"></div>
+            </div>
+            <div class="skeleton-line mt-3 h-6 w-2/3"></div>
+            <div class="skeleton-line mt-2 h-4 w-5/6"></div>
+          </div>
+          <div class="skeleton-item">
+            <div class="flex justify-between">
+              <div class="skeleton-line h-3 w-20"></div>
+              <div class="skeleton-line h-4 w-12"></div>
+            </div>
+            <div class="skeleton-line mt-3 h-6 w-1/2"></div>
+            <div class="skeleton-line mt-2 h-4 w-4/5"></div>
+          </div>
+        </div>
       </div>
 
       <div class="mt-8 text-center sm:text-left">

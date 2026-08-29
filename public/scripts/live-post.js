@@ -1,11 +1,9 @@
-const page = document.querySelector('[data-live-post-page]');
+const titleNode = document.querySelector('[data-live-post-title]');
+const excerptNode = document.querySelector('[data-live-post-excerpt]');
 const content = document.querySelector('[data-live-post-content]');
 const dateNode = document.querySelector('[data-live-post-date]');
-const updatedRow = document.querySelector('[data-live-post-updated-row]');
-const updatedNode = document.querySelector('[data-live-post-updated]');
 const wordsNode = document.querySelector('[data-live-post-words]');
 const minutesNode = document.querySelector('[data-live-post-minutes]');
-const typeNode = document.querySelector('[data-live-post-type]');
 const tagsNode = document.querySelector('[data-live-post-tags]');
 const relatedNode = document.querySelector('[data-live-related-posts]');
 const navNode = document.querySelector('[data-live-post-nav]');
@@ -24,30 +22,10 @@ const formatDate = (value) => {
   return date.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
 };
 
-const formatDateTime = (value) => {
-  const normalized = String(value || '').replace(' ', 'T');
-  const date = new Date(`${normalized}${/[zZ]|[+-]\d{2}:?\d{2}$/.test(normalized) ? '' : 'Z'}`);
-  if (Number.isNaN(date.getTime())) return value || '-';
-  return date.toLocaleString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-};
-
 const timestamp = (value) => {
   const normalized = String(value || '').replace(' ', 'T');
   const date = new Date(`${normalized}${/[zZ]|[+-]\d{2}:?\d{2}$/.test(normalized) ? '' : 'Z'}`);
   return date.getTime();
-};
-
-const shouldShowUpdated = (post) => {
-  if (!post?.createdAt || !post?.updatedAt) return false;
-  const created = timestamp(post.createdAt);
-  const updated = timestamp(post.updatedAt);
-  return Number.isFinite(created) && Number.isFinite(updated) && updated - created > 60_000;
 };
 
 const postKey = (post) => post?.href || post?.slug || '';
@@ -83,9 +61,9 @@ const renderRelatedPosts = (post, posts = []) => {
 
   relatedNode.innerHTML = relatedPosts.length > 0
     ? relatedPosts.map((item) => `
-      <a href="${escapeHtml(item.href)}" class="article-related-item no-underline">
-        <span class="article-related-date">${formatDate(item.date)}</span>
-        <span class="article-related-title">${escapeHtml(item.title)}</span>
+      <a href="${escapeHtml(item.href)}" class="group flex items-baseline justify-between py-2.5 border-b border-zinc-100 no-underline transition last:border-b-0 hover:text-black">
+        <span class="text-sm sm:text-base font-medium text-zinc-800 group-hover:text-black group-hover:underline underline-offset-4">${escapeHtml(item.title)}</span>
+        <span class="font-mono text-xs text-zinc-400 pl-4 shrink-0">${formatDate(item.date)}</span>
       </a>
     `).join('')
     : '<p class="text-sm text-zinc-400">暂无其他文章。</p>';
@@ -126,30 +104,30 @@ const renderReadingNav = (post, posts = []) => {
 
 const renderPost = (post) => {
   document.title = `${post.title} | s1oop's Blog`;
-  page?.querySelector('.ui-page-head h1')?.replaceChildren(document.createTextNode(post.title));
-  page?.querySelector('.ui-description')?.replaceChildren(document.createTextNode(post.excerpt || ''));
-  const eyebrow = page?.querySelector('.ui-eyebrow');
-  if (eyebrow) eyebrow.textContent = formatDate(post.date);
+  if (titleNode) titleNode.textContent = post.title || '无标题';
+  if (excerptNode) {
+    if (post.excerpt) {
+      excerptNode.textContent = post.excerpt;
+      excerptNode.hidden = false;
+    } else {
+      excerptNode.hidden = true;
+    }
+  }
 
   if (content) content.innerHTML = post.html || '<p>这篇文章暂时没有正文。</p>';
   if (dateNode) dateNode.textContent = formatDate(post.date);
-  if (updatedRow && updatedNode) {
-    const showUpdated = shouldShowUpdated(post);
-    updatedRow.hidden = !showUpdated;
-    if (showUpdated) updatedNode.textContent = formatDateTime(post.updatedAt);
-  }
   if (wordsNode) wordsNode.textContent = `约 ${post.wordCount || 0} 字`;
-  if (minutesNode) minutesNode.textContent = `${post.readingMinutes || 1} 分钟`;
+  if (minutesNode) minutesNode.textContent = `阅读约 ${post.readingMinutes || 1} 分钟`;
   if (tagsNode) {
     tagsNode.innerHTML = (post.tags || [])
-      .map((tag) => `<a href="/search?q=${encodeURIComponent(tag)}" class="ui-badge no-underline hover:text-white">#${escapeHtml(tag)}</a>`)
+      .map((tag) => `<a href="/search?q=${encodeURIComponent(tag)}" class="ui-badge no-underline">#${escapeHtml(tag)}</a>`)
       .join('');
   }
 };
 
 const slug = new URLSearchParams(window.location.search).get('slug');
 if (!slug) {
-  if (content) content.innerHTML = '<p>缺少文章标识。</p>';
+  if (content) content.innerHTML = '<p class="py-12 text-center text-sm text-zinc-400">缺少文章标识。</p>';
 } else {
   Promise.all([
     fetch(`/api/posts/${encodeURIComponent(slug)}`)
@@ -161,14 +139,13 @@ if (!slug) {
     .then(([data, listData]) => {
       if (!data?.post) throw new Error('not found');
       renderPost(data.post);
-      if (typeNode) typeNode.textContent = 'D1';
       const runtimePosts = Array.isArray(listData?.posts) ? listData.posts : [];
       const posts = mergePosts(runtimePosts);
       renderRelatedPosts(data.post, posts);
       renderReadingNav(data.post, posts);
     })
     .catch(() => {
-      if (content) content.innerHTML = '<p>没有找到这篇实时文章。</p>';
+      if (content) content.innerHTML = '<p class="py-12 text-center text-sm text-zinc-400">没有找到这篇实时文章。</p>';
       if (relatedNode) relatedNode.innerHTML = '<p class="text-sm text-zinc-400">暂无其他文章。</p>';
     });
 }

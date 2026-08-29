@@ -28,13 +28,48 @@ const initialPostData: unknown[] = [];
 
     <div class="ui-grid ui-page-body">
       <div
-        class="ui-stack ui-stagger archive-post-list"
+        class="ui-stack archive-post-list"
         data-post-list
         data-page-size={POSTS_PER_PAGE}
         data-initial-posts={JSON.stringify(initialPostData)}
         data-archive-paths={JSON.stringify(archivePaths)}
       >
-        <div class="py-12 text-center text-sm text-zinc-400" data-archive-empty>正在读取文章列表...</div>
+        <!-- Zero-CLS Skeleton Stream -->
+        <div class="skeleton-stream" aria-hidden="true">
+          <div class="skeleton-item">
+            <div class="flex justify-between">
+              <div class="skeleton-line h-3 w-24"></div>
+              <div class="skeleton-line h-4 w-12"></div>
+            </div>
+            <div class="skeleton-line mt-3 h-6 w-3/4"></div>
+            <div class="skeleton-line mt-2 h-4 w-full"></div>
+          </div>
+          <div class="skeleton-item">
+            <div class="flex justify-between">
+              <div class="skeleton-line h-3 w-24"></div>
+              <div class="skeleton-line h-4 w-12"></div>
+            </div>
+            <div class="skeleton-line mt-3 h-6 w-2/3"></div>
+            <div class="skeleton-line mt-2 h-4 w-5/6"></div>
+          </div>
+          <div class="skeleton-item">
+            <div class="flex justify-between">
+              <div class="skeleton-line h-3 w-24"></div>
+              <div class="skeleton-line h-4 w-12"></div>
+            </div>
+            <div class="skeleton-line mt-3 h-6 w-1/2"></div>
+            <div class="skeleton-line mt-2 h-4 w-4/5"></div>
+          </div>
+          <div class="skeleton-item">
+            <div class="flex justify-between">
+              <div class="skeleton-line h-3 w-24"></div>
+              <div class="skeleton-line h-4 w-12"></div>
+            </div>
+            <div class="skeleton-line mt-3 h-6 w-3/5"></div>
+            <div class="skeleton-line mt-2 h-4 w-3/4"></div>
+          </div>
+        </div>
+
         <div data-post-pagination>
           <Pagination currentPage={currentPage} totalPages={totalPages} baseHref="/blog" queryParam="page" />
         </div>

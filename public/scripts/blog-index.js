@@ -114,7 +114,7 @@ const renderCombinedPosts = (runtimePosts = []) => {
   const boundedPage = Math.min(currentPage, totalPages);
   const visiblePosts = posts.slice((boundedPage - 1) * pageSize, boundedPage * pageSize);
 
-  postList.querySelectorAll('.post-card, [data-archive-empty]').forEach((node) => node.remove());
+  postList.querySelectorAll('.post-card, [data-archive-empty], .skeleton-stream').forEach((node) => node.remove());
   const renderedPosts = visiblePosts.map((post) => renderPost(post)).join('');
   postList.insertAdjacentHTML(
     'afterbegin',

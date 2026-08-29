@@ -80,6 +80,29 @@
     transform: translateX(4px);
   }
 
+  /* Zero-CLS Hairline Skeletons */
+  .skeleton-stream {
+    @apply grid gap-0;
+  }
+
+  .skeleton-item {
+    @apply border-b border-zinc-200 py-7 px-2 sm:px-4;
+  }
+
+  .skeleton-item:first-child {
+    @apply border-t border-zinc-200;
+  }
+
+  .skeleton-line {
+    @apply bg-zinc-200 rounded-sm;
+    animation: skeleton-pulse 1.6s ease-in-out infinite alternate;
+  }
+
+  @keyframes skeleton-pulse {
+    0% { opacity: 0.35; }
+    100% { opacity: 0.85; }
+  }
+
   .archive-page::before,
   .reading-page::before {
     display: none;

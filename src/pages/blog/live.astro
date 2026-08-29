@@ -1,76 +1,65 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import PageHeader from '../../components/PageHeader.astro';
 import Comments from '../../components/Comments.astro';
 import '../../styles/reading.css';
-import '../../styles/article-sidebar.css';
 ---
 
-<BaseLayout title="实时文章 | s1oop's Blog">
-  <article class="ui-page reading-page" data-live-post-page>
-    <PageHeader
-      eyebrow="reading"
-      title="文章阅读"
-      description="正在整理文章内容。"
-    >
-      <Fragment slot="actions">
-        <a href="/blog" class="ui-button">全部内容</a>
-      </Fragment>
-    </PageHeader>
+<BaseLayout title="文章阅读 | s1oop's Blog">
+  <article class="mx-auto w-full max-w-3xl px-5 py-8 sm:py-12" data-live-post-page>
+    <!-- Back link -->
+    <div class="mb-6">
+      <a href="/blog" class="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-wider text-zinc-500 hover:text-black no-underline transition">
+        <span aria-hidden="true">&larr;</span> 全部文章
+      </a>
+    </div>
 
-    <div class="ui-grid ui-page-body">
-      <div class="ui-stack">
-        <div class="post-content reading-surface ui-panel p-6 sm:p-8" data-live-post-content>
-          <p>正在读取文章。</p>
-        </div>
+    <!-- Article Header -->
+    <header class="border-b border-zinc-200 pb-6 sm:pb-8">
+      <h1 class="text-3xl font-bold leading-tight tracking-tight text-zinc-950 sm:text-4xl lg:text-5xl" style="font-family: var(--font-display);" data-live-post-title>
+        正在读取文章...
+      </h1>
+      <p class="mt-4 text-base leading-relaxed text-zinc-600 sm:text-lg" data-live-post-excerpt></p>
 
-        <nav class="reading-nav" aria-label="文章导航" data-live-post-nav hidden></nav>
-
-        <Comments />
+      <!-- Single-line Elegant Meta Bar -->
+      <div class="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-xs text-zinc-400">
+        <time data-live-post-date class="font-medium text-zinc-600">-</time>
+        <span aria-hidden="true">&middot;</span>
+        <span data-live-post-words>-</span>
+        <span aria-hidden="true">&middot;</span>
+        <span data-live-post-minutes>-</span>
+        <div class="flex flex-wrap items-center gap-1.5 pl-2" data-live-post-tags></div>
       </div>
+    </header>
 
-      <aside class="ui-sidebar reading-sidebar ui-stagger">
-        <section class="ui-panel">
-          <div class="ui-panel-header">
-            <h2 class="ui-panel-title">文章信息</h2>
-          </div>
-          <div class="ui-panel-body grid gap-4">
-            <div class="ui-stat-row">
-              <span class="ui-stat-label">日期</span>
-              <span class="ui-stat-value" data-live-post-date>-</span>
-            </div>
-            <div class="ui-stat-row" data-live-post-updated-row hidden>
-              <span class="ui-stat-label">最后编辑</span>
-              <span class="ui-stat-value" data-live-post-updated>-</span>
-            </div>
-            <div class="ui-stat-row">
-              <span class="ui-stat-label">类型</span>
-              <span class="ui-stat-value" data-live-post-type>-</span>
-            </div>
-            <div class="ui-stat-row">
-              <span class="ui-stat-label">字数</span>
-              <span class="ui-stat-value" data-live-post-words>-</span>
-            </div>
-            <div class="ui-stat-row">
-              <span class="ui-stat-label">阅读</span>
-              <span class="ui-stat-value" data-live-post-minutes>-</span>
-            </div>
-            <div class="grid gap-2 border-t border-white/10 pt-4">
-              <span class="ui-stat-label">标签</span>
-              <div class="flex flex-wrap gap-2" data-live-post-tags></div>
-            </div>
-          </div>
-        </section>
+    <!-- Main Content Stream -->
+    <div class="reading-surface mt-8 sm:mt-10">
+      <div class="post-content text-base sm:text-lg leading-8 sm:leading-9" data-live-post-content>
+        <div class="skeleton-stream" aria-hidden="true">
+          <div class="skeleton-line h-4 w-full"></div>
+          <div class="skeleton-line mt-3 h-4 w-5/6"></div>
+          <div class="skeleton-line mt-3 h-4 w-4/5"></div>
+          <div class="skeleton-line mt-6 h-4 w-full"></div>
+          <div class="skeleton-line mt-3 h-4 w-11/12"></div>
+        </div>
+      </div>
+    </div>
 
-        <section class="ui-panel">
-          <div class="ui-panel-header">
-            <h2 class="ui-panel-title">继续阅读</h2>
-          </div>
-          <div class="ui-panel-body article-related-list" data-live-related-posts>
-            <p class="text-sm text-zinc-400">正在整理相关内容。</p>
-          </div>
-        </section>
-      </aside>
+    <!-- Navigation between articles -->
+    <nav class="reading-nav mt-12" aria-label="文章导航" data-live-post-nav hidden></nav>
+
+    <!-- Related Articles -->
+    <section class="mt-12 border-t border-zinc-200 pt-8" data-live-related-section>
+      <h2 class="font-mono text-xs uppercase tracking-[0.18em] text-zinc-400 font-semibold">
+        继续阅读 / Related Posts
+      </h2>
+      <div class="mt-4 grid gap-2" data-live-related-posts>
+        <p class="text-sm text-zinc-400">正在整理相关文章...</p>
+      </div>
+    </section>
+
+    <!-- Comments Section -->
+    <div class="mt-12 border-t border-zinc-200 pt-8">
+      <Comments />
     </div>
   </article>
 

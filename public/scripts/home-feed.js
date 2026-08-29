@@ -48,8 +48,10 @@ if (homeFeed) {
       if (posts.length > 0) {
         homeFeed.innerHTML = posts.map((p) => renderHomePost(p)).join('');
       } else {
-        homeFeed.innerHTML = '<div class="py-8 text-center text-sm text-zinc-400">暂无最新文章。</div>';
+        homeFeed.innerHTML = '<div class="py-12 text-center text-sm text-zinc-400">暂无最新文章。</div>';
       }
     })
-    .catch(() => {});
+    .catch(() => {
+      homeFeed.innerHTML = '<div class="py-12 text-center text-sm text-zinc-400">文章加载失败，请稍后刷新。</div>';
+    });
 }
