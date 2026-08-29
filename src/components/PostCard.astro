@@ -22,34 +22,29 @@ const visibleTags = tags.slice(0, 2);
 const extraTagCount = Math.max(0, tags.length - visibleTags.length);
 ---
 
-<article class="post-card ui-panel ui-panel-link">
+<article class="post-card">
   <a href={href} class="post-card-link">
-    <div class="post-card-media">
-      {image && (
-        <img src={image.src} alt={image.alt} loading="lazy" decoding="async" />
-      )}
-      {!image && <span aria-hidden="true"></span>}
-      <time datetime={dateTime}>{displayDate}</time>
-    </div>
-    <div class="post-card-main">
+    <div class="post-card-header">
+      <time class="post-card-date" datetime={dateTime}>{displayDate}</time>
       <div class="post-card-meta">
         {visibleTags.map((tag) => (
-          <span class="ui-badge">
-            #{tag}
-          </span>
+          <span class="ui-badge">#{tag}</span>
         ))}
         {extraTagCount > 0 && (
-          <span class="ui-badge">
-            +{extraTagCount}
-          </span>
+          <span class="ui-badge">+{extraTagCount}</span>
         )}
       </div>
-      <h2 class="post-card-title">{title}</h2>
-      <p class="post-card-excerpt">{excerpt}</p>
-      <div class="post-card-action">
-        <span>阅读文章</span>
-        <span aria-hidden="true">-&gt;</span>
+    </div>
+    <h2 class="post-card-title">{title}</h2>
+    <p class="post-card-excerpt">{excerpt}</p>
+    {image?.src && (
+      <div class="post-card-media">
+        <img src={image.src} alt={image.alt || ''} loading="lazy" decoding="async" />
       </div>
+    )}
+    <div class="post-card-action">
+      <span>阅读全文</span>
+      <span aria-hidden="true">-&gt;</span>
     </div>
   </a>
 </article>

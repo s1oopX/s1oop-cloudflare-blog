@@ -36,18 +36,19 @@ const normalizeTime = (value) => {
 };
 
 const renderPost = (post) => `
-  <article class="post-card ui-panel ui-panel-link" data-runtime-post="${escapeHtml(post.slug)}">
+  <article class="post-card" data-runtime-post="${escapeHtml(post.slug)}">
     <a href="${escapeHtml(post.href)}" class="post-card-link">
-      <div class="post-card-media">
-        ${post.image ? `<img src="${escapeHtml(post.image.src)}" alt="${escapeHtml(post.image.alt)}" loading="lazy" decoding="async" />` : '<span aria-hidden="true"></span>'}
-        <time>${formatDate(post.date)}</time>
-      </div>
-      <div class="post-card-main">
+      <div class="post-card-header">
+        <time class="post-card-date">${formatDate(post.date)}</time>
         <div class="post-card-meta">${renderTags(post.tags)}</div>
-        <h2 class="post-card-title">${escapeHtml(post.title)}</h2>
-        <p class="post-card-excerpt">${escapeHtml(post.excerpt)}</p>
-        <div class="post-card-action"><span>阅读文章</span><span aria-hidden="true">-&gt;</span></div>
       </div>
+      <h2 class="post-card-title">${escapeHtml(post.title)}</h2>
+      <p class="post-card-excerpt">${escapeHtml(post.excerpt)}</p>
+      ${post.image?.src ? `
+      <div class="post-card-media">
+        <img src="${escapeHtml(post.image.src)}" alt="${escapeHtml(post.image.alt || '')}" loading="lazy" decoding="async" />
+      </div>` : ''}
+      <div class="post-card-action"><span>阅读全文</span><span aria-hidden="true">-&gt;</span></div>
     </a>
   </article>
 `;
@@ -117,7 +118,7 @@ const renderCombinedPosts = (runtimePosts = []) => {
   const renderedPosts = visiblePosts.map((post) => renderPost(post)).join('');
   postList.insertAdjacentHTML(
     'afterbegin',
-    renderedPosts || '<div class="ui-panel p-5 text-sm text-zinc-400" data-archive-empty>D1 暂无文章。</div>',
+    renderedPosts || '<div class="py-12 text-center text-sm text-zinc-400" data-archive-empty>暂无文章。</div>',
   );
   renderPagination(boundedPage, totalPages);
   updateArchivePathCounts(archivePathCounts);

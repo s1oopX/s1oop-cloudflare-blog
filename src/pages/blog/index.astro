@@ -34,7 +34,7 @@ const initialPostData: unknown[] = [];
         data-initial-posts={JSON.stringify(initialPostData)}
         data-archive-paths={JSON.stringify(archivePaths)}
       >
-        <div class="ui-panel p-5 text-sm text-zinc-400" data-archive-empty>正在读取 D1 文章。</div>
+        <div class="py-12 text-center text-sm text-zinc-400" data-archive-empty>正在读取文章列表...</div>
         <div data-post-pagination>
           <Pagination currentPage={currentPage} totalPages={totalPages} baseHref="/blog" queryParam="page" />
         </div>

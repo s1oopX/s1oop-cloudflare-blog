@@ -1,5 +1,5 @@
 ---
-import SiteStatusPanel from './SiteStatusPanel.astro';
+import { collections, collectionHref } from '../lib/collections';
 
 interface Props {
   postCount: number;
@@ -10,27 +10,34 @@ interface Props {
 const { postCount, tagCount, latestLabel } = Astro.props;
 ---
 
-<aside class="ui-sidebar ui-stagger">
-  <SiteStatusPanel />
-
-  <section class="ui-panel">
-    <div class="ui-panel-header">
-      <h2 class="ui-panel-title">阅读概览</h2>
-    </div>
-    <div class="ui-panel-body grid gap-4">
+<aside class="ui-sidebar">
+  <section class="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+    <h2 class="font-mono text-xs uppercase tracking-widest text-zinc-400 font-semibold">阅读概览</h2>
+    <div class="mt-4 grid gap-3">
       <div class="ui-stat-row">
-        <span class="ui-stat-label">文章</span>
+        <span class="ui-stat-label">文章总数</span>
         <span class="ui-stat-value" data-post-count>{postCount}</span>
       </div>
       <div class="ui-stat-row">
-        <span class="ui-stat-label">标签</span>
+        <span class="ui-stat-label">标签数量</span>
         <span class="ui-stat-value" data-tag-count>{tagCount}</span>
       </div>
       <div class="ui-stat-row">
-        <span class="ui-stat-label">最新</span>
+        <span class="ui-stat-label">最近更新</span>
         <span class="ui-stat-value" data-latest-post>{latestLabel}</span>
       </div>
     </div>
   </section>
 
+  <section class="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+    <h2 class="font-mono text-xs uppercase tracking-widest text-zinc-400 font-semibold">精选专栏</h2>
+    <div class="mt-3 grid gap-1">
+      {collections.map((col) => (
+        <a href={collectionHref(col)} class="group flex items-center justify-between py-2 text-sm text-zinc-600 no-underline transition hover:text-black">
+          <span class="font-medium">{col.title}</span>
+          <span class="font-mono text-xs text-zinc-400" data-archive-path-count={col.slug}>-</span>
+        </a>
+      ))}
+    </div>
+  </section>
 </aside>

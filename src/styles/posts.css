@@ -1,111 +1,86 @@
-  .post-card {
-    border-radius: var(--radius);
-    background: #ffffff;
+  .archive-post-list {
+    @apply grid gap-0;
   }
 
-  .archive-post-list {
-    @apply gap-4;
+  .post-card {
+    @apply border-b border-zinc-200 transition-colors;
+    background: transparent;
+  }
+
+  .post-card:first-child {
+    @apply border-t border-zinc-200;
   }
 
   .post-card-link {
-    @apply grid gap-4 no-underline sm:grid-cols-[12.5rem_minmax(0,1fr)];
-    padding: 1rem;
+    @apply relative block py-7 px-2 no-underline transition sm:px-4;
+    border-radius: var(--radius);
   }
 
-  .post-card-media {
-    @apply relative grid self-center overflow-hidden border;
-    grid-template-rows: auto auto;
-    border-color: var(--border);
-    border-radius: calc(var(--radius) - 2px);
-    background: #f4f4f5;
-  }
-
-  .post-card-media img,
-  .post-card-media > span {
-    @apply block w-full transition;
-    aspect-ratio: 16 / 9;
-    filter: grayscale(100%) contrast(1.05);
-  }
-
-  .post-card-media img {
-    @apply object-contain;
-  }
-
-  .post-card-media > span {
-    @apply object-cover;
-    background:
-      linear-gradient(135deg, rgb(0 0 0 / 0.03), transparent 60%),
-      repeating-linear-gradient(135deg, rgb(0 0 0 / 0.015) 0 1px, transparent 1px 0.75rem);
-  }
-
-  .post-card-media::after {
-    content: '';
-    @apply pointer-events-none absolute inset-x-0 top-0;
-    aspect-ratio: 16 / 9;
-    background:
-      linear-gradient(180deg, transparent 50%, rgb(0 0 0 / 0.15));
-  }
-
-  .post-card-media time {
-    @apply relative z-10 px-3 py-1.5 font-mono text-xs uppercase tracking-[0.12em];
-    color: var(--muted);
+  .post-card-link:hover {
     background: #ffffff;
-    border-top: 1px solid var(--border);
+    box-shadow: 0 4px 20px rgb(0 0 0 / 0.03);
   }
 
-  .ui-panel-link:hover .post-card-media img {
-    filter: grayscale(40%) contrast(1.08);
+  .post-card-header {
+    @apply flex flex-wrap items-center justify-between gap-3 text-xs;
   }
 
-  .post-card-main {
-    @apply min-w-0 self-center py-1;
+  .post-card-date {
+    @apply font-mono uppercase tracking-[0.14em] text-zinc-400 font-medium;
   }
 
   .post-card-meta {
-    @apply flex flex-wrap gap-1.5;
+    @apply flex flex-wrap items-center gap-1.5;
   }
 
   .post-card-title {
-    @apply mt-2.5 text-xl font-semibold text-zinc-950 sm:text-2xl;
+    @apply mt-3 text-xl font-bold leading-snug text-zinc-950 transition sm:text-2xl;
     font-family: var(--font-display);
-    letter-spacing: 0;
-    overflow-wrap: anywhere;
+    letter-spacing: -0.01em;
+  }
+
+  .post-card-link:hover .post-card-title {
+    color: #000000;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1.5px;
   }
 
   .post-card-excerpt {
-    @apply mt-2 max-w-2xl text-sm leading-7 text-zinc-600;
+    @apply mt-2.5 max-w-3xl text-sm leading-7 text-zinc-600 sm:text-base;
     display: -webkit-box;
     overflow: hidden;
-    min-height: 3.5rem;
-    overflow-wrap: anywhere;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
   }
 
-  .post-card-action {
-    @apply mt-4 inline-flex items-center gap-2 text-sm font-semibold text-zinc-900;
+  .post-card-media {
+    @apply mt-4 max-h-56 max-w-md overflow-hidden rounded-md border border-zinc-200;
   }
 
-  .ui-panel-link:hover .post-card-action {
-    color: #000000;
+  .post-card-media img {
+    @apply h-full w-full object-cover grayscale transition duration-300;
+    filter: grayscale(100%) contrast(1.05);
+  }
+
+  .post-card-link:hover .post-card-media img {
+    filter: grayscale(20%) contrast(1.08);
+    transform: scale(1.02);
+  }
+
+  .post-card-action {
+    @apply mt-4 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-zinc-900 font-semibold transition;
   }
 
   .post-card-action span:last-child {
-    @apply transition;
+    @apply transition-transform duration-150;
   }
 
-  .ui-panel-link:hover .post-card-action span:last-child {
-    transform: translateX(0.25rem);
+  .post-card-link:hover .post-card-action span:last-child {
+    transform: translateX(4px);
   }
 
   .archive-page::before,
-  .reading-page::before {
-    content: '';
-    @apply pointer-events-none absolute inset-x-5 top-0 -z-10 h-56;
-    background: radial-gradient(circle at 50% 0%, rgb(0 0 0 / 0.02), transparent 20rem);
-    filter: blur(1px);
-  }
-
   .reading-page::before {
     display: none;
   }
